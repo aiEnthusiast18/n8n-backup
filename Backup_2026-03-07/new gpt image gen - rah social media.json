@@ -1,0 +1,135 @@
+{
+  "updatedAt": "2025-12-21T20:19:26.570Z",
+  "createdAt": "2025-12-21T19:56:38.661Z",
+  "id": "GPVuPZVUWmQ8Clyf",
+  "name": "new gpt image gen - rah social media",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Following the provided instructions, generate a social media visual to accompany the following post. Ensure to incorporate text elements from the post.\n\nImage description: {{ $json['Image Description'] }}\n\nPost Text: {{ $json['Post Text'] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        336,
+        832
+      ],
+      "id": "2903702f-8450-4ff0-b581-f895f4c4b69a",
+      "name": "Generate an image",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "GPT Image Gen",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Image Description",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Post Text",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        832
+      ],
+      "id": "ef3e4714-141d-486a-9f3b-146a99f59383",
+      "name": "On form submission",
+      "webhookId": "704de4e4-0bab-4950-86be-719757ec2f9c"
+    },
+    {
+      "parameters": {
+        "name": "=GPT Image Gen RAH Social Media ({{ $now }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        544,
+        832
+      ],
+      "id": "b2259fd2-ca10-40a7-9bd3-22b34eb3c8d6",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e8b88687-6172-46e3-aec5-5b280e0faa6e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-21T19:56:38.667Z",
+      "createdAt": "2025-12-21T19:56:38.667Z",
+      "role": "workflow:owner",
+      "workflowId": "GPVuPZVUWmQ8Clyf",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
