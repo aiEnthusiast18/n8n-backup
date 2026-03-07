@@ -1,0 +1,1143 @@
+{
+  "updatedAt": "2026-03-05T03:09:28.022Z",
+  "createdAt": "2025-09-18T23:34:05.258Z",
+  "id": "XD7X1QrgxmQUdKcW",
+  "name": "Drive Image Retrieval",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        -96
+      ],
+      "id": "ef5d1e1e-ed74-4841-b71a-0662ed366fc4",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N Counter Node - JavaScript Code\n// This node maintains a counter that increments by 1 each time the workflow runs\n\n// Get workflow static data (persists between executions)\nconst staticData = $getWorkflowStaticData('global');\n\n// Try to get the current counter value\nlet currentCount = staticData.counter;\n\n// If counter doesn't exist, initialize it to 0\nif (currentCount === undefined) {\n  currentCount = 0;\n}\n\n// Increment the counter\ncurrentCount += 1;\n\n// Save the updated counter back to workflow static data\nstaticData.counter = currentCount;\n\n// Return the current count value\nreturn [\n  {\n    json: {\n      counter: currentCount,\n      message: `Workflow has been executed ${currentCount} time(s)`,\n      timestamp: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "573600ae-1274-4005-918d-30307c00b9fe",
+      "name": "Counter"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -592
+      ],
+      "id": "4a23db16-dedf-4ee1-a46f-2feec1446b35",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "folderId": "%2Fpersonal%2Frida_anagomb_ca%2FDocuments%2Fn8n%20test"
+      },
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -592
+      ],
+      "id": "2f059566-bf70-40a3-8f0c-d710075fc107",
+      "name": "Get items in a folder",
+      "credentials": {
+        "microsoftOneDriveOAuth2Api": {
+          "id": "aVvzENvstzaCJG6f",
+          "name": "Microsoft Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Counter').item.json.counter }}.JP",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo",
+            "mode": "list",
+            "cachedResultName": "n8n test",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        -96
+      ],
+      "id": "4592722f-9faf-445f-a05d-9bb7eb3f04db",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Rida Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "commenter",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1632,
+        -96
+      ],
+      "id": "354ca571-d7d4-4055-a83a-865e2b353873",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Rida Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Search files and folders').item.json.name }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo",
+            "mode": "list",
+            "cachedResultName": "n8n test",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo"
+          }
+        },
+        "options": {
+          "fields": [
+            "webViewLink"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1888,
+        -96
+      ],
+      "id": "c4a9b5bb-0d3b-41f6-b6cb-721f5eadac0b",
+      "name": "Search files and folders1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Rida Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4",
+          "mode": "list",
+          "cachedResultName": "Social media automation rah copy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Unique ID",
+              "displayName": "Unique ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic Approval",
+              "displayName": "Topic Approval",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post_DateandTime",
+              "displayName": "Post_DateandTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Insta",
+              "displayName": "Insta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FB",
+              "displayName": "FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Review Status",
+              "displayName": "Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled Post Date and Time",
+              "displayName": "Scheduled Post Date and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File ID",
+              "displayName": "File ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        -624
+      ],
+      "id": "9703a883-e073-480a-96d8-6fe3934c33c0",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "- Use the Google Drive tool and count files in Google Drive folder.\n- Return the result as digits only (e.g. `7`).",
+        "options": {
+          "systemMessage": "You are an automated agent that uses the Google Drive tool to count files. When asked, you MUST:\n- Use the Google Drive tool to retrieve all files in the specified folder only.\n- Respond with the file count and the file count only. The response must be a single token containing digits (e.g. `42`) with no extra text, punctuation, JSON, code fences, whitespace before/after, or explanation. Nothing else.\n- If the folder is empty, inaccessible, or does not exist, output `0` and nothing else.\n- Do not log, do not return metadata, and do not include error messages in the response body — only the numeric count."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        -96
+      ],
+      "id": "90cd07b0-b226-4afa-a0b9-bca927d59b56",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo",
+            "mode": "list",
+            "cachedResultName": "n8n test",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        768,
+        112
+      ],
+      "id": "1c7e745e-0485-428a-81ba-aa009a4b14bb",
+      "name": "Search files and folders in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Rida Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        112
+      ],
+      "id": "4abe1e25-5c47-4366-9c50-e7f5f2149ef5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c99fe21-01c2-4c8f-b00c-3b2008db8330",
+              "leftValue": "={{ $('Counter').item.json.counter }}",
+              "rightValue": "={{ $json.output }}",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        -96
+      ],
+      "id": "afc973a8-4ee9-4f89-b473-f88ba0950609",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $('Counter').item.json.counter - $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "e73f8aa4-48a2-499b-beae-e8ee1d873d5c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## fetches pictures from drive folder for social media workflow \ncounter +=\n",
+        "width": 336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -624
+      ],
+      "id": "3a0ae798-7d70-4bbd-b499-080e232bb464",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Counter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Get items in a folder": {
+      "main": [
+        []
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders1": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": {
+    "global": {
+      "counter": 5
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "740ae164-7ea8-4348-8c95-bced11646cbd",
+  "activeVersionId": "740ae164-7ea8-4348-8c95-bced11646cbd",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-18T23:34:05.261Z",
+      "createdAt": "2025-09-18T23:34:05.261Z",
+      "role": "workflow:owner",
+      "workflowId": "XD7X1QrgxmQUdKcW",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-05T03:09:55.000Z",
+    "createdAt": "2026-03-05T03:09:28.023Z",
+    "versionId": "740ae164-7ea8-4348-8c95-bced11646cbd",
+    "workflowId": "XD7X1QrgxmQUdKcW",
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -144,
+          -96
+        ],
+        "id": "ef5d1e1e-ed74-4841-b71a-0662ed366fc4",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "// N8N Counter Node - JavaScript Code\n// This node maintains a counter that increments by 1 each time the workflow runs\n\n// Get workflow static data (persists between executions)\nconst staticData = $getWorkflowStaticData('global');\n\n// Try to get the current counter value\nlet currentCount = staticData.counter;\n\n// If counter doesn't exist, initialize it to 0\nif (currentCount === undefined) {\n  currentCount = 0;\n}\n\n// Increment the counter\ncurrentCount += 1;\n\n// Save the updated counter back to workflow static data\nstaticData.counter = currentCount;\n\n// Return the current count value\nreturn [\n  {\n    json: {\n      counter: currentCount,\n      message: `Workflow has been executed ${currentCount} time(s)`,\n      timestamp: new Date().toISOString()\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          192,
+          -96
+        ],
+        "id": "573600ae-1274-4005-918d-30307c00b9fe",
+        "name": "Counter"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -16,
+          -592
+        ],
+        "id": "4a23db16-dedf-4ee1-a46f-2feec1446b35",
+        "name": "When clicking ‘Execute workflow’",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "resource": "folder",
+          "folderId": "%2Fpersonal%2Frida_anagomb_ca%2FDocuments%2Fn8n%20test"
+        },
+        "type": "n8n-nodes-base.microsoftOneDrive",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -592
+        ],
+        "id": "2f059566-bf70-40a3-8f0c-d710075fc107",
+        "name": "Get items in a folder",
+        "credentials": {
+          "microsoftOneDriveOAuth2Api": {
+            "id": "aVvzENvstzaCJG6f",
+            "name": "Microsoft Drive account 2"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "queryString": "={{ $('Counter').item.json.counter }}.JP",
+          "returnAll": true,
+          "filter": {
+            "folderId": {
+              "__rl": true,
+              "value": "1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo",
+              "mode": "list",
+              "cachedResultName": "n8n test",
+              "cachedResultUrl": "https://drive.google.com/drive/folders/1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo"
+            }
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          1376,
+          -96
+        ],
+        "id": "4592722f-9faf-445f-a05d-9bb7eb3f04db",
+        "name": "Search files and folders",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "q78V8eBUVKK8J2at",
+            "name": "Rida Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "share",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "permissionsUi": {
+            "permissionsValues": {
+              "role": "commenter",
+              "type": "anyone"
+            }
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          1632,
+          -96
+        ],
+        "id": "354ca571-d7d4-4055-a83a-865e2b353873",
+        "name": "Share file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "q78V8eBUVKK8J2at",
+            "name": "Rida Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "queryString": "={{ $('Search files and folders').item.json.name }}",
+          "filter": {
+            "folderId": {
+              "__rl": true,
+              "value": "1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo",
+              "mode": "list",
+              "cachedResultName": "n8n test",
+              "cachedResultUrl": "https://drive.google.com/drive/folders/1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo"
+            }
+          },
+          "options": {
+            "fields": [
+              "webViewLink"
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          1888,
+          -96
+        ],
+        "id": "c4a9b5bb-0d3b-41f6-b6cb-721f5eadac0b",
+        "name": "Search files and folders1",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "q78V8eBUVKK8J2at",
+            "name": "Rida Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4",
+            "mode": "list",
+            "cachedResultName": "Social media automation rah copy",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Unique ID",
+                "displayName": "Unique ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Topic Approval",
+                "displayName": "Topic Approval",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Post_DateandTime",
+                "displayName": "Post_DateandTime",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Linkedin",
+                "displayName": "Linkedin",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Insta",
+                "displayName": "Insta",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "FB",
+                "displayName": "FB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Review Status",
+                "displayName": "Review Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Image URL",
+                "displayName": "Image URL",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Scheduled Post Date and Time",
+                "displayName": "Scheduled Post Date and Time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "File ID",
+                "displayName": "File ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1040,
+          -624
+        ],
+        "id": "9703a883-e073-480a-96d8-6fe3934c33c0",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "- Use the Google Drive tool and count files in Google Drive folder.\n- Return the result as digits only (e.g. `7`).",
+          "options": {
+            "systemMessage": "You are an automated agent that uses the Google Drive tool to count files. When asked, you MUST:\n- Use the Google Drive tool to retrieve all files in the specified folder only.\n- Respond with the file count and the file count only. The response must be a single token containing digits (e.g. `42`) with no extra text, punctuation, JSON, code fences, whitespace before/after, or explanation. Nothing else.\n- If the folder is empty, inaccessible, or does not exist, output `0` and nothing else.\n- Do not log, do not return metadata, and do not include error messages in the response body — only the numeric count."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          608,
+          -96
+        ],
+        "id": "90cd07b0-b226-4afa-a0b9-bca927d59b56",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "returnAll": true,
+          "filter": {
+            "folderId": {
+              "__rl": true,
+              "value": "1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo",
+              "mode": "list",
+              "cachedResultName": "n8n test",
+              "cachedResultUrl": "https://drive.google.com/drive/folders/1vb8iA2H5kmVNAZqqVxPqpW12ghHrIPpo"
+            }
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTool",
+        "typeVersion": 3,
+        "position": [
+          768,
+          112
+        ],
+        "id": "1c7e745e-0485-428a-81ba-aa009a4b14bb",
+        "name": "Search files and folders in Google Drive",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "q78V8eBUVKK8J2at",
+            "name": "Rida Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          480,
+          112
+        ],
+        "id": "4abe1e25-5c47-4366-9c50-e7f5f2149ef5",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "5c99fe21-01c2-4c8f-b00c-3b2008db8330",
+                "leftValue": "={{ $('Counter').item.json.counter }}",
+                "rightValue": "={{ $json.output }}",
+                "operator": {
+                  "type": "number",
+                  "operation": "lte"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          960,
+          -96
+        ],
+        "id": "afc973a8-4ee9-4f89-b473-f88ba0950609",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={{ $('Counter').item.json.counter - $('AI Agent').item.json.output }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1168,
+          0
+        ],
+        "id": "e73f8aa4-48a2-499b-beae-e8ee1d873d5c",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "content": "## fetches pictures from drive folder for social media workflow \ncounter +=\n",
+          "width": 336
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          432,
+          -624
+        ],
+        "id": "3a0ae798-7d70-4bbd-b499-080e232bb464",
+        "name": "Sticky Note"
+      }
+    ],
+    "connections": {
+      "Counter": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          []
+        ]
+      },
+      "Get items in a folder": {
+        "main": [
+          []
+        ]
+      },
+      "Search files and folders": {
+        "main": [
+          [
+            {
+              "node": "Share file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Counter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Share file": {
+        "main": [
+          [
+            {
+              "node": "Search files and folders1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Search files and folders1": {
+        "main": [
+          []
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Search files and folders in Google Drive": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Search files and folders",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 740ae164",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
