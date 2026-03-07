@@ -1,0 +1,292 @@
+{
+  "updatedAt": "2026-01-28T17:28:23.188Z",
+  "createdAt": "2026-01-28T17:26:10.349Z",
+  "id": "H_8JuIlhzIKHy1NByvVr6",
+  "name": "Google Drive Monitor - Folder1",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Folder1"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "7f03e2a0-fbce-4b5c-8e19-c0178af9be0e",
+      "name": "Google Drive Trigger - Folder1",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        288,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{ $json.id }}",
+        "options": {}
+      },
+      "id": "d9cd34c4-6613-42e4-916a-28ae85726ab9",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        512,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1e2d3c4-b5a6-9788-0011-223344556677",
+              "name": "fileName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "a2b3c4d5-e6f7-8990-1122-334455667788",
+              "name": "folderName",
+              "value": "Folder1",
+              "type": "string"
+            },
+            {
+              "id": "b3c4d5e6-f7a8-9900-1122-334455667788",
+              "name": "recipientEmail",
+              "value": "recipient@example.com",
+              "type": "string"
+            },
+            {
+              "id": "c4d5e6f7-a8b9-0011-2233-445566778899",
+              "name": "emailSubject",
+              "value": "New File Added to Folder1 Folder",
+              "type": "string"
+            },
+            {
+              "id": "d5e6f7a8-b9c0-1122-3344-556677889900",
+              "name": "emailBody",
+              "value": "A new file has been added to your Google Drive folder.\n\nFolder: Folder1\nFile Name: {{ $json.name }}\nAdded: {{ $json.createdTime }}\n\nThe file is attached to this email.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "439e3b8b-daf9-4645-9089-3a285942dd88",
+      "name": "Prepare Email Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        16
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d3fb2a21-d82e-492b-8367-df3ade44dfd0",
+      "name": "Send Email via Outlook",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Folder2"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "8195f334-8a9a-4e1b-ac4c-1cf3b456d336",
+      "name": "Google Drive Trigger - Folder2",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        288,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{ $json.id }}",
+        "options": {}
+      },
+      "id": "ae1d8d85-8616-43e6-9849-e5da14020f01",
+      "name": "Download File1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        512,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1a2a3a4-a5a6-a7a8-a9a0-b1b2b3b4b5b6",
+              "name": "fileName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "b2b3b4b5-b6b7-b8b9-b0c1-c2c3c4c5c6c7",
+              "name": "folderName",
+              "value": "Folder2",
+              "type": "string"
+            },
+            {
+              "id": "c3c4c5c6-c7c8-c9d0-d1d2-d3d4d5d6d7d8",
+              "name": "recipientEmail",
+              "value": "recipient@example.com",
+              "type": "string"
+            },
+            {
+              "id": "d4d5d6d7-d8d9-e0e1-e2e3-e4e5e6e7e8e9",
+              "name": "emailSubject",
+              "value": "New File Added to Folder2 Folder",
+              "type": "string"
+            },
+            {
+              "id": "e5e6e7e8-e9f0-f1f2-f3f4-f5f6f7f8f9g0",
+              "name": "emailBody",
+              "value": "A new file has been added to your Google Drive folder.\n\nFolder: Folder2\nFile Name: {{ $json.name }}\nAdded: {{ $json.createdTime }}\n\nThe file is attached to this email.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3433b0c0-60f0-4ab5-9aed-95e40eba7af8",
+      "name": "Prepare Email Data1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        288
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3dd8b53a-4b3e-4726-a3a0-6fb6d36f7a74",
+      "name": "Send Email via Outlook1",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Google Drive Receipt Monitor Workflows\n\nTwo n8n workflows that automatically monitor Google Drive folders and send email notifications via Outlook when new receipt files are added.\n\n## Workflows\n\n### 1. google-drive-folder1-monitor.json\nMonitors the first Google Drive folder (placeholder: \"Folder1\")\n\n### 2. google-drive-folder2-monitor.json\nMonitors the second Google Drive folder (placeholder: \"Folder2\")\n\n## Architecture\n\nEach workflow follows the same pattern:\n```\nGoogle Drive Trigger → Download File → Prepare Email Data → Send Email via Outlook\n```\n\n- **Google Drive Trigger**: Polls folder every minute for new files\n- **Download File**: Downloads the file as binary data\n- **Prepare Email Data**: Formats email content with folder identification\n- **Send Email via Outlook**: Sends notification with file attached\n\n## Prerequisites\n\nBefore deploying, you need to set up OAuth2 credentials in your n8n instance.\n\n### 1. Google OAuth2 Credentials\n\n**In Google Cloud Console**:\n1. Go to https://console.cloud.google.com\n2. Create a new project or select existing\n3. Enable Google Drive API\n4. Go to \"Credentials\" → \"Create Credentials\" → \"OAuth 2.0 Client ID\"\n5. Application type: Web application\n6. Add authorized redirect URI: `https://n8n.204it.ca/rest/oauth2-credential/callback`\n7. Copy Client ID and Client Secret\n\n**In n8n**:\n1. Go to Settings → Credentials\n2. Click \"Create New Credential\"\n3. Select \"Google OAuth2 API\"\n4. Paste Client ID and Client Secret\n5. Add scope: `https://www.googleapis.com/auth/drive.readonly`\n6. Click \"Connect to Google\" and authorize\n7. Save the credential\n\n### 2. Microsoft Outlook OAuth2 Credentials\n\n**In Azure Portal**:\n1. Go to https://portal.azure.com\n2. Navigate to Azure Active Directory → App registrations\n3. Click \"New registration\"\n4. Name: \"n8n Outlook Integration\"\n5. Add redirect URI: `https://n8n.204it.ca/rest/oauth2-credential/callback`\n6. Go to \"Certificates & secrets\" → Create new client secret\n7. Copy the secret value (shown only once)\n8. Go to \"API permissions\" → Add permission → Microsoft Graph → Delegated permissions\n9. Add: `Mail.Send`\n10. Copy Application (client) ID and Directory (tenant) ID from Overview page\n\n**In n8n**:\n1. Go to Settings → Credentials\n2. Click \"Create New Credential\"\n3. Select \"Microsoft Outlook OAuth2 API\"\n4. Paste Application ID, Directory ID, and Client Secret\n5. Click \"Connect to Microsoft\" and authorize\n6. Save the credential\n\n## Deployment Steps\n\n### Option A: Import via n8n UI (Recommended)\n\n1. Open your n8n instance: https://n8n.204it.ca\n2. Click \"Add workflow\" → \"Import from File\"\n3. Select [google-drive-folder1-monitor.json](google-drive-folder1-monitor.json)\n4. The workflow will open in the editor\n5. Configure credentials:\n   - Click on \"Google Drive Trigger - Folder1\" node\n   - Select your Google OAuth2 credential\n   - Click on \"Download File\" node\n   - Select the same Google OAuth2 credential\n   - Click on \"Send Email via Outlook\" node\n   - Select your Microsoft Outlook OAuth2 credential\n6. Update placeholder values (see Configuration section below)\n7. Click \"Save\"\n8. Repeat steps 2-7 for [google-drive-folder2-monitor.json](google-drive-folder2-monitor.json)\n\n### Option B: Deploy via n8n API\n\n```bash\n# Deploy Workflow 1\ncurl -X POST https://n8n.204it.ca/api/v1/workflows \\\n  -H \"X-N8N-API-KEY: your-api-key-here\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @google-drive-folder1-monitor.json\n\n# Deploy Workflow 2\ncurl -X POST https://n8n.204it.ca/api/v1/workflows \\\n  -H \"X-N8N-API-KEY: your-api-key-here\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @google-drive-folder2-monitor.json\n```\n\nNote: API key can be found in your `.mcp.json` file (but don't commit it to git!)\n\n## Configuration\n\nAfter importing, you MUST update these placeholder values in each workflow:\n\n### Workflow 1: google-drive-folder1-monitor\n\n**Node: \"Google Drive Trigger - Folder1\"**\n- Current value: `\"Folder1\"`\n- Change to: Your actual first folder name (case-sensitive)\n\n**Node: \"Prepare Email Data\"** - Update all 3 values:\n1. `folderName`: Change from `\"Folder1\"` to actual folder name\n2. `recipientEmail`: Change from `\"recipient@example.com\"` to actual recipient email\n3. `emailSubject`: Update \"Folder1\" reference to match actual folder name\n4. `emailBody`: Update \"Folder1\" reference to match actual folder name\n\n### Workflow 2: google-drive-folder2-monitor\n\n**Node: \"Google Drive Trigger - Folder2\"**\n- Current value: `\"Folder2\"`\n- Change to: Your actual second folder name (case-sensitive)\n\n**Node: \"Prepare Email Data\"** - Update all 3 values:\n1. `folderName`: Change from `\"Folder2\"` to actual folder name\n2. `recipientEmail`: Change from `\"recipient@example.com\"` to actual recipient email\n3. `emailSubject`: Update \"Folder2\" reference to match actual folder name\n4. `emailBody`: Update \"Folder2\" reference to match actual folder name\n\n### Quick Configuration Checklist\n\n- [ ] Import both workflows to n8n\n- [ ] Connect Google OAuth2 credentials to all Google Drive nodes\n- [ ] Connect Microsoft Outlook OAuth2 credentials to Outlook nodes\n- [ ] Update Folder1 name in workflow 1\n- [ ] Update Folder2 name in workflow 2\n- [ ] Update recipient email in both workflows\n- [ ] Update email subject/body to match actual folder names\n- [ ] Test both workflows manually\n- [ ] Activate both workflows\n\n## Testing\n\n### Manual Test (Recommended Before Activation)\n\n1. Open workflow in n8n editor\n2. Click \"Execute Workflow\" button (play icon)\n3. Manually add a test file to the monitored Google Drive folder\n4. Wait up to 1 minute for polling\n5. Check execution in n8n:\n   - Should show green success\n   - Check each node output\n   - Verify binary data in \"Download File\" node\n6. Check recipient email inbox:\n   - Should receive email within 1-2 minutes\n   - Verify correct subject line\n   - Verify correct folder name in body\n   - Verify file is attached and opens correctly\n\n### Live Test\n\n1. Activate workflow by toggling \"Active\" switch\n2. Upload real receipt file to folder\n3. Wait for notification email (max 1 minute)\n4. Verify email content and attachment\n5. Repeat for second folder\n\n### Troubleshooting Failed Tests\n\n**No execution triggered**:\n- Check workflow is activated (green toggle)\n- Verify folder name is exact match (case-sensitive)\n- Check Google OAuth2 credential is valid\n- Wait full minute (polling interval)\n\n**Execution fails at Download node**:\n- Verify file still exists in Google Drive\n- Check OAuth2 permissions include drive.readonly\n- Verify file is not corrupted\n\n**Execution fails at Email node**:\n- Check Outlook OAuth2 credential is valid\n- Verify Mail.Send permission granted\n- Check recipient email is valid\n- Check attachment size < 50MB\n\n## Email Template\n\nWhen a file is added, the recipient receives:\n\n**Subject**: `New File Added to [FolderName] Folder`\n\n**Body**:\n```\nA new file has been added to your Google Drive folder.\n\nFolder: [FolderName]\nFile Name: [FileName]\nAdded: [Timestamp]\n\nThe file is attached to this email.\n```\n\n**Attachment**: Original file from Google Drive\n\n## How It Works\n\n### Polling Mechanism\n\n- Workflows check folders **every minute**\n- Google Drive Trigger node maintains state to detect new files\n- Only fires when new files are created (not updates/deletes)\n- Processes one file per execution\n\n### Binary Data Handling\n\n1. **Download**: File stored as binary data in `$binary.data`\n2. **Pass-through**: Binary data automatically flows through Set node\n3. **Attach**: Outlook node reads from `binaryPropertyName: \"data\"`\n4. No manual encoding needed - n8n handles it\n\n### File Size Limits\n\n- n8n default max: **50MB** per file\n- Files larger than limit will fail at Download or Email node\n- To handle larger files, consider sending Google Drive share link instead of attachment\n\n## Monitoring and Maintenance\n\n### Check Execution History\n\n1. Open workflow in n8n\n2. Click \"Executions\" tab\n3. Review recent executions:\n   - Green = Success\n   - Red = Failed\n4. Click execution to see details and node outputs\n\n### Common Maintenance Tasks\n\n**Weekly**:\n- Review execution history for errors\n- Check email delivery (ask recipient)\n\n**Monthly**:\n- Check API quota usage in Google Cloud Console\n- Verify OAuth2 credentials still valid\n\n**As Needed**:\n- Update folder names if folders renamed in Google Drive\n- Update recipient email address\n- Adjust polling interval (if needed)\n\n### Changing Folder Names\n\nIf you rename folders in Google Drive:\n1. Open workflow in n8n\n2. Edit \"Google Drive Trigger\" node\n3. Update \"Folder to Watch\" value\n4. Edit \"Prepare Email Data\" node\n5. Update `folderName`, `emailSubject`, and `emailBody` to match\n6. Save workflow\n\n### Changing Recipient Email\n\n1. Open workflow in n8n\n2. Edit \"Prepare Email Data\" node\n3. Update `recipientEmail` value\n4. Save workflow\n\n### Adjusting Polling Interval\n\nCurrent: Every minute (fastest, most API usage)\n\nTo change:\n1. Open workflow\n2. Edit \"Google Drive Trigger\" node\n3. Expand \"Options\"\n4. Change \"Poll Times\" to:\n   - Every minute\n   - Every 5 minutes\n   - Every 15 minutes\n   - Every hour\n   - Custom interval\n5. Save workflow\n\n## API Quota Usage\n\n### Google Drive API\n- **Free tier**: 20,000 requests/day per user\n- **Our usage**: 2 workflows × 1,440 polls/day = 2,880 requests/day\n- **Percentage**: ~14% of free tier\n- **Cost**: $0/month\n\n### Microsoft Graph API (Outlook)\n- **Free tier**: 10,000 requests/day per app\n- **Our usage**: Variable (depends on file additions)\n- Typical: <100 requests/day\n- **Cost**: $0/month\n\nBoth APIs are well within free tiers.\n\n## Security Considerations\n\n- OAuth2 tokens stored encrypted in n8n database\n- Credentials never exposed in workflow JSON\n- `.mcp.json` file contains API key - **do not commit to git**\n- `.gitignore` configured to protect sensitive files\n- Email recipient hardcoded (not user-controlled)\n- Consider using Google service account for production\n\n## Workflow Structure Details\n\n### Node Flow\n\n```\n┌─────────────────────────────┐\n│ Google Drive Trigger        │\n│ - Monitors specific folder  │\n│ - Polls every minute        │\n│ - Detects new files only    │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│ Download File               │\n│ - Gets file by ID           │\n│ - Stores as binary data     │\n│ - Property: \"data\"          │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│ Prepare Email Data          │\n│ - Sets folder name          │\n│ - Sets recipient email      │\n│ - Formats subject/body      │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│ Send Email via Outlook      │\n│ - Sends to recipient        │\n│ - Attaches binary file      │\n│ - Uses email template       │\n└─────────────────────────────┘\n```\n\n### Expression Syntax Used\n\n- `={{ $json.id }}` - File ID from trigger\n- `={{ $json.name }}` - File name from trigger\n- `={{ $json.createdTime }}` - Timestamp from trigger\n- `={{ $json.recipientEmail }}` - From Set node\n- `={{ $json.emailSubject }}` - From Set node\n- `={{ $json.emailBody }}` - From Set node\n\n## Extending the Workflows\n\n### Add More Recipients\n\nIn \"Prepare Email Data\" node, change:\n```json\n\"recipientEmail\": \"email1@example.com,email2@example.com,email3@example.com\"\n```\n\n### Add More Folders\n\nSimply clone an existing workflow and update folder references.\n\n### Add Slack Notifications\n\nAfter \"Prepare Email Data\" node:\n1. Add Slack node\n2. Configure channel and message\n3. Connect in parallel with Outlook node\n\n### Add Error Notifications\n\n1. Add \"Error Trigger\" node\n2. Connect to Slack/Email node\n3. Send alert when workflow fails\n\n### Filter by File Type\n\nAfter \"Google Drive Trigger\", add IF node:\n```javascript\n// Only process PDF files\n{{ $json.mimeType === 'application/pdf' }}\n```\n\n## Support and Resources\n\n- **n8n Instance**: https://n8n.204it.ca\n- **n8n Documentation**: https://docs.n8n.io\n- **Google Drive API Docs**: https://developers.google.com/drive\n- **Microsoft Graph API Docs**: https://docs.microsoft.com/graph\n- **Plan file**: `/Users/ridalakhani/.claude/plans/atomic-hopping-creek.md`\n\n## Changelog\n\n### 2026-01-28 - Initial Creation\n- Created two workflow files for monitoring Google Drive folders\n- Configured every-minute polling for responsive notifications\n- Set up Outlook email integration with attachments\n- Added comprehensive documentation\n\n---\n\n**Status**: Ready for deployment\n**Last Updated**: 2026-01-28\n",
+        "height": 9376,
+        "width": 1168
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -304
+      ],
+      "id": "0d0163b6-7517-4a1c-9f3f-e4f402df628a",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger - Folder1": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger - Folder2": {
+      "main": [
+        [
+          {
+            "node": "Download File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "f6a3e4de-78df-44cb-b8b8-ca1485437b55",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T17:26:10.353Z",
+      "createdAt": "2026-01-28T17:26:10.353Z",
+      "role": "workflow:owner",
+      "workflowId": "H_8JuIlhzIKHy1NByvVr6",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
