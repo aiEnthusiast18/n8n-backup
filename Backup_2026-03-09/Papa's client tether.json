@@ -1,0 +1,799 @@
+{
+  "updatedAt": "2025-09-11T22:15:51.000Z",
+  "createdAt": "2025-09-11T00:01:11.146Z",
+  "id": "DebkzM20MXq5b9Im",
+  "name": "Papa's client tether",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "62478346-87e1-4f3b-a026-ca0710244733",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -960,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE",
+          "mode": "list",
+          "cachedResultName": "Anago Client Tether Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "608ed161-d448-4f75-8036-9ed2ea7357f4",
+      "name": "Google Sheets - Read Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -736,
+        -96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+              "leftValue": "={{ $json.first_name || $json.client_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "2b3c4d5e-6f78-90ab-cdef-123456789abc",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3a8f6b23-23a7-48e8-9c3d-e3bbd9b22bf6",
+      "name": "Filter Valid Records",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        -512,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE",
+          "mode": "list",
+          "cachedResultName": "Anago Client Tether Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_tether_id": "={{ $('Client Tether - Create Client1').item.json.Client_ID }}",
+            "sync_status": "={{ $('Client Tether - Create Client1').item.json.Message }}",
+            "sync_date": "={{ $now.format('DD') }}",
+            "row_number": "={{ $('Google Sheets - Read Data').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tags",
+              "displayName": "tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sync_status",
+              "displayName": "sync_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sync_date",
+              "displayName": "sync_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_tether_id",
+              "displayName": "client_tether_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error_message",
+              "displayName": "error_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "efb3afdc-637b-49e3-a064-d450ca5851fc",
+      "name": "Update Sheet - Success",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        208,
+        -192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE",
+          "mode": "list",
+          "cachedResultName": "Anago Client Tether Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MpGi32rSlxwy6XNsO1YLi2R4BnLk8gyKvznE_7n7-zE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "error_message": "={{ $json.Message }}",
+            "sync_status": "={{ \n  $json.ResultCode === 'WS200' ? 'Success' :\n  $json.ResultCode === 'WS400' ? 'Bad Request' :\n  $json.ResultCode === 'WS500' ? 'Unknown Error' :\n  $json.ResultCode === 'WS501' ? 'Missing Required Key:Value Pair' :\n  $json.ResultCode === 'WS520' ? 'Insert Failed' :\n  'Unknown Result Code: ' + $json.ResultCode\n}}",
+            "row_number": "={{ $('Google Sheets - Read Data').item.json.row_number }}",
+            "sync_date": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tags",
+              "displayName": "tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sync_status",
+              "displayName": "sync_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sync_date",
+              "displayName": "sync_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_tether_id",
+              "displayName": "client_tether_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error_message",
+              "displayName": "error_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4b4b1018-f548-4c92-bbc6-854c4f419819",
+      "name": "Update Sheet - Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        224,
+        32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e1d150ec-2cb4-4ba1-989a-e5278f2a7962",
+              "leftValue": "={{ $json.ResultCode }}",
+              "rightValue": "WS200",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        -240
+      ],
+      "id": "8a4f1b9c-b389-41c0-938d-05d9d1f4283f",
+      "name": "Filter",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5511cc1c-a0c6-4d99-a186-d41cf2d72b01",
+              "leftValue": "={{ $json.ResultCode }}",
+              "rightValue": "WS200",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        -336
+      ],
+      "id": "3c807bb8-a878-4268-afa9-1d080f6384ce",
+      "name": "Filter1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://anago.waterstreet.net/rest/anago/read_client_by_id/49195",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Access-Token",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybGFraGFuaSIsInJvbGUiOiIzIiwib3JpZ2luIjpudWxsfQ.Yp0UkhU7HZaOOTMfDDOTj9SUO7iZ31O3D0v7MezwhUc"
+            },
+            {
+              "name": "X-Web-Key",
+              "value": "CT_09d00a51553ce1613d1c6dd7eeea0409"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        240
+      ],
+      "id": "a3ef4006-1350-49aa-80df-55050ae59c38",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.clienttether.com/v2/api/read_lead_source_list",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Access-Token",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybGFraGFuaSIsInJvbGUiOiIzIiwib3JpZ2luIjpudWxsfQ.Yp0UkhU7HZaOOTMfDDOTj9SUO7iZ31O3D0v7MezwhUc"
+            },
+            {
+              "name": "X-Web-Key",
+              "value": "CT_09d00a51553ce1613d1c6dd7eeea0409"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        240
+      ],
+      "id": "4d8a322d-7f71-468b-bab6-9dc9f80fefa7",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://anago.waterstreet.net/rest/anago/create_sales_lead",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-account-id",
+              "value": "4E50EDDC-2B69-44B3-BFEC-DB38C4990662"
+            },
+            {
+              "name": "x-api-access-key",
+              "value": "yCvFraQdUb39jBj5ysF2g+Gl2u3JELoV3mApHcAJK8k="
+            },
+            {
+              "name": "content-type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "vendor_name",
+              "value": "First Rank"
+            },
+            {
+              "name": "campaign_source",
+              "value": "Website"
+            },
+            {
+              "name": "campaign_name",
+              "value": "Organic"
+            },
+            {
+              "name": "franchise_dba",
+              "value": "Anago of Manitoba"
+            },
+            {
+              "name": "franchisee_id",
+              "value": 60
+            },
+            {
+              "name": "first_name",
+              "value": "={{ $json.first_name || ($json.client_name ? $json.client_name.split(' ')[0] : 'Test') }}"
+            },
+            {
+              "name": "last_name",
+              "value": "={{ $json.last_name || ($json.client_name && $json.client_name.split(' ').length > 1 ? $json.client_name.split(' ').slice(1).join(' ') : 'User') }}"
+            },
+            {
+              "name": "company_name",
+              "value": "={{ $json.company_name || $json.company || '' }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "name": "phone1",
+              "value": "={{ $json.phone1 ? $json.phone1.replace(/\\D/g, '') : ($json.phone2 ? $json.phone2.replace(/\\D/g, '') : '') }}"
+            },
+            {
+              "name": "phone1_type",
+              "value": "={{ parseInt($json.phone1_type) || 2 }}"
+            },
+            {
+              "name": "phone2",
+              "value": "={{ $json.phone2?.replace(/\\D/g, '') || '' }}"
+            },
+            {
+              "name": "phone2_type",
+              "value": "={{ parseInt($json.phone2_type) || 1 }}"
+            },
+            {
+              "name": "sms_number",
+              "value": "={{ $json.sms_number || 'phone1' }}"
+            },
+            {
+              "name": "preferred_notification",
+              "value": "={{ $json.preferred_notification || 'both' }}"
+            },
+            {
+              "name": "address1",
+              "value": "={{ $json.address1 || $json.address || '' }}"
+            },
+            {
+              "name": "address2",
+              "value": "={{ $json.address2 || '' }}"
+            },
+            {
+              "name": "city",
+              "value": "={{ $json.city || '' }}"
+            },
+            {
+              "name": "state",
+              "value": "={{ $json.state || $json.province || '' }}"
+            },
+            {
+              "name": "zipcode",
+              "value": "={{ $json.zipcode || $json.postal_code || '' }}"
+            },
+            {
+              "name": "country",
+              "value": "={{ $json.country || 'CAN' }}"
+            },
+            {
+              "name": "notes",
+              "value": "={{ $json.notes || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7177789a-a0a7-4c90-86ac-4d3e93653220",
+      "name": "Client Tether - Create Client1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -304,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "723f87c8-1507-4194-b724-9bad13ed011c",
+              "leftValue": "={{ $json.ResultCode }}",
+              "rightValue": "WS200",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        -96
+      ],
+      "id": "ba8542b1-d675-4691-ab31-f3deb77d2e51",
+      "name": "If"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Records": {
+      "main": [
+        [
+          {
+            "node": "Client Tether - Create Client1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        []
+      ]
+    },
+    "Filter1": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Tether - Create Client1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet - Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Sheet - Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9e274589-c713-4a34-9f32-f58ef197c819",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-11T00:01:11.153Z",
+      "createdAt": "2025-09-11T00:01:11.153Z",
+      "role": "workflow:owner",
+      "workflowId": "DebkzM20MXq5b9Im",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
