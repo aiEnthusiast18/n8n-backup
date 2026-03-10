@@ -1,0 +1,256 @@
+{
+  "updatedAt": "2026-01-28T18:40:38.692Z",
+  "createdAt": "2025-08-21T14:59:07.194Z",
+  "id": "CRDbp0pBY8CSh7iP",
+  "name": "#Retrieve Client from Clienttether",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Retrieve Client Info",
+        "formDescription": "Retrieving Info from Clienttether",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Info Text",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "respondWith": "redirect",
+              "redirectUrl": "https://docs.google.com/spreadsheets/d/1NEIns4bu6EiQFzoG6K37uPcxRBJjApJtv1QJXzStwx0/edit?gid=0#gid=0"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e14935cb-25e8-4da1-b41b-467cbaef1cd1",
+      "name": "On form submission",
+      "webhookId": "399553a5-11b6-4bb2-8e37-cab41bf5c3e2"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.clienttether.com/v2/api/read_client_exist",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Access-Token",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybGFraGFuaSIsInJvbGUiOiIzIiwib3JpZ2luIjpudWxsfQ.Yp0UkhU7HZaOOTMfDDOTj9SUO7iZ31O3D0v7MezwhUc"
+            },
+            {
+              "name": "X-Web-Key",
+              "value": "CT_09d00a51553ce1613d1c6dd7eeea0409"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "52821bed-d795-40b1-aac0-7be0532586ec",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "content": "- workflow triggered by form submission containing client email\n- http request sent to client tether to retrieve client infos (match with email)",
+        "height": 144,
+        "width": 272,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        208,
+        256
+      ],
+      "id": "5b92aa52-3181-4044-8054-aad53a1e7b8a",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Email": "ronaldo_diaz15@yahoo.com",
+          "Info Text": null,
+          "submittedAt": "2025-08-21T10:12:32.212-05:00",
+          "formMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "8663cf48-def4-4465-8ff1-c218ac8e2943",
+  "activeVersionId": "8663cf48-def4-4465-8ff1-c218ac8e2943",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-21T14:59:07.199Z",
+      "createdAt": "2025-08-21T14:59:07.199Z",
+      "role": "workflow:owner",
+      "workflowId": "CRDbp0pBY8CSh7iP",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-11-27T23:57:16.304Z",
+    "createdAt": "2025-11-27T23:57:16.304Z",
+    "versionId": "8663cf48-def4-4465-8ff1-c218ac8e2943",
+    "workflowId": "CRDbp0pBY8CSh7iP",
+    "nodes": [
+      {
+        "parameters": {
+          "formTitle": "Retrieve Client Info",
+          "formDescription": "Retrieving Info from Clienttether",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Email",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Info Text",
+                "fieldType": "textarea"
+              }
+            ]
+          },
+          "options": {
+            "respondWithOptions": {
+              "values": {
+                "respondWith": "redirect",
+                "redirectUrl": "https://docs.google.com/spreadsheets/d/1NEIns4bu6EiQFzoG6K37uPcxRBJjApJtv1QJXzStwx0/edit?gid=0#gid=0"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.2,
+        "position": [
+          0,
+          0
+        ],
+        "id": "e14935cb-25e8-4da1-b41b-467cbaef1cd1",
+        "name": "On form submission",
+        "webhookId": "399553a5-11b6-4bb2-8e37-cab41bf5c3e2"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.clienttether.com/v2/api/read_client_exist",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "email",
+                "value": "={{ $json.Email }}"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Access-Token",
+                "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybGFraGFuaSIsInJvbGUiOiIzIiwib3JpZ2luIjpudWxsfQ.Yp0UkhU7HZaOOTMfDDOTj9SUO7iZ31O3D0v7MezwhUc"
+              },
+              {
+                "name": "X-Web-Key",
+                "value": "CT_09d00a51553ce1613d1c6dd7eeea0409"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          0
+        ],
+        "id": "52821bed-d795-40b1-aac0-7be0532586ec",
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "content": "- workflow triggered by form submission containing client email\n- http request sent to client tether to retrieve client infos (match with email)",
+          "height": 144,
+          "width": 272,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          208,
+          256
+        ],
+        "id": "5b92aa52-3181-4044-8054-aad53a1e7b8a",
+        "name": "Sticky Note1"
+      }
+    ],
+    "connections": {
+      "On form submission": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
