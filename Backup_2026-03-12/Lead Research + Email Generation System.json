@@ -1,0 +1,865 @@
+{
+  "updatedAt": "2025-09-25T23:13:32.000Z",
+  "createdAt": "2025-08-17T18:51:59.205Z",
+  "id": "N4TQyB68Jd6d2XrU",
+  "name": "Lead Research + Email Generation System",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12hQkR66riOTSxuxbz0376fNLn896i_eRISL61K_Fxgg",
+          "mode": "list",
+          "cachedResultName": "Lead Generator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12hQkR66riOTSxuxbz0376fNLn896i_eRISL61K_Fxgg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12hQkR66riOTSxuxbz0376fNLn896i_eRISL61K_Fxgg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "First Name": "={{ $('Lead Info').item.json['First Name'] }}",
+            "Last Name": "={{ $('Lead Info').item.json['Last Name'] }}",
+            "Company": "={{ $('Lead Info').item.json.Company }}",
+            "Company Website": "={{ $('Lead Info').item.json['Company Website'] }}",
+            "Job Title": "={{ $('Lead Info').item.json['Job Title'] }}",
+            "LinkedIn URL": "={{ $('Lead Info').item.json['LinkedIn URL'] }}",
+            "Headline": "={{ $('Lead Info').item.json['Job Title'] }} at {{ $('Lead Info').item.json.Company }}",
+            "Email Address": "={{ $('Lead Info').item.json['Email Address'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Headline",
+              "displayName": "Headline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Research",
+              "displayName": "Research",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Personalized Message",
+              "displayName": "Personalized Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Row",
+              "displayName": "Row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1936,
+        -48
+      ],
+      "id": "4ca46aee-a8c3-40e8-b192-e717237f9cee",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97bddfcc-2866-4a30-bd8b-32ee0ba6a3e5",
+              "name": "First Name",
+              "value": "John",
+              "type": "string"
+            },
+            {
+              "id": "50b0e8b1-d358-471d-af81-9fc5d9cb7777",
+              "name": "Last Name",
+              "value": "Doe",
+              "type": "string"
+            },
+            {
+              "id": "fb652006-1129-4253-8286-8194dbfd2d82",
+              "name": "Company Name",
+              "value": "Ultra Cool Realty",
+              "type": "string"
+            },
+            {
+              "id": "b224c104-e3d5-4c2b-b1ca-d54172306d21",
+              "name": "About",
+              "value": "John has consistently ranked among the top-performing agents in his market, closing multi-million-dollar transactions year after year. His track record includes record-breaking sales and repeat business from a loyal client base built on trust and results.",
+              "type": "string"
+            },
+            {
+              "id": "4930067e-88f3-4066-967f-b45012788cb4",
+              "name": "Email",
+              "value": "itsridalakhani@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1728,
+        -48
+      ],
+      "id": "6ebd6a37-b7c9-49cc-b402-097529fb7c48",
+      "name": "About Me"
+    },
+    {
+      "parameters": {
+        "formTitle": "Real Estate Lead Gen",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "First Name",
+              "placeholder": "Jane"
+            },
+            {
+              "fieldLabel": "Last Name",
+              "placeholder": "Doe"
+            },
+            {
+              "fieldLabel": "Company",
+              "placeholder": "McDonalds"
+            },
+            {
+              "fieldLabel": "Job Title",
+              "placeholder": "Manager"
+            },
+            {
+              "fieldLabel": "Email Address",
+              "placeholder": "janedoe123@gmail.com"
+            },
+            {
+              "fieldLabel": "Company Website",
+              "placeholder": "https://mcdonalds.ca"
+            },
+            {
+              "fieldLabel": "LinkedIn URL",
+              "placeholder": "https://www.linkedin.com/in/jane-doe-123456789/"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        1536,
+        -48
+      ],
+      "id": "a25d39a6-73bc-43a0-8137-a0599bbbc23d",
+      "name": "Lead Info",
+      "webhookId": "8bd0d255-8519-4c27-86a1-a1b9188a370e"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-search-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-SEARCH-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=research every thing you can about this person:\n{{ $json['First Name'] }}{{ $json['Last Name'] }}\n\n{{ $json['Job Title'] }}\n{{ $json.Company }}\n\n{{ $json.Headline }}\n\nreturn any particularly interesting facts or accomplishments this person has achieved.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2128,
+        -48
+      ],
+      "id": "817e2d2c-12cc-4d88-96fe-b0b82164ac40",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the current item's message content\nconst message = item.json.message?.content;\n\n// Function to clean text but keep headings/bullets\nfunction cleanText(str) {\n  if (typeof str !== 'string') return str;\n\n  // 1. Remove URLs\n  str = str.replace(/https?:\\/\\/\\S+/g, '');\n\n  // 2. Remove bold or italic markdown (**text** or *text*)\n  str = str.replace(/\\*\\*(.*?)\\*\\*/g, '$1'); // bold\n  str = str.replace(/\\*(.*?)\\*/g, '$1');     // italic\n\n  // 3. Remove unnecessary trailing spaces\n  str = str.replace(/[ \\t]+$/gm, '');\n\n  // 4. Collapse multiple empty lines to a single line\n  str = str.replace(/\\n{2,}/g, '\\n\\n');\n\n  // 5. Trim start and end\n  str = str.trim();\n\n  return str;\n}\n\n// Return cleaned message\nreturn {\n  json: {\n    ...item.json,\n    message: cleanText(message)\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        -48
+      ],
+      "id": "e4416cf3-c296-4924-8a8e-02792af9e425",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-search-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-SEARCH-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a succinct summary about this company, include 3 bullet points about anything particularly interesting, or notable theyve accomplished\n\n{{ $('Lead Info').item.json.Company }}\n{{ $('Lead Info').item.json['Company Website'] }}\n\n{{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2672,
+        -48
+      ],
+      "id": "f49e42d3-eaf2-4e13-af0d-9d7711dff75e",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=First Name: {{ $('Lead Info').item.json['First Name'] }}\n\nHeadline: {{ $('Lead Info').item.json['Job Title'] }} at {{ $('Lead Info').item.json.Company }}\n\nJob Title: {{ $('Lead Info').item.json['Job Title'] }}\n\nCompany Name: {{ $('Lead Info').item.json.Company }}\n\nPersonal Research: {{ $('Message a model').item.json.message.content }}\n\nCompany Research: {{ $json.message.content }}\n\nUse a casual, spartan tone. Write like you're talking to a friend.\n\nNEVER output intros or outros. You MUST only output the personalized message.\nALWAYS follow the template structure AS CLOSELY AS POSSIBLE!!"
+            },
+            {
+              "content": "=# Generic Cold Email Outreach System\n\nYou are an expert in cold email outreach. You wil be given a prospect's first name, their job title and company, reseach about them and their company, plus information about the sender's business. Your task is to generate a personalized cold email with this information.\n\n## Input Data You'll Receive\n\nProspect Information:\n- First Name\n- Last Name\n- Job Title\n- Company Name\n- Research about them/their company\n\nSender Business Information:\n- Information about the user's business (services, capabilities, recent projects, etc.)\n- First Name: {{ $('About Me').item.json['First Name'] }}\n- Last Name: {{ $('About Me').item.json['Last Name'] }}\n- Business Name: {{ $('About Me').item.json['Company Name'] }}\n- about their business: {{ $('About Me').item.json.About }}\n\n## Email Template Structure\n\nTemplate:\n\nHi [First Name] - \n\nreally enjoyed [specific reference to their recent project, company milestone, or relevant detail from reserach].\n\nI run [Company Name from business info], [brief description of what the business does]. \n\n[Bridge statement - why reaching out and connection to their needs]\n\nI'm confident enough in our work that [risk reversal guarantee based on business type].\n\nWould you be open to a quick 15-minute call to discuss how we might support your next project? How's [time #1] or [time #2]?\n\nThanks!\n- [Sender name from business info]\n[Title], [Company Name]\n\n## Email Generation Process\n\n1. Analyze the prospect reseach to find specific, recent details to reference in the opening\n2. Extract key business details from the sender's business information (company name, services, recent projects)\n3. Match services to prospect needs based on their job title, company, and research\n4. Create relevant bridge statement connecting why you're reaching out to their likely needs\n5. Generate appropriate risk reversal based on the type of business and services offerend\n6. Complete the remplate with all peresonalized elements\n\n## Personalization Guidelines\n\n- Opening hook: Refence something specific form the reserach that shows genuine interest\n- Service description: Briefly explain what the business does in terms relevant to the prospect\n- Recent accomplishemt: Use something from business info that owuld impress this type of prospect\n- Bridge statement: Connect your outreach to their likely needs or challenges\n- Risk reversal: Create a guarantee that addresses common concerns for their industry/role\n\n## Quality standards \n\n- Keep emails under 100 words\n- Use conversational, confident tone\n- Include specifc details from research\n- Make value proposition clear\n- Ensure risk reversal is credible\n- Use proper grammer and formatting\n\nGenerate one complete, personalized email using the provided prospect and business information.",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3024,
+        -48
+      ],
+      "id": "7230c319-6624-4e8e-bea4-a5dff7295ee6",
+      "name": "Message a model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "12hQkR66riOTSxuxbz0376fNLn896i_eRISL61K_Fxgg",
+          "mode": "list",
+          "cachedResultName": "Lead Generator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12hQkR66riOTSxuxbz0376fNLn896i_eRISL61K_Fxgg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12hQkR66riOTSxuxbz0376fNLn896i_eRISL61K_Fxgg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company": "={{ $('Lead Info').item.json.Company }}",
+            "Personalized Message": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "Company"
+          ],
+          "schema": [
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Headline",
+              "displayName": "Headline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Research",
+              "displayName": "Research",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Personalized Message",
+              "displayName": "Personalized Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Row",
+              "displayName": "Row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3376,
+        -48
+      ],
+      "id": "56790a5d-91b2-4103-b5b5-062586e1c00d",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('About Me').item.json.Email }}",
+        "subject": "Your New Leads Are Ready!",
+        "message": "=Hi {{ $('About Me').item.json['First Name'] }} {{ $('About Me').item.json['Last Name'] }}!\n\nYour new leads are ready! \nCheck your updated google sheet to review them :)\n\nBest Regards,\nThe Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3584,
+        -48
+      ],
+      "id": "ea03e1cc-7ca1-4948-9700-9302ecda4fb0",
+      "name": "Send a message",
+      "webhookId": "9b51599a-44d3-459c-9b2c-538c8310e49e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3hqtCAi1EGcgg76C",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## - intakes inputted lead infos (name, contanct, linkedin)\n## - inputs leads infos into sheet\n## - conducts researh on lead\n## - writes cold email for lead\n## - inputs email text into sheet\n## - prompts via email",
+        "height": 256,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        -448
+      ],
+      "id": "e0676bfc-ea2a-4848-916f-1aac12384c1e",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "About Me": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Info": {
+      "main": [
+        [
+          {
+            "node": "About Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model2": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Append row in sheet": [
+      {
+        "json": {
+          "First Name": "Taz",
+          "Last Name": "Lakhani",
+          "Company": "Right At Home Winnipeg",
+          "Company Website": "https://www.rightathomecanada.com/winnipeg",
+          "Job Title": "Owner",
+          "LinkedIn URL": "https://www.linkedin.com/in/taz-lakhani-26a87729/",
+          "Headline": "Owner at Right At Home Winnipeg",
+          "Email Address": "lakhanimumtaz@gmail.com"
+        }
+      }
+    ],
+    "About Me": [
+      {
+        "json": {
+          "First Name": "John",
+          "Last Name": "Doe",
+          "Company Name": "Ultra Cool Realty",
+          "About": "John has consistently ranked among the top-performing agents in his market, closing multi-million-dollar transactions year after year. His track record includes record-breaking sales and repeat business from a loyal client base built on trust and results.",
+          "Email": "itsridalakhani@gmail.com"
+        }
+      }
+    ],
+    "Message a model": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Taz Lakhani serves as the Director of Care at Right at Home Winnipeg, a home care company established in 2018. Under her leadership, the organization has achieved significant recognition for its commitment to quality care.\n\nIn October 2024, Right at Home Winnipeg was honored with the \"RAH Top Performer Award\" at the Right at Home National Conference in Ottawa. This award acknowledges caregivers who consistently provide exceptional in-home care services. Lakhani accepted the award on behalf of her team, expressing pride in their dedication and the positive feedback received from clients. ([rightathomecanada.com](https://www.rightathomecanada.com/winnipeg/blog/press-release-top-performer-award?utm_source=openai))\n\nAdditionally, in 2023, the company received the Consumer Choice Award in the Home Healthcare Services category. This accolade is based on consumer feedback and recognizes businesses for outstanding customer service and satisfaction. ([rightathomecanada.com](https://www.rightathomecanada.com/winnipeg/blog/rah-wins-consumer-choice-award-for-2023?utm_source=openai))\n\nBeyond her role at Right at Home Winnipeg, Lakhani has been active in the community. In 2018, she participated in the Leadership Winnipeg program, which aims to develop leadership skills and community engagement among its participants. ([wcc.thelizardlab.net](https://wcc.thelizardlab.net/category/chamber-blog/page/19/?utm_source=openai))\n\nFurthermore, Lakhani contributed her expertise to the \"All Things Seniors\" podcast in April 2020, discussing the impact of COVID-19 on seniors and caregivers. Her insights provided valuable guidance during a challenging time for the community. ([toppodcast.com](https://toppodcast.com/podcast_feeds/all-things-seniors-a-podcast-for-caregivers/?utm_source=openai))\n\nThrough these accomplishments, Taz Lakhani has demonstrated a strong commitment to enhancing home care services and supporting the well-being of seniors in Winnipeg. ",
+            "refusal": null,
+            "annotations": [
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 720,
+                  "start_index": 594,
+                  "title": "Winnipeg Home Care Company Recognized With Top Performer Award",
+                  "url": "https://www.rightathomecanada.com/winnipeg/blog/press-release-top-performer-award?utm_source=openai"
+                }
+              },
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 1087,
+                  "start_index": 955,
+                  "title": "Right at Home Winnipeg Receives Consumer Choice Award For 2023",
+                  "url": "https://www.rightathomecanada.com/winnipeg/blog/rah-wins-consumer-choice-award-for-2023?utm_source=openai"
+                }
+              },
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 1428,
+                  "start_index": 1325,
+                  "title": "Chamber Blog Archives | Page 19 of 38 | VL Winnipeg Chamber of Commerce",
+                  "url": "https://wcc.thelizardlab.net/category/chamber-blog/page/19/?utm_source=openai"
+                }
+              },
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 1793,
+                  "start_index": 1674,
+                  "title": "All Things Seniors: A Podcast For Caregivers - TopPodcast.com",
+                  "url": "https://toppodcast.com/podcast_feeds/all-things-seniors-a-podcast-for-caregivers/?utm_source=openai"
+                }
+              }
+            ]
+          },
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Code": [
+      {
+        "json": {
+          "index": 0,
+          "message": "Taz Lakhani serves as the Director of Care at Right at Home Winnipeg, a home care company established in 2018. Under her leadership, the organization has achieved significant recognition for its commitment to quality care.\n\nIn October 2024, Right at Home Winnipeg was honored with the \"RAH Top Performer Award\" at the Right at Home National Conference in Ottawa. This award acknowledges caregivers who consistently provide exceptional in-home care services. Lakhani accepted the award on behalf of her team, expressing pride in their dedication and the positive feedback received from clients. ([rightathomecanada.com](\n\nAdditionally, in 2023, the company received the Consumer Choice Award in the Home Healthcare Services category. This accolade is based on consumer feedback and recognizes businesses for outstanding customer service and satisfaction. ([rightathomecanada.com](\n\nBeyond her role at Right at Home Winnipeg, Lakhani has been active in the community. In 2018, she participated in the Leadership Winnipeg program, which aims to develop leadership skills and community engagement among its participants. ([wcc.thelizardlab.net](\n\nFurthermore, Lakhani contributed her expertise to the \"All Things Seniors\" podcast in April 2020, discussing the impact of COVID-19 on seniors and caregivers. Her insights provided valuable guidance during a challenging time for the community. ([toppodcast.com](\n\nThrough these accomplishments, Taz Lakhani has demonstrated a strong commitment to enhancing home care services and supporting the well-being of seniors in Winnipeg.",
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Message a model1": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Right at Home Winnipeg, established in 2018, is a home care company dedicated to supporting clients in living successfully at home, regardless of their mental, physical, or emotional needs. Their services include companion care, personal care, nursing care, and specialty services tailored to individual requirements. ([rightathomecanada.com](https://www.rightathomecanada.com/winnipeg?utm_source=openai))\n\nNotable accomplishments:\n\n- **RAH Top Performer Award (2024):** In October 2024, Right at Home Winnipeg received the \"RAH Top Performer Award\" at the Right at Home National Conference in Ottawa, recognizing caregivers who consistently provide exceptional in-home care services. ([rightathomecanada.com](https://www.rightathomecanada.com/winnipeg/blog/press-release-top-performer-award?utm_source=openai))\n\n- **Consumer Choice Award (2023):** The company was honored with the Consumer Choice Award in the Home Healthcare Services category in 2023, reflecting outstanding customer service and satisfaction based on consumer feedback. ([rightathomecanada.com](https://www.rightathomecanada.com/winnipeg/blog/rah-wins-consumer-choice-award-for-2023?utm_source=openai))\n\n- **Leadership in Community Engagement:** Director of Care, Taz Lakhani, participated in the Leadership Winnipeg program in 2018, aiming to develop leadership skills and community engagement among its participants. ",
+            "refusal": null,
+            "annotations": [
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 405,
+                  "start_index": 318,
+                  "title": "Private Home Care Winnipeg | Senior In-Home Care & Assistance",
+                  "url": "https://www.rightathomecanada.com/winnipeg?utm_source=openai"
+                }
+              },
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 811,
+                  "start_index": 685,
+                  "title": "Winnipeg Home Care Company Recognized With Top Performer Award",
+                  "url": "https://www.rightathomecanada.com/winnipeg/blog/press-release-top-performer-award?utm_source=openai"
+                }
+              },
+              {
+                "type": "url_citation",
+                "url_citation": {
+                  "end_index": 1171,
+                  "start_index": 1039,
+                  "title": "Right at Home Winnipeg Receives Consumer Choice Award For 2023",
+                  "url": "https://www.rightathomecanada.com/winnipeg/blog/rah-wins-consumer-choice-award-for-2023?utm_source=openai"
+                }
+              }
+            ]
+          },
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Message a model2": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Hi Taz -\n\nreally enjoyed seeing Right at Home Winnipeg win the 2024 RAH Top Performer—great follow-up to your 2023 Consumer Choice.\n\nI run Ultra Cool Realty, a top-performing agent closing multi‑million‑dollar deals.\n\nReaching out because growth often means new or better office space; we find locations and negotiate terms fast.\n\nI’m confident enough that if we can’t beat your current terms, you owe nothing.\n\nOpen to a quick 15‑min call to explore? How’s Tue 10:00 or Thu 2:00?\n\nThanks!\n- John Doe\nReal Estate Agent, Ultra Cool Realty",
+            "refusal": null,
+            "annotations": []
+          },
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Update row in sheet": [
+      {
+        "json": {
+          "Company": "Right At Home Winnipeg",
+          "Personalized Message": "Hi Taz -\n\nreally enjoyed seeing Right at Home Winnipeg win the 2024 RAH Top Performer—great follow-up to your 2023 Consumer Choice.\n\nI run Ultra Cool Realty, a top-performing agent closing multi‑million‑dollar deals.\n\nReaching out because growth often means new or better office space; we find locations and negotiate terms fast.\n\nI’m confident enough that if we can’t beat your current terms, you owe nothing.\n\nOpen to a quick 15‑min call to explore? How’s Tue 10:00 or Thu 2:00?\n\nThanks!\n- John Doe\nReal Estate Agent, Ultra Cool Realty"
+        }
+      }
+    ],
+    "Send a message": [
+      {
+        "json": {
+          "id": "198ba0b129c81ba0",
+          "threadId": "198ba0b129c81ba0",
+          "labelIds": [
+            "UNREAD",
+            "SENT",
+            "INBOX"
+          ]
+        }
+      }
+    ],
+    "Lead Info": [
+      {
+        "json": {
+          "First Name": "Taz",
+          "Last Name": "Lakhani",
+          "Company": "Right At Home Winnipeg",
+          "Job Title": "Owner",
+          "Email Address": "lakhanimumtaz@gmail.com",
+          "Company Website": "https://www.rightathomecanada.com/winnipeg",
+          "LinkedIn URL": "https://www.linkedin.com/in/taz-lakhani-26a87729/",
+          "submittedAt": "2025-08-17T16:58:03.856-05:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "e07da099-be98-42ce-a289-5014c768be1b",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-08-17T18:51:59.210Z",
+      "createdAt": "2025-08-17T18:51:59.210Z",
+      "role": "workflow:owner",
+      "workflowId": "N4TQyB68Jd6d2XrU",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
