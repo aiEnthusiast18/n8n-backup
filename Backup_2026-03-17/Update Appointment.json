@@ -1,0 +1,416 @@
+{
+  "updatedAt": "2026-03-08T22:40:37.974Z",
+  "createdAt": "2026-03-08T20:53:09.374Z",
+  "id": "7e5oe2yNrgL11BdO",
+  "name": "Update Appointment",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "eventID"
+            },
+            {
+              "name": "afterTime"
+            },
+            {
+              "name": "beforeTime"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9d6ec65d-d1a1-4581-ae6f-ec0027a933d9",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "itsridalakhani@gmail.com",
+          "mode": "list",
+          "cachedResultName": "itsridalakhani@gmail.com"
+        },
+        "eventId": "={{ $json.eventID }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1ab77138-bfb9-4507-9e06-8c56931abfbd",
+      "name": "Update an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dCZ8M5ZWxYvzU4gK",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+          "mode": "list",
+          "cachedResultName": "Call Agent CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 904413505,
+          "mode": "list",
+          "cachedResultName": "Appointment Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit#gid=904413505"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $('When Executed by Another Workflow').item.json.startTime }}",
+            "ID": "={{ $json.id }}",
+            "Notes": "=Moved to {{ $('When Executed by Another Workflow').item.json.startTime }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Appointment Type",
+              "displayName": "Appointment Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "3ef0ce3c-7eee-4e7e-a789-a616b92f738c",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "52719d46-3008-4580-b23e-b24351f6278a",
+  "activeVersionId": "52719d46-3008-4580-b23e-b24351f6278a",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-08T20:53:09.377Z",
+      "createdAt": "2026-03-08T20:53:09.377Z",
+      "role": "workflow:owner",
+      "workflowId": "7e5oe2yNrgL11BdO",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T22:40:41.000Z",
+    "createdAt": "2026-03-08T22:39:41.903Z",
+    "versionId": "52719d46-3008-4580-b23e-b24351f6278a",
+    "workflowId": "7e5oe2yNrgL11BdO",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "eventID"
+              },
+              {
+                "name": "afterTime"
+              },
+              {
+                "name": "beforeTime"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "9d6ec65d-d1a1-4581-ae6f-ec0027a933d9",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "calendar": {
+            "__rl": true,
+            "value": "itsridalakhani@gmail.com",
+            "mode": "list",
+            "cachedResultName": "itsridalakhani@gmail.com"
+          },
+          "eventId": "={{ $json.eventID }}",
+          "updateFields": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          208,
+          0
+        ],
+        "id": "1ab77138-bfb9-4507-9e06-8c56931abfbd",
+        "name": "Update an event",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dCZ8M5ZWxYvzU4gK",
+            "name": "Google Calendar account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+            "mode": "list",
+            "cachedResultName": "Call Agent CRM",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 904413505,
+            "mode": "list",
+            "cachedResultName": "Appointment Log",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit#gid=904413505"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Date": "={{ $('When Executed by Another Workflow').item.json.startTime }}",
+              "ID": "={{ $json.id }}",
+              "Notes": "=Moved to {{ $('When Executed by Another Workflow').item.json.startTime }}"
+            },
+            "matchingColumns": [
+              "ID"
+            ],
+            "schema": [
+              {
+                "id": "ID",
+                "displayName": "ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Email",
+                "displayName": "Email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Appointment Type",
+                "displayName": "Appointment Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Date",
+                "displayName": "Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Notes",
+                "displayName": "Notes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          416,
+          0
+        ],
+        "id": "3ef0ce3c-7eee-4e7e-a789-a616b92f738c",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Update an event",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update an event": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 52719d46",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
