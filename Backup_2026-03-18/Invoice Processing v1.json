@@ -1,0 +1,934 @@
+{
+  "updatedAt": "2025-09-26T00:54:27.000Z",
+  "createdAt": "2025-09-13T20:52:05.695Z",
+  "id": "LLvXi986PCcjXC6W",
+  "name": "Invoice Processing v1",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc",
+          "mode": "list",
+          "cachedResultName": "n8n invoice workflow",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "55dbbd39-11ff-4256-9610-73aebbc91d55",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e355b70b-2d7e-4618-ae40-dcee7e8c97e1",
+              "leftValue": "={{ $json.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b0bb5966-8008-48c0-8540-4c1fd950a930",
+      "name": "If",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc",
+          "mode": "list",
+          "cachedResultName": "n8n invoice workflow",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "903f2562-7992-4efe-a2ad-00a2334b63d2",
+      "name": "Monitor Invoice Folder",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        544
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Invoice Processing Workflow\n\n**Purpose**: Automatically process PDF invoices from Google Drive\n\n**Process**:\n1. Monitor Google Drive folder for new PDF files\n2. Extract text content from PDF\n3. Use AI to extract structured invoice data\n4. Validate extracted data\n5. Add to Google Sheets or send alert\n\n**Error Handling**: Comprehensive validation and alert system",
+        "height": 332,
+        "width": 400
+      },
+      "id": "5a861224-d7ad-4afd-87f6-bd5058844b6c",
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract structured data from the provided invoice file.\nInvoice file text: {{ $json.text }}",
+        "options": {
+          "systemMessage": "=You are an expert invoice processing AI. Your task is to extract structured data from invoice PDFs and return it in a specific JSON format.\n\nWhen given an invoice file, extract the following information:\n- Invoice Number  \n- Invoice Date (format: YYYY-MM-DD)\n- Vendor Name\n- Line Items (array with description, quantity, unit_price, amount)\n- Subtotal\n- Tax Amount  \n- Total Amount\n\nIMPORTANT: Look for ALL line items in the invoice. Line items may appear as:\n- Individual product/service rows with descriptions\n- Summary sections with service categories (like \"Parcels\", \"Shipments\", etc.)\n- Itemized charges or fees\n- Both positive and negative amounts (adjustments/credits)\n\nAlways extract each item/product/service category as a separate line item, even if quantities aren't specified (use 1 as default quantity).\n\nAlways respond with valid JSON in this exact format:\n{\n  \"invoice_number\": \"string\",\n  \"invoice_date\": \"YYYY-MM-DD\", \n  \"vendor_name\": \"string\",\n  \"line_items\": [\n    {\n      \"description\": \"string\",\n      \"quantity\": number,\n      \"unit_price\": number, \n      \"amount\": number\n    }\n  ],\n  \"subtotal\": number,\n  \"tax_amount\": number,\n  \"total_amount\": number,\n  \"extraction_confidence\": \"high|medium|low\",\n  \"missing_fields\": [\"array of any missing required fields\"]\n}\n\nExtract ALL service categories, charges, and adjustments as separate line items. If you cannot extract certain fields, set them to null and list them in missing_fields."
+        }
+      },
+      "id": "5a56aeaa-1f47-4e22-ad32-1e69b2f6458f",
+      "name": "AI Invoice Data Extractor",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        208,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validate the extracted invoice data\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  try {\n    let extractedData;\n    \n    // Parse AI output if it's a string\n    if (typeof item.json.output === 'string') {\n      extractedData = JSON.parse(item.json.output);\n    } else {\n      extractedData = item.json.output || item.json;\n    }\n    \n    // Required fields for validation\n    const requiredFields = ['invoice_number', 'invoice_date', 'vendor_name', 'total_amount'];\n    const missingFields = [];\n    \n    // Check for required fields\n    for (const field of requiredFields) {\n      if (!extractedData[field] || extractedData[field] === null) {\n        missingFields.push(field);\n      }\n    }\n    \n    // Validate date format\n    const dateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\n    if (extractedData.invoice_date && !dateRegex.test(extractedData.invoice_date)) {\n      missingFields.push('invalid_date_format');\n    }\n    \n    // Validate total amount is a number\n    if (extractedData.total_amount && isNaN(parseFloat(extractedData.total_amount))) {\n      missingFields.push('invalid_total_amount');\n    }\n    \n    // Determine validation status\n    const isValid = missingFields.length === 0;\n    const confidenceLevel = extractedData.extraction_confidence || 'unknown';\n    \n    // Get original filename from the previous nodes in the chain\n    let originalFileName = 'unknown';\n    try {\n      // Try to get filename from Monitor Invoice Folder node\n      const monitorNode = $node['Monitor Invoice Folder'];\n      if (monitorNode && monitorNode.first() && monitorNode.first().json) {\n        originalFileName = monitorNode.first().json.name || monitorNode.first().json.originalFilename || 'unknown';\n      }\n      \n      // Alternative: try to get from Extract from File node\n      const extractNode = $node['Extract from File'];\n      if (extractNode && extractNode.first() && extractNode.first().json) {\n        originalFileName = extractNode.first().json.fileName || originalFileName;\n      }\n    } catch (nodeError) {\n      console.log('Could not retrieve original filename:', nodeError.message);\n    }\n    \n    results.push({\n      json: {\n        ...extractedData,\n        validation_status: isValid ? 'valid' : 'invalid',\n        validation_errors: missingFields,\n        confidence_level: confidenceLevel,\n        requires_manual_review: !isValid || confidenceLevel === 'low',\n        processed_at: new Date().toISOString(),\n        original_file: originalFileName\n      }\n    });\n    \n  } catch (error) {\n    // Get original filename safely even in error cases\n    let originalFileName = 'unknown';\n    try {\n      const monitorNode = $node['Monitor Invoice Folder'];\n      if (monitorNode && monitorNode.first() && monitorNode.first().json) {\n        originalFileName = monitorNode.first().json.name || monitorNode.first().json.originalFilename || 'unknown';\n      }\n    } catch (nodeError) {\n      console.log('Could not retrieve original filename in error case:', nodeError.message);\n    }\n    \n    results.push({\n      json: {\n        validation_status: 'error',\n        error_message: error.message,\n        validation_errors: ['parsing_error'],\n        requires_manual_review: true,\n        processed_at: new Date().toISOString(),\n        original_file: originalFileName\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "ec6e6de3-7a56-4f41-8d66-1e3c6009ae0c",
+      "name": "Validate Extracted Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        544,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE",
+          "mode": "list",
+          "cachedResultName": "n8n invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $('If2').item.json.invoice_number }}",
+            "Invoice Date (YYYY-MM-DD)": "={{ $('If2').item.json.invoice_date }}",
+            "Vendor Name": "={{ $('If2').item.json.vendor_name }}",
+            "Subtotal": "={{ $('If2').item.json.subtotal }}",
+            "Tax Amount": "={{ $('If2').item.json.tax_amount }}",
+            "Total Amount": "={{ $('If2').item.json.total_amount }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Date (YYYY-MM-DD)",
+              "displayName": "Invoice Date (YYYY-MM-DD)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Name",
+              "displayName": "Vendor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subtotal",
+              "displayName": "Subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tax Amount",
+              "displayName": "Tax Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e7b34b90-f21e-419c-897f-e066750684a2",
+      "name": "Add to Invoice Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1152,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\n\n**Validation Checks**:\n- Required fields present\n- Date format validation\n- Numeric amount validation\n- Confidence level assessment\n\n**Alert Conditions**:\n- Missing required fields\n- Low confidence extraction\n- PDF processing errors\n- Data validation failures\n\n**Manual Review Triggers**:\n- Validation status: invalid\n- Confidence level: low\n- Processing errors",
+        "height": 426,
+        "width": 300
+      },
+      "id": "dd05fe54-68c3-47f2-9c04-9dac266a7912",
+      "name": "Error Handling Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        576
+      ],
+      "id": "4e911a24-f966-4a2c-8be2-6a0f9d650f2e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=Invoice Processed Successfully - {{ $('If2').item.json.invoice_number }}",
+        "bodyContent": "=Invoice {{ $('If2').item.json.invoice_number }} from {{ $('If2').item.json.vendor_name }} ({{ $('If2').item.json.invoice_date }}) has been successfully processed. Both summary and line item data have been added to the spreadsheet.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        224
+      ],
+      "id": "a5dde100-81c9-4fb4-bf24-5951ca50d012",
+      "name": "Send a message",
+      "webhookId": "7e24a261-ee66-492f-b92e-3c1ea55f3ceb",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=Invoice Processing Error - {{ $json['Invoice Number'] }}",
+        "bodyContent": "There was an error adding details for {{ $json['Invoice Number'] }} from {{ $json['Vendor Name'] }} ({{ $json['Invoice Date (YYYY-MM-DD)'] }}) to sheet.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        496
+      ],
+      "id": "62457970-2da7-45c7-84e5-3889561ebfe8",
+      "name": "Send a message1",
+      "webhookId": "b7b0cfc9-a8f9-47e9-b1b5-8e871a7955b8",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e355b70b-2d7e-4618-ae40-dcee7e8c97e1",
+              "leftValue": "={{ $json.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -752,
+        544
+      ],
+      "id": "ddfc42c5-3f94-442b-94ab-aa6b4641890c",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "46381a5f-db3d-4f25-ab54-0eba72dd42f9",
+              "leftValue": "={{ $json.validation_status }}",
+              "rightValue": "valid",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        400
+      ],
+      "id": "22fc9547-90bc-4a06-b218-079adfd8b610",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=Invoice File Retrieval Error - {{ $('Monitor Invoice Folder').item.json.originalFilename }} (ID: {{ $('Monitor Invoice Folder').item.json.lastModifyingUser.permissionId }})",
+        "bodyContent": "=There was an error retrieving file for Invoice Processing workflow - n8n.\n{{ $('Monitor Invoice Folder').item.json.originalFilename }} (ID: {{ $('Monitor Invoice Folder').item.json.lastModifyingUser.permissionId }})",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        672
+      ],
+      "id": "a11d099d-e64d-4479-9585-8ec45563c587",
+      "name": "Send a message2",
+      "webhookId": "797b8cbb-7f0f-40f8-8756-7b7cc558acce",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  const lineItems = item.json.line_items || [];\n  \n  if (lineItems.length === 0) {\n    item.json.line_item_description = null;\n    item.json.line_item_quantity = null;\n    item.json.line_item_unit_price = null;\n    item.json.line_item_amount = null;\n    item.json.line_item_number = null;\n    item.json.total_line_items = 0;\n  }\n}\n\nconst results = [];\nfor (const item of items) {\n  const lineItems = item.json.line_items || [];\n  \n  if (lineItems.length === 0) {\n    results.push(item);\n  } else {\n    for (let i = 0; i < lineItems.length; i++) {\n      const newItem = JSON.parse(JSON.stringify(item));\n      newItem.json.line_item_description = lineItems[i].description;\n      newItem.json.line_item_quantity = lineItems[i].quantity;\n      newItem.json.line_item_unit_price = lineItems[i].unit_price;\n      newItem.json.line_item_amount = lineItems[i].amount;\n      newItem.json.line_item_number = i + 1;\n      newItem.json.total_line_items = lineItems.length;\n      \n      // Only show vendor name and invoice number on first line item\n      if (i === 0) {\n        // Keep original values for first item\n        newItem.json.display_invoice_number = newItem.json.invoice_number;\n        newItem.json.display_vendor_name = newItem.json.vendor_name;\n      } else {\n        // Empty for subsequent items\n        newItem.json.display_invoice_number = \"\";\n        newItem.json.display_vendor_name = \"\";\n      }\n      \n      results.push(newItem);\n    }\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        176
+      ],
+      "id": "9752ccf4-7107-4230-9a51-c4d377edf916",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE",
+          "mode": "list",
+          "cachedResultName": "n8n invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1632490364,
+          "mode": "list",
+          "cachedResultName": "line items",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit#gid=1632490364"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $json['Invoice Number'] }}",
+            "Vendor Name": "={{ $json['Vendor Name'] }}",
+            "Item Description": "=",
+            "Quantity": "=",
+            "Unit Price": "=",
+            "Total Amount": "="
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Name",
+              "displayName": "Vendor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item Description",
+              "displayName": "Item Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        -16
+      ],
+      "id": "15f6249f-17d8-4fa1-815f-972ea679babe",
+      "name": "Add Line Items to Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE",
+          "mode": "list",
+          "cachedResultName": "n8n invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1632490364,
+          "mode": "list",
+          "cachedResultName": "line items",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit#gid=1632490364"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $json.display_invoice_number }}",
+            "Vendor Name": "={{ $json.display_vendor_name }}",
+            "Item Description": "={{ $json.line_item_description }}",
+            "Quantity": "={{ $json.line_item_quantity }}",
+            "Unit Price": "={{ $json.line_item_unit_price }}",
+            "Total Amount": "={{ $json.line_item_amount }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Name",
+              "displayName": "Vendor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item Description",
+              "displayName": "Item Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        176
+      ],
+      "id": "b1812e0e-7900-4715-96ab-ac989017b1a9",
+      "name": "Add Line Items to Sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## If2 → Code in JavaScript → Add Line Items to Sheet1 → Add to Invoice Sheet → Code in JavaScript1 → Send a message\n",
+        "height": 128,
+        "width": 512
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -32
+      ],
+      "id": "283a62e6-919c-4acb-99aa-abc88b30bb69",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "44488761-219c-4777-87a5-29afb0fd2109",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Monitor Invoice Folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -192,
+        400
+      ],
+      "id": "4eb419c4-877c-4411-92f5-cfc0d2668a9f",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "output": "empty"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1696,
+        240
+      ],
+      "id": "de561a82-30f9-4057-980b-86dc963c4cbc",
+      "name": "Merge"
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Invoice Folder": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Invoice Data Extractor": {
+      "main": [
+        [
+          {
+            "node": "Validate Extracted Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Extracted Data": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Invoice Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Invoice Data Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add to Invoice Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Add Line Items to Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Line Items to Sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Add Line Items to Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Invoice Data Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c2b8a51c-f0e3-49b0-b17c-57c0b7fa258c",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-13T20:52:05.702Z",
+      "createdAt": "2025-09-13T20:52:05.702Z",
+      "role": "workflow:owner",
+      "workflowId": "LLvXi986PCcjXC6W",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
