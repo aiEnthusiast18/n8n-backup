@@ -1,0 +1,1560 @@
+{
+  "updatedAt": "2025-12-02T02:32:54.000Z",
+  "createdAt": "2025-12-02T02:21:39.416Z",
+  "id": "Q8yFBxAl2fOL7Q47",
+  "name": "N8N / Retell / Twillio / Trade Receptionist",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e5563a13-1323-4109-ae88-5e87b8d48d3c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        1728
+      ],
+      "id": "fc15d69b-6505-4bb2-8a14-b1b31193f6c6",
+      "name": "Log Emergency",
+      "webhookId": "e5563a13-1323-4109-ae88-5e87b8d48d3c"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "9dfc3c1d-9d99-4041-9cae-3a60cc86652d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        400
+      ],
+      "id": "e95dc96b-ec2f-472e-842d-aeaf9a94ed8c",
+      "name": "Job Creation",
+      "webhookId": "9dfc3c1d-9d99-4041-9cae-3a60cc86652d"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "56d89e8d-66c3-42bb-ae33-2c78e5d10caa",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        1040
+      ],
+      "id": "145e9f18-b55a-42e9-8f46-7f47ff6943b9",
+      "name": "Log Inquiry",
+      "webhookId": "56d89e8d-66c3-42bb-ae33-2c78e5d10caa"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Job",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full name": "={{ $json.body.name }}",
+            "Phone number": "='{{ $json.body.phone_number }}",
+            "Preferred time": "={{ $json.body.preferred_time }}",
+            "Service type": "={{ $json.body.service_type }}",
+            "Location type": "={{ $json.body.location_type }}",
+            "Location": "={{ $json.body.location }}",
+            "Appointment booked?": "={{ $json.body.appointment_booked }}",
+            "Email": "={{ $json.body.email }}"
+          },
+          "matchingColumns": [
+            "phone_number"
+          ],
+          "schema": [
+            {
+              "id": "Full name",
+              "displayName": "Full name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service type",
+              "displayName": "Service type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Preferred time",
+              "displayName": "Preferred time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Location type",
+              "displayName": "Location type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Appointment booked?",
+              "displayName": "Appointment booked?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        208,
+        400
+      ],
+      "id": "144016e0-7978-4cb6-8652-8285da6f01aa",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 11699001,
+          "mode": "list",
+          "cachedResultName": "Emergency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=11699001"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full name": "={{ $json.body.name }}",
+            "Phone number": "='{{ $json.body.phone_number }}",
+            "Location": "={{ $json.body.location }}",
+            "Emergency details": "={{ $json.body.emergency_details }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full name",
+              "displayName": "Full name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Emergency details",
+              "displayName": "Emergency details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        208,
+        1728
+      ],
+      "id": "eb5f69bb-11c7-472d-9aa6-40db0c9ee8ae",
+      "name": "Append row in Emergency",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1470146104,
+          "mode": "list",
+          "cachedResultName": "Inquiry",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=1470146104"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full name": "={{ $json.body.name }}",
+            "Phone number": "='{{ $json.body.phone_number }}",
+            "Location": "={{ $json.body.location }}",
+            "Inquiry details": "={{ $json.body.inquiry_details }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full name",
+              "displayName": "Full name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Inquiry details",
+              "displayName": "Inquiry details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        208,
+        1040
+      ],
+      "id": "810c83ef-4536-47ce-aa0e-4bce86f4757f",
+      "name": "Append row in Inquiry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "881e3b34-7867-473a-a819-bc56c662a3af",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "962062bb-09fa-4c74-80d4-9035bf8848f2",
+      "name": "Job Query by Phone",
+      "webhookId": "881e3b34-7867-473a-a819-bc56c662a3af"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Job",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone number",
+              "lookupValue": "={{ $json.body.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        144,
+        -80
+      ],
+      "id": "863de931-beb8-4d71-8fac-7457647b878d",
+      "name": "Get row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+14313411115",
+        "to": "={{ $json.output.phone_number }}",
+        "message": "={{ $json.output.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        784,
+        400
+      ],
+      "id": "48aaeb9f-565b-4d9f-81c1-b449f58b3f99",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "u9Nvye7bKA1c76J2",
+          "name": "Twilio account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "brendan@inflate.agency",
+        "subject": "[Inflate] New inquiry",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        1040
+      ],
+      "id": "af9df13b-f049-4b10-a6a1-7cf6cca69d2b",
+      "name": "Send a message",
+      "webhookId": "036e7c1e-11ac-4635-a8a2-1a5614bbd821",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3hqtCAi1EGcgg76C",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Define the wrap-up HTML email content with styles, without any leading sentences. Make sure that the response is in a valid HTML format, start with <!DOCTYPE html>, without any wrapper (e.g. \\`\\`\\` or \\`\\`\\`html).\n\nFull name: {{ $json[\"Full name\"] }}\nPhone number: {{ $json[\"Phone number\"] }}\nLocation: {{ $json.Location }}\nInquiry: {{ $json[\"Inquiry details\"] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        448,
+        1040
+      ],
+      "id": "dfe1d4c3-1432-4ebb-8c84-c641082a4892",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Define the SMS message to wrap up the appointment, make sure to return the content of the message only, don't return the leading sentence.\n\nFull name: {{ $json[\"Full name\"] }}\nPhone number: {{ $json[\"Phone number\"] }}\nLocation: {{ $json.Location }}\nBooked time: {{ $json[\"Preferred time\"] }}\nService type: {{ $json[\"Service type\"] }}\nAppointment booked? or booked link: {{ $json[\"Appointment booked?\"] }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        448,
+        400
+      ],
+      "id": "02cc65bd-abc8-4b57-8be3-59101f0cc19c",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "content": "## Get Jobs by phone number\nUse to find appointments before booking another one",
+        "height": 300,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -176
+      ],
+      "id": "5e62dd0c-eb97-4e84-872f-ac36519d6913",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Log the emergency case\nAfter logging the emergency to the sheet, send an email to the business. \n",
+        "height": 540,
+        "width": 1840
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1584
+      ],
+      "id": "c0312b3d-4119-4ffd-a4c8-01daa1f00995",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Log the inquiry\nAfter appending the inquiry to the sheet, send an email to the business.\n\n",
+        "height": 540,
+        "width": 1240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        912
+      ],
+      "id": "6de206b2-f11b-43a7-8e03-173de0b5661b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Create a new job\nAfter creating a new job, send an SMS message to confirm the appointment.\n\n",
+        "height": 540,
+        "width": 1240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        240
+      ],
+      "id": "aa1a3062-f1fd-4a38-b737-08bb7fd65a52",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"phone_number\": {\n\t\t\t\"type\": \"string\",\n            \"description\": \"Convert phone number with AU prefix, e.g. +61480089451\"\n\t\t},\n\t\t\"message\": {\n\t\t\t\"type\": \"string\",\n            \"description\": \"The SMS message\"\n\t\t}\n\t},\n    \"required\": [ \"phone_number\", \"message\" ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        624
+      ],
+      "id": "0ef69025-0bef-4769-b2a8-c96d0ab39ed2",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "sendTo": "brendan@inflate.agency",
+        "subject": "[Inflate] Emergency case",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1424,
+        1728
+      ],
+      "id": "8724dab4-ed56-4649-9e1b-f4897e037e61",
+      "name": "Send a message1",
+      "webhookId": "036e7c1e-11ac-4635-a8a2-1a5614bbd821",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3hqtCAi1EGcgg76C",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Define the SMS message for an emergency report, make sure to return the content of the message only, don't return the leading sentence.\n\nFull name: {{ $json[\"Full name\"] }}\nPhone number: {{ $json[\"Phone number\"] }}\nLocation: {{ $json.Location }}\nEmergency details: {{ $json[\"Emergency details\"] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        448,
+        1728
+      ],
+      "id": "3c9c8126-229f-47e9-a46a-55c4d1406a91",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Define the HTML email content with styles, without any leading sentences for that message. Make sure that the response is in a valid HTML format, start with <!DOCTYPE html>, without any wrapper (e.g. \\`\\`\\` or \\`\\`\\`html)\n\n\nFull name: {{ $('Append row in Emergency').item.json[\"Full name\"] }}\nPhone number: {{ $('Append row in Emergency').item.json[\"Phone number\"] }}\nLocation: {{ $('Append row in Emergency').item.json.Location }}\nEmergency details: {{ $('Append row in Emergency').item.json[\"Emergency details\"] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        1728
+      ],
+      "id": "dd73cd7e-1f00-4794-8175-a983b4d5e723",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "content": "## Post-call analysis to cover missing actions\nAnalyze the transcript, and determine to log or create a job if missing, always looks for the information first.",
+        "height": 540,
+        "width": 1840
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        2288
+      ],
+      "id": "3b78fd72-ffa7-4123-b8ca-08beb75b116e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the conversation to identify any failed tools , calling functions with missing fields or the conversation ending suddenly; we need to retry them here. Possible cases:\n- Failed to create a job\n- Created a job with a missing booking link for \"Appointment booked\", with format \"https://app.cal.com/booking/${booking_uid}\"\n- Failed to create an inquiry (For example some inquiries about the services or anything else, but hangs up, we want to capture this to try contact them again)\n- Failed to create an emergency case\n\nNote: Always get the list of records first, before making any updates to prevent duplication.\n\nNote: If someone inquries about our services and seems interested, but nothing happends, we NEED to log this as an inquiry for the team, this is busines CRITICAL.\n\nTranscript with tool callings:\n```\n{{ $json.body.call.transcript_with_tool_calls.map(item => `role: ${item.role}, content: ${item.content || item.arguments}`).join('\\n') }}\n```",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        720,
+        2432
+      ],
+      "id": "c25ef118-1681-4533-812b-84f0b9bcac55",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "from": "+14313411115",
+        "to": "=",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        832,
+        1728
+      ],
+      "id": "6d9350c2-48eb-4c6d-b305-ad93a99eecbd",
+      "name": "Send an SMS message",
+      "credentials": {
+        "twilioApi": {
+          "id": "u9Nvye7bKA1c76J2",
+          "name": "Twilio account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "596d4180-8295-497c-84f9-4481ed0ab8d3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        2432
+      ],
+      "id": "3e9f2254-092b-4fab-8556-b8e97a61eb28",
+      "name": "Post-call Analysis",
+      "webhookId": "596d4180-8295-497c-84f9-4481ed0ab8d3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1450777b-94c8-4081-bd89-5d2c28e77957",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "call_analyzed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        2432
+      ],
+      "id": "400cf5eb-878e-4555-bf6d-903e468faf05",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Job",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Full_name', ``, 'string') }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
+            "Phone number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_number', ``, 'string') }}",
+            "Service type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Service_type', ``, 'string') }}",
+            "Preferred time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Preferred_time', ``, 'string') }}",
+            "Location type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location_type', ``, 'string') }}",
+            "Location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+            "Appointment booked?": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Appointment_booked_', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Full name",
+              "displayName": "Full name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service type",
+              "displayName": "Service type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Preferred time",
+              "displayName": "Preferred time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location type",
+              "displayName": "Location type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment booked?",
+              "displayName": "Appointment booked?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1184,
+        2640
+      ],
+      "id": "b2dd1b41-9644-47b7-8cc3-29aff582578a",
+      "name": "Append or update row in Jobs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 11699001,
+          "mode": "list",
+          "cachedResultName": "Emergency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=11699001"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Full_name', ``, 'string') }}",
+            "Phone number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_number', ``, 'string') }}",
+            "Location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+            "Emergency details": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Emergency_details', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full name",
+              "displayName": "Full name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Emergency details",
+              "displayName": "Emergency details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1344,
+        2640
+      ],
+      "id": "7bf4159b-1ec3-4d65-ac69-90b671c6c3ce",
+      "name": "Append row in sheet in Emergency",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1470146104,
+          "mode": "list",
+          "cachedResultName": "Inquiry",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=1470146104"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Full_name', ``, 'string') }}",
+            "Phone number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_number', ``, 'string') }}",
+            "Location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+            "Inquiry details": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Inquiry_details', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full name",
+              "displayName": "Full name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Inquiry details",
+              "displayName": "Inquiry details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1504,
+        2640
+      ],
+      "id": "0571fbec-b2aa-4adf-99ed-e5d1b59a9a48",
+      "name": "Append row in sheet in Inquiry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Job",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        704,
+        2640
+      ],
+      "id": "758d74b8-4bb9-4719-901d-f62857324d93",
+      "name": "Get Jobs by email",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 11699001,
+          "mode": "list",
+          "cachedResultName": "Emergency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=11699001"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        864,
+        2640
+      ],
+      "id": "7cf601b6-29f5-4daa-93c7-f7003b47c219",
+      "name": "Get emergency list",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw",
+          "mode": "list",
+          "cachedResultName": "[Youtube Demo] Trade Business",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1470146104,
+          "mode": "list",
+          "cachedResultName": "Inquiry",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jOeTB0vKMhHTUyRHVCH2S-tzW1-DyPyUwZXtN7dDiHw/edit#gid=1470146104"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1024,
+        2640
+      ],
+      "id": "6a673bb7-3c7e-4b16-b714-50473a4048db",
+      "name": "Get inquiry list",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        2640
+      ],
+      "id": "c6c09625-0d13-4f06-b419-58c3923038b1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        1952
+      ],
+      "id": "b7a38302-6f6e-4a89-b54e-f0c30e51e68b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1024,
+        1952
+      ],
+      "id": "4023dc23-1857-418d-a322-f50a4d7742a3",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        1264
+      ],
+      "id": "3cc1b8b7-4f40-4ce8-8325-882ee702772f",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        624
+      ],
+      "id": "b6d7dcc5-a49d-402c-adf4-003216e15fa1",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Job Creation": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Emergency": {
+      "main": [
+        [
+          {
+            "node": "Append row in Emergency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Append row in Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Query by Phone": {
+      "main": [
+        [
+          {
+            "node": "Get row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in Inquiry": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in Emergency": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS message": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post-call Analysis": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in Jobs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Emergency": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Inquiry": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Jobs by email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get emergency list": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get inquiry list": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "72f09266-b94c-4550-8a5b-c903e80db3c2",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-02T02:21:39.419Z",
+      "createdAt": "2025-12-02T02:21:39.419Z",
+      "role": "workflow:owner",
+      "workflowId": "Q8yFBxAl2fOL7Q47",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
