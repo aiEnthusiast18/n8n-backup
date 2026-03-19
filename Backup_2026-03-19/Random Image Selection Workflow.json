@@ -1,0 +1,1181 @@
+{
+  "updatedAt": "2025-09-26T00:58:04.000Z",
+  "createdAt": "2025-09-17T00:14:23.647Z",
+  "id": "KLg1j0NcijpU6VSF",
+  "name": "Random Image Selection Workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "allowedOrigins": [
+            "*"
+          ],
+          "loadPreviousSession": "memory",
+          "responseMode": "responseNode"
+        }
+      },
+      "id": "f879af8f-5494-4ef8-b78c-40255cbbe3f3",
+      "name": "When Chat Message Received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        1440
+      ],
+      "webhookId": "a46933da-bcbc-4d2e-b7b8-a94b5f72ed06",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Random Image to Google Sheet Workflow\n\n**Purpose:** Selects a random image from a Google Drive folder and adds its shareable link to a Google Sheet.\n\n**Flow:**\n1. Chat trigger receives user request\n2. List files from Google Drive folder\n3. Filter for image files\n4. Select random image\n5. Get shareable link\n6. Add to Google Sheet\n7. AI agent responds to user",
+        "height": 200,
+        "width": 400,
+        "color": 3
+      },
+      "id": "e1d6fa1b-dc24-4709-9778-e279448f2230",
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        1312
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant that manages random image selection from Google Drive folders. When users request to get a random image or add one to a sheet, you will coordinate with the available tools to:\n\n1. Access the Google Drive folder\n2. Filter for image files (jpg, jpeg, png, gif, webp)\n3. Select a random image\n4. Get its shareable link\n5. Add the link to the specified Google Sheet\n\nAlways provide clear feedback about what you're doing and the results. If there are any errors, explain them clearly and suggest solutions.\n\nFor successful operations, provide the image name and the Google Sheet location where it was added."
+        }
+      },
+      "id": "52b6441e-9be9-48c3-9806-fe32cdfc5b28",
+      "name": "AI Agent - Image Selector",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -160,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "list"
+      },
+      "id": "abe005c4-3ae1-4c2b-825d-aaa46fa3699c",
+      "name": "Google Drive - List Folder Files",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        144,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter for image files and select random one\nconst imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'svg'];\nconst imageMimeTypes = [\n  'image/jpeg',\n  'image/png', \n  'image/gif',\n  'image/webp',\n  'image/bmp',\n  'image/tiff',\n  'image/svg+xml'\n];\n\ntry {\n  // Get all items from Google Drive\n  const allFiles = $input.all().map(item => item.json);\n  \n  if (!allFiles || allFiles.length === 0) {\n    return [{\n      json: {\n        error: 'No files found in the specified folder',\n        success: false\n      }\n    }];\n  }\n  \n  // Filter for image files\n  const imageFiles = allFiles.filter(file => {\n    const fileName = (file.name || '').toLowerCase();\n    const mimeType = file.mimeType || '';\n    \n    // Check by file extension\n    const hasImageExtension = imageExtensions.some(ext => \n      fileName.endsWith('.' + ext)\n    );\n    \n    // Check by MIME type\n    const hasImageMimeType = imageMimeTypes.includes(mimeType);\n    \n    return hasImageExtension || hasImageMimeType;\n  });\n  \n  if (imageFiles.length === 0) {\n    return [{\n      json: {\n        error: 'No image files found in the folder',\n        success: false,\n        totalFiles: allFiles.length\n      }\n    }];\n  }\n  \n  // Select random image\n  const randomIndex = Math.floor(Math.random() * imageFiles.length);\n  const selectedImage = imageFiles[randomIndex];\n  \n  return [{\n    json: {\n      success: true,\n      selectedImage: selectedImage,\n      totalImages: imageFiles.length,\n      totalFiles: allFiles.length,\n      randomIndex: randomIndex\n    }\n  }];\n  \n} catch (error) {\n  return [{\n    json: {\n      error: 'Error processing files: ' + error.message,\n      success: false\n    }\n  }];\n}"
+      },
+      "id": "13bf7e6e-bab1-4f60-8f9c-02fc5de13318",
+      "name": "Filter Images & Select Random",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "share",
+        "fileId": "={{ $json.selectedImage.id }}",
+        "permissionsUi": {},
+        "options": {}
+      },
+      "id": "924afbef-6af5-48bc-b192-80edf68f6a69",
+      "name": "Google Drive - Get Shareable Link",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        752,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare data for Google Sheets\nconst filterResult = $node['Filter Images & Select Random'].json;\nconst shareResult = $json;\n\nif (!filterResult.success) {\n  return [{\n    json: {\n      error: filterResult.error,\n      success: false\n    }\n  }];\n}\n\nconst selectedImage = filterResult.selectedImage;\nconst shareableLink = shareResult.webViewLink || shareResult.webContentLink || `https://drive.google.com/file/d/${selectedImage.id}/view`;\n\nconst timestamp = new Date().toISOString();\nconst formattedTimestamp = new Date().toLocaleString();\n\nreturn [{\n  json: {\n    success: true,\n    fileName: selectedImage.name,\n    fileId: selectedImage.id,\n    shareableLink: shareableLink,\n    mimeType: selectedImage.mimeType,\n    timestamp: timestamp,\n    formattedTimestamp: formattedTimestamp,\n    totalImages: filterResult.totalImages,\n    // Data for Google Sheets row\n    sheetRowData: {\n      'Image Name': selectedImage.name,\n      'Shareable Link': shareableLink,\n      'File ID': selectedImage.id,\n      'Date Added': formattedTimestamp,\n      'MIME Type': selectedImage.mimeType\n    }\n  }\n}];"
+      },
+      "id": "f6473da5-3dd8-48b3-8f70-01ba04a8fa9b",
+      "name": "Prepare Sheet Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "{{ $json.sheetName || 'Random Images' }}",
+        "options": {}
+      },
+      "id": "c044b2ae-d9df-4ad0-b2d2-2ed6337e2623",
+      "name": "Google Sheets - Add Image Link",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1344,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "chatgpt-4o-latest",
+        "prompt": "Based on the following data, create a friendly response to the user about the random image selection:\n\nSelected Image: {{ $json.fileName }}\nShareable Link: {{ $json.shareableLink }}\nTotal Images in Folder: {{ $json.totalImages }}\nAdded to Sheet: {{ $json.formattedTimestamp }}\n\nCreate a conversational response that includes:\n1. Confirmation that a random image was selected\n2. The image name\n3. That it was added to the Google Sheet\n4. The shareable link\n\nKeep it friendly and helpful.",
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "ada00b81-308b-469b-9768-9d0a3905142b",
+      "name": "OpenAI - Generate Response",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Configuration Required\n\n**Google Drive:**\n- Set folderId in the AI Agent or as workflow parameter\n- Ensure OAuth2 credentials are configured\n\n**Google Sheets:**\n- Set spreadsheetId and sheetName\n- Sheet should have headers: Image Name, Shareable Link, File ID, Date Added, MIME Type\n\n**Supported Image Types:**\njpg, jpeg, png, gif, webp, bmp, tiff, svg",
+        "height": 180,
+        "width": 350,
+        "color": 4
+      },
+      "id": "0f91786c-2db5-4e35-ab7f-235e84dcddf7",
+      "name": "Configuration Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        1280
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\n\n- Empty folder detection\n- No images found handling\n- Failed sharing permissions\n- Google Sheets access errors\n- Proper error messages to user\n\nAll errors are caught and returned with success: false flag",
+        "height": 140,
+        "width": 300,
+        "color": 6
+      },
+      "id": "7d10be6f-cd67-48bb-96f5-2c44edef6153",
+      "name": "Error Handling",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        752,
+        1280
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $node['Prepare Sheet Data'].json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f5f2028e-9c5b-4e7d-b57b-07ec02bd6c4e",
+      "name": "Check Operation Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        1440
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "728d8761-d85b-4524-85c4-cd96d18a83c4",
+      "name": "Set Success Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        2256,
+        1360
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9a47d170-9620-4fd8-8e4e-6fcd61d58f63",
+      "name": "Set Error Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        2256,
+        1520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are an intelligent image cycle manager. You ensure that images from a Google Drive folder are selected randomly but without repetition until all images have been used exactly once.\n\nYour process:\n1. Get all images from the specified folder\n2. Check the tracking sheet to see which images have been used\n3. Select randomly from unused images\n4. If all images have been used, reset the cycle and start over\n5. Mark the selected image as used\n6. Add the image info to the results sheet\n\nAlways provide clear feedback about:\n- Which image was selected\n- How many images remain unused in the current cycle\n- Whether a cycle was reset\n- The total number of images in the folder\n\nHandle any errors gracefully and provide helpful guidance."
+        }
+      },
+      "id": "d6851fca-e51e-45b1-a55e-85fbb3b209f8",
+      "name": "AI Agent - Cycle Manager",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -704,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "d0a7856f-da97-4f3e-abf8-d5c1272e8b64",
+      "name": "Google Sheets - Get Tracking Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -96,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Advanced cycle logic to ensure no repeats until all images used\nconst imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'svg'];\nconst imageMimeTypes = [\n  'image/jpeg', 'image/png', 'image/gif', 'image/webp',\n  'image/bmp', 'image/tiff', 'image/svg+xml'\n];\n\ntry {\n  // Get files from Google Drive\n  const driveFiles = $node['Google Drive - List Folder Files1'].json;\n  const allFiles = Array.isArray(driveFiles) ? driveFiles : [driveFiles];\n  \n  // Get tracking data from Google Sheets\n  const trackingData = $node['Google Sheets - Get Tracking Data'].json;\n  const trackingRows = Array.isArray(trackingData) ? trackingData : [];\n  \n  console.log('All files found:', allFiles.length);\n  console.log('Tracking rows:', trackingRows.length);\n  \n  // Filter for image files only\n  const imageFiles = allFiles.filter(file => {\n    const fileName = (file.name || '').toLowerCase();\n    const mimeType = file.mimeType || '';\n    \n    const hasImageExtension = imageExtensions.some(ext => \n      fileName.endsWith('.' + ext)\n    );\n    const hasImageMimeType = imageMimeTypes.includes(mimeType);\n    \n    return hasImageExtension || hasImageMimeType;\n  });\n  \n  if (imageFiles.length === 0) {\n    return [{\n      json: {\n        error: 'No image files found in the folder',\n        success: false,\n        totalFiles: allFiles.length\n      }\n    }];\n  }\n  \n  console.log('Image files found:', imageFiles.length);\n  \n  // Create a set of used image IDs from tracking sheet\n  const usedImageIds = new Set();\n  const usedImageNames = new Set();\n  \n  trackingRows.forEach(row => {\n    if (row['File ID']) {\n      usedImageIds.add(row['File ID']);\n    }\n    if (row['Image Name']) {\n      usedImageNames.add(row['Image Name']);\n    }\n  });\n  \n  console.log('Used image IDs:', usedImageIds.size);\n  \n  // Find unused images\n  let unusedImages = imageFiles.filter(image => \n    !usedImageIds.has(image.id) && !usedImageNames.has(image.name)\n  );\n  \n  console.log('Unused images found:', unusedImages.length);\n  \n  let cycleReset = false;\n  \n  // If no unused images, reset the cycle\n  if (unusedImages.length === 0) {\n    console.log('All images have been used. Resetting cycle.');\n    unusedImages = imageFiles;\n    cycleReset = true;\n  }\n  \n  // Select random image from unused ones\n  const randomIndex = Math.floor(Math.random() * unusedImages.length);\n  const selectedImage = unusedImages[randomIndex];\n  \n  console.log('Selected image:', selectedImage.name);\n  \n  return [{\n    json: {\n      success: true,\n      selectedImage: selectedImage,\n      totalImages: imageFiles.length,\n      usedImagesCount: usedImageIds.size,\n      remainingImages: unusedImages.length - 1, // -1 because we're about to use one\n      cycleReset: cycleReset,\n      randomIndex: randomIndex,\n      allImageFiles: imageFiles // Pass all images for potential tracking updates\n    }\n  }];\n  \n} catch (error) {\n  console.error('Error in cycle logic:', error);\n  return [{\n    json: {\n      error: 'Error in cycle logic: ' + error.message,\n      success: false\n    }\n  }];\n}"
+      },
+      "id": "ad4f8d44-0666-4fff-bae8-24200496cb17",
+      "name": "Cycle Logic - Select Unused Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.cycleReset }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "45bd4a8d-2a64-4a6e-b81a-b5589d6a9e02",
+      "name": "Check If Cycle Reset",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        512,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "{{ $json.trackingSheetName || 'Image_Tracking' }}"
+      },
+      "id": "712f6e6f-5990-4244-9a0c-49bef6f02e70",
+      "name": "Google Sheets - Clear Tracking (Reset)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        800,
+        2192
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare data for both tracking and results sheets\nconst cycleResult = $node['Cycle Logic - Select Unused Image'].json;\nconst shareResult = $json;\n\nif (!cycleResult.success) {\n  return [{\n    json: {\n      error: cycleResult.error,\n      success: false\n    }\n  }];\n}\n\nconst selectedImage = cycleResult.selectedImage;\nconst shareableLink = shareResult.webViewLink || shareResult.webContentLink || \n  `https://drive.google.com/file/d/${selectedImage.id}/view`;\n\nconst timestamp = new Date().toISOString();\nconst formattedTimestamp = new Date().toLocaleString();\nconst cycleNumber = Math.floor((cycleResult.usedImagesCount) / cycleResult.totalImages) + 1;\n\nreturn [{\n  json: {\n    success: true,\n    fileName: selectedImage.name,\n    fileId: selectedImage.id,\n    shareableLink: shareableLink,\n    mimeType: selectedImage.mimeType,\n    timestamp: timestamp,\n    formattedTimestamp: formattedTimestamp,\n    totalImages: cycleResult.totalImages,\n    remainingImages: cycleResult.remainingImages,\n    cycleReset: cycleResult.cycleReset,\n    cycleNumber: cycleNumber,\n    usedImagesCount: cycleResult.usedImagesCount,\n    \n    // Data for results sheet\n    resultsRowData: {\n      'Image Name': selectedImage.name,\n      'Shareable Link': shareableLink,\n      'File ID': selectedImage.id,\n      'Date Selected': formattedTimestamp,\n      'MIME Type': selectedImage.mimeType,\n      'Cycle Number': cycleNumber,\n      'Remaining in Cycle': cycleResult.remainingImages\n    },\n    \n    // Data for tracking sheet\n    trackingRowData: {\n      'Image Name': selectedImage.name,\n      'File ID': selectedImage.id,\n      'Date Used': formattedTimestamp,\n      'Cycle Number': cycleNumber\n    }\n  }\n}];"
+      },
+      "id": "edb3b94c-973e-42f2-863d-ceddf76521bd",
+      "name": "Prepare Data for Sheets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "{{ $json.trackingSheetName || 'Image_Tracking' }}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "d1e3132d-4758-4ebb-a5be-86eea7b08d65",
+      "name": "Google Sheets - Add to Tracking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1712,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "{{ $json.resultsSheetName || 'Random_Images' }}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "765e347b-5a16-4cbe-a671-3fbf89bbf2dd",
+      "name": "Google Sheets - Add to Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2000,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a35aeec8-1861-4534-816d-5082a53a909d",
+      "name": "Set Final Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        2304,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Required Google Sheets Setup\n\n**Tracking Sheet (Image_Tracking):**\nHeaders: Image Name | File ID | Date Used | Cycle Number\n\n**Results Sheet (Random_Images):**\nHeaders: Image Name | Shareable Link | File ID | Date Selected | MIME Type | Cycle Number | Remaining in Cycle\n\n**Configuration:**\n- Set spreadsheetId in nodes\n- Both sheets in same spreadsheet\n- Tracking sheet tracks usage to prevent repeats",
+        "height": 344,
+        "width": 380,
+        "color": 4
+      },
+      "id": "2fae1337-3c20-4c2f-bf2d-c1423a3ab96e",
+      "name": "Sheet Setup Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        1888
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## How the Cycle Works\n\n1. **Get all images** from folder\n2. **Check tracking sheet** for used images\n3. **Filter to unused images**\n4. **If all used:** Clear tracking, reset cycle\n5. **Select random** from unused\n6. **Mark as used** in tracking\n7. **Add to results** sheet\n\n**Result:** Each image used exactly once before any repeats, regardless of folder size!",
+        "height": 292,
+        "width": 350,
+        "color": 5
+      },
+      "id": "94c9e17a-757a-404f-973d-79e98d093269",
+      "name": "Cycle Logic Explanation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        1888
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Cycle Random Image Selector\n\n**Purpose:** Selects random images from Google Drive folder ensuring each image is used exactly once before any repeats.\n\n**Tracking:** Uses Google Sheet to track which images have been used\n\n**Cycle Logic:**\n1. Get all images from folder\n2. Check tracking sheet for used images\n3. Select from unused images\n4. If all used, reset cycle\n5. Mark selected image as used\n6. Add to results sheet",
+        "height": 360,
+        "width": 400,
+        "color": 3
+      },
+      "id": "37e2e8b7-a194-49a7-bedf-f23f4b83cc68",
+      "name": "Workflow Documentation1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        2080
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "0fab0b44-6563-44f6-9c96-862bf1827fea",
+      "name": "Google Drive - List Folder Files1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -400,
+        2272
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "share",
+        "fileId": "={{ $json.selectedImage.id }}",
+        "permissionsUi": {},
+        "options": {}
+      },
+      "id": "50f0b2eb-ddb6-4269-b52c-26657a4ffd26",
+      "name": "Google Drive - Get Shareable Link1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1104,
+        2272
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "29b3d44a-9695-4e0c-aab8-db4f7ac2e8ad",
+      "name": "Set Folder Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -208,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "search"
+      },
+      "id": "4bd082a9-18f2-491b-bba6-4c0907be68ec",
+      "name": "Google Drive - Search Folder Files",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        96,
+        864
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Setup Instructions\n\n**1. Google Drive Folder ID:**\n- Right-click folder in Drive > Share > Copy link\n- Extract ID from: https://drive.google.com/drive/folders/[FOLDER_ID]\n\n**2. Google Sheets:**\n- Create spreadsheet with two sheets:\n  - \"Image_Tracking\" (Headers: Image Name, File ID, Date Used, Cycle Number)\n  - \"Random_Images\" (Headers: Image Name, Shareable Link, File ID, Date Selected, MIME Type, Cycle Number, Remaining in Cycle)\n\n**3. Update node with your IDs**",
+        "height": 360,
+        "width": 400,
+        "color": 4
+      },
+      "id": "0c5c1cc7-31f0-4841-9a94-f7c8293255d6",
+      "name": "Configuration Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        256
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Search Query Explained\n\n**Query:** `'[FOLDER_ID]' in parents and trashed=false`\n\n- **'[FOLDER_ID]' in parents:** Find files in specific folder\n- **and trashed=false:** Exclude deleted files\n- **fields:** Specify which file properties to return\n\n**Returns:** All non-trashed files in the specified folder",
+        "height": 278,
+        "width": 350,
+        "color": 5
+      },
+      "id": "d0dc7ee6-1f4d-45cc-b349-5a025cad35c5",
+      "name": "Google Drive Search Query",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        48,
+        208
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Cycle Random Image Selector\n\n**Purpose:** Selects random images from Google Drive folder ensuring each image is used exactly once before any repeats.\n\n**Tracking:** Uses Google Sheet to track which images have been used\n\n**Cycle Logic:**\n1. Search for files in Google Drive folder\n2. Check tracking sheet for used images\n3. Select from unused images\n4. If all used, reset cycle\n5. Mark selected image as used\n6. Add to results sheet",
+        "height": 360,
+        "width": 400,
+        "color": 3
+      },
+      "id": "c5656ff7-bedb-4afb-b449-7e35282f70c1",
+      "name": "Workflow Documentation2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        544
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are an intelligent image cycle manager. You ensure that images from a Google Drive folder are selected randomly but without repetition until all images have been used exactly once.\n\nYour process:\n1. Search for all images in the specified folder\n2. Check the tracking sheet to see which images have been used\n3. Select randomly from unused images\n4. If all images have been used, reset the cycle and start over\n5. Mark the selected image as used\n6. Add the image info to the results sheet\n\nAlways provide clear feedback about:\n- Which image was selected\n- How many images remain unused in the current cycle\n- Whether a cycle was reset\n- The total number of images in the folder\n\nHandle any errors gracefully and provide helpful guidance."
+        }
+      },
+      "id": "75d9c420-6f68-4fc0-a928-c43ee7efa469",
+      "name": "AI Agent - Cycle Manager1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -512,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "7772fe9b-f4a2-4509-957b-63b8bb522c70",
+      "name": "Google Sheets - Get Tracking Data1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        400,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Advanced cycle logic to ensure no repeats until all images used\nconst imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'svg'];\nconst imageMimeTypes = [\n  'image/jpeg', 'image/png', 'image/gif', 'image/webp',\n  'image/bmp', 'image/tiff', 'image/svg+xml'\n];\n\ntry {\n  // Get files from Google Drive search\n  const driveResult = $node['Google Drive - Search Folder Files'].json;\n  let allFiles = [];\n  \n  // Handle different response formats\n  if (driveResult && driveResult.files) {\n    allFiles = driveResult.files;\n  } else if (Array.isArray(driveResult)) {\n    allFiles = driveResult;\n  } else {\n    allFiles = [driveResult].filter(f => f && f.id);\n  }\n  \n  // Get tracking data from Google Sheets\n  const trackingData = $node['Google Sheets - Get Tracking Data1'].json;\n  const trackingRows = Array.isArray(trackingData) ? trackingData : [];\n  \n  console.log('All files found:', allFiles.length);\n  console.log('Tracking rows:', trackingRows.length);\n  \n  // Filter for image files only\n  const imageFiles = allFiles.filter(file => {\n    if (!file || !file.name) return false;\n    \n    const fileName = file.name.toLowerCase();\n    const mimeType = file.mimeType || '';\n    \n    const hasImageExtension = imageExtensions.some(ext => \n      fileName.endsWith('.' + ext)\n    );\n    const hasImageMimeType = imageMimeTypes.includes(mimeType);\n    \n    return hasImageExtension || hasImageMimeType;\n  });\n  \n  if (imageFiles.length === 0) {\n    return [{\n      json: {\n        error: 'No image files found in the folder',\n        success: false,\n        totalFiles: allFiles.length,\n        searchResult: driveResult\n      }\n    }];\n  }\n  \n  console.log('Image files found:', imageFiles.length);\n  \n  // Create a set of used image IDs from tracking sheet\n  const usedImageIds = new Set();\n  const usedImageNames = new Set();\n  \n  // Skip header row and process tracking data\n  trackingRows.slice(1).forEach(row => {\n    if (row && typeof row === 'object') {\n      // Handle different possible field names\n      const fileId = row['File ID'] || row['fileId'] || row.fileId;\n      const imageName = row['Image Name'] || row['imageName'] || row.name;\n      \n      if (fileId) {\n        usedImageIds.add(fileId);\n      }\n      if (imageName) {\n        usedImageNames.add(imageName);\n      }\n    }\n  });\n  \n  console.log('Used image IDs:', usedImageIds.size);\n  \n  // Find unused images\n  let unusedImages = imageFiles.filter(image => \n    !usedImageIds.has(image.id) && !usedImageNames.has(image.name)\n  );\n  \n  console.log('Unused images found:', unusedImages.length);\n  \n  let cycleReset = false;\n  \n  // If no unused images, reset the cycle\n  if (unusedImages.length === 0) {\n    console.log('All images have been used. Resetting cycle.');\n    unusedImages = imageFiles;\n    cycleReset = true;\n  }\n  \n  // Select random image from unused ones\n  const randomIndex = Math.floor(Math.random() * unusedImages.length);\n  const selectedImage = unusedImages[randomIndex];\n  \n  console.log('Selected image:', selectedImage.name);\n  \n  return [{\n    json: {\n      success: true,\n      selectedImage: selectedImage,\n      totalImages: imageFiles.length,\n      usedImagesCount: usedImageIds.size,\n      remainingImages: unusedImages.length - 1, // -1 because we're about to use one\n      cycleReset: cycleReset,\n      randomIndex: randomIndex,\n      folderId: $node['Set Folder Configuration'].json.folderId,\n      spreadsheetId: $node['Set Folder Configuration'].json.spreadsheetId\n    }\n  }];\n  \n} catch (error) {\n  console.error('Error in cycle logic:', error);\n  return [{\n    json: {\n      error: 'Error in cycle logic: ' + error.message,\n      success: false\n    }\n  }];\n}"
+      },
+      "id": "4730b07b-aac4-44f9-83ec-3c3eb40d965e",
+      "name": "Cycle Logic - Select Unused Image1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.cycleReset }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ebe965d5-baf7-40d0-973c-0e65d0cb35b0",
+      "name": "Check If Cycle Reset1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        992,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "Image_Tracking"
+      },
+      "id": "7b24dee9-5983-4365-91e6-160c26547cee",
+      "name": "Google Sheets - Clear Tracking (Reset)1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1296,
+        784
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "share",
+        "fileId": "={{ $json.selectedImage.id }}",
+        "permissionsUi": {},
+        "options": {}
+      },
+      "id": "fbf6b6e8-ef36-434d-91d4-1bdfa7dcfcd9",
+      "name": "Google Drive - Get Shareable Link2",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare data for both tracking and results sheets\nconst cycleResult = $node['Cycle Logic - Select Unused Image1'].json;\n\n// Get share result - handle different possible structures\nlet shareResult = $json;\nif ($json && $json.json) {\n  shareResult = $json.json;\n}\n\nif (!cycleResult.success) {\n  return [{\n    json: {\n      error: cycleResult.error,\n      success: false\n    }\n  }];\n}\n\nconst selectedImage = cycleResult.selectedImage;\n\n// Build shareable link - try multiple approaches\nlet shareableLink = '';\nif (shareResult && shareResult.webViewLink) {\n  shareableLink = shareResult.webViewLink;\n} else if (shareResult && shareResult.webContentLink) {\n  shareableLink = shareResult.webContentLink;\n} else if (selectedImage.webViewLink) {\n  shareableLink = selectedImage.webViewLink;\n} else if (selectedImage.webContentLink) {\n  shareableLink = selectedImage.webContentLink;\n} else {\n  shareableLink = `https://drive.google.com/file/d/${selectedImage.id}/view`;\n}\n\nconst timestamp = new Date().toISOString();\nconst formattedTimestamp = new Date().toLocaleString();\nconst cycleNumber = Math.floor((cycleResult.usedImagesCount) / cycleResult.totalImages) + 1;\n\nreturn [{\n  json: {\n    success: true,\n    fileName: selectedImage.name,\n    fileId: selectedImage.id,\n    shareableLink: shareableLink,\n    mimeType: selectedImage.mimeType,\n    timestamp: timestamp,\n    formattedTimestamp: formattedTimestamp,\n    totalImages: cycleResult.totalImages,\n    remainingImages: cycleResult.remainingImages,\n    cycleReset: cycleResult.cycleReset,\n    cycleNumber: cycleNumber,\n    usedImagesCount: cycleResult.usedImagesCount,\n    spreadsheetId: cycleResult.spreadsheetId\n  }\n}];"
+      },
+      "id": "9505586e-5619-4f68-b5ea-832b91f6e400",
+      "name": "Prepare Data for Sheets1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "Image_Tracking",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "ad08a6a1-43ed-4e81-8612-77311bffaa7a",
+      "name": "Google Sheets - Add to Tracking1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2192,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": "Random_Images",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "7ca79454-426d-44b9-a613-0374d0162f64",
+      "name": "Google Sheets - Add to Results1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2496,
+        864
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9622961b-3ffb-4561-bda4-93967a09f09d",
+      "name": "Set Final Response1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        2800,
+        864
+      ],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "When Chat Message Received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Image Selector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Image Selector": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - List Folder Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - List Folder Files": {
+      "main": [
+        [
+          {
+            "node": "Filter Images & Select Random",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Images & Select Random": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Get Shareable Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Get Shareable Link": {
+      "main": [
+        [
+          {
+            "node": "Prepare Sheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sheet Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Add Image Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add Image Link": {
+      "main": [
+        [
+          {
+            "node": "Check Operation Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Operation Success": {
+      "main": [
+        [
+          {
+            "node": "Set Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Cycle Manager": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - List Folder Files1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Get Tracking Data": {
+      "main": [
+        [
+          {
+            "node": "Cycle Logic - Select Unused Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cycle Logic - Select Unused Image": {
+      "main": [
+        [
+          {
+            "node": "Check If Cycle Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Cycle Reset": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Clear Tracking (Reset)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Drive - Get Shareable Link1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Clear Tracking (Reset)": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Get Shareable Link1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data for Sheets": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Add to Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add to Tracking": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Add to Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add to Results": {
+      "main": [
+        [
+          {
+            "node": "Set Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - List Folder Files1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Get Tracking Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Get Shareable Link1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data for Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Folder Configuration": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Search Folder Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Search Folder Files": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Get Tracking Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Cycle Manager1": {
+      "main": [
+        [
+          {
+            "node": "Set Folder Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Get Tracking Data1": {
+      "main": [
+        [
+          {
+            "node": "Cycle Logic - Select Unused Image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cycle Logic - Select Unused Image1": {
+      "main": [
+        [
+          {
+            "node": "Check If Cycle Reset1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Cycle Reset1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Clear Tracking (Reset)1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Drive - Get Shareable Link2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Clear Tracking (Reset)1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Get Shareable Link2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Get Shareable Link2": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data for Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data for Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Add to Tracking1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add to Tracking1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Add to Results1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add to Results1": {
+      "main": [
+        [
+          {
+            "node": "Set Final Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "fa404a98-0eaa-4f52-91fd-83fd94a35c58",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-17T00:14:23.653Z",
+      "createdAt": "2025-09-17T00:14:23.653Z",
+      "role": "workflow:owner",
+      "workflowId": "KLg1j0NcijpU6VSF",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
