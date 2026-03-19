@@ -1,0 +1,292 @@
+{
+  "updatedAt": "2025-09-25T23:42:56.000Z",
+  "createdAt": "2025-08-26T17:11:42.378Z",
+  "id": "NmWyasnHhgPrON62",
+  "name": "Leads - more infos + email draft",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Website: {{ $json.body.rowValues[0]['2'] }}\nEmail: {{ $json.body.rowValues[0]['3'] }}\n\nTask:\n1. Research the website and email to find company name, address, and phone number.\n2. Generate a cold outreach email from Anago Cleaning Systems Manitoba offering a free site inspection and no-commitment cleaning quote.\n3. Append these results to the Google Sheet using the `append_to_google_sheet` tool.",
+        "options": {
+          "systemMessage": "You are a B2B lead generation assistant for Anago Cleaning Systems Manitoba.\n\nProcess you must always follow:\n1. Accept a company’s website and email address as inputs.\n2. Research the company using its website and any public sources to identify:\n   - Company name\n   - Company physical address\n   - Company phone number\n3. Generate a personalized cold outreach email that:\n   - Introduces Anago Cleaning Systems Manitoba\n   - Offers a free, no-commitment cleaning quote\n   - Suggests a complimentary site inspection\n   - Uses a professional but approachable tone\n   - Is concise and encourages a reply\n4. Call the tool `append_to_google_sheet` EXACTLY ONCE to append one row containing:\n   [website, email, company name, address, phone, outreach email draft]\n\nConstraints:\n- If any detail cannot be found, use an empty string \"\" for that field, but still call the tool.\n- Do not hallucinate company details; only use verifiable info.\n- Do not return text directly to the user. You must always finish by appending the row with the tool.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        64
+      ],
+      "id": "2d505069-627c-4bc9-961f-99281d6fcac7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        240
+      ],
+      "id": "d5016f14-79d1-49d2-bc4b-d497e952b6ec",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "25929508-50dd-4b55-b1b0-63cb11ce4127",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "524b3aef-2dbb-4d16-a029-82135b042db9",
+      "name": "Webhook1",
+      "webhookId": "25929508-50dd-4b55-b1b0-63cb11ce4127"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1Itzxu689Gg6VmTLohwiLZ2KTIhzK46xZvNJbB-4Sqo0",
+          "mode": "list",
+          "cachedResultName": "Copy of Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Itzxu689Gg6VmTLohwiLZ2KTIhzK46xZvNJbB-4Sqo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1551800884,
+          "mode": "list",
+          "cachedResultName": "Leads n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Itzxu689Gg6VmTLohwiLZ2KTIhzK46xZvNJbB-4Sqo0/edit#gid=1551800884"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Company_Name', ``, 'string') }}",
+            "Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address', ``, 'string') }}",
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "Email Address": "={{ $json.body.rowValues[0]['3'] }}",
+            "Email Draft": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_Draft', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Email Address"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Draft",
+              "displayName": "Email Draft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        272
+      ],
+      "id": "f5fa9c71-22bd-4bdc-a2b8-d04cb2ec29df",
+      "name": "Update row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "614b06e8-fb3c-4139-af8f-069f1ff93a1a",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "content": "## Leads research w/ company website and cold email generation as Anago",
+        "height": 112,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -224
+      ],
+      "id": "7992fab2-8f8e-4352-b8b9-3a3bcb73ab8f",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c72e0b0c-0090-41fd-8cd8-149417ee3fc2",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-26T17:11:42.384Z",
+      "createdAt": "2025-08-26T17:11:42.384Z",
+      "role": "workflow:owner",
+      "workflowId": "NmWyasnHhgPrON62",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
