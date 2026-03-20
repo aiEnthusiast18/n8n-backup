@@ -1,0 +1,338 @@
+{
+  "updatedAt": "2026-03-08T22:41:02.412Z",
+  "createdAt": "2026-03-08T19:02:10.572Z",
+  "id": "PBH3T0O2A8qgWR2f",
+  "name": "Check Availability",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "afterTime"
+            },
+            {
+              "name": "beforeTime"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "62f12fe1-ec0a-4432-bc18-bf3eda885d2e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "itsridalakhani@gmail.com",
+          "mode": "list",
+          "cachedResultName": "itsridalakhani@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.afterTime }}",
+        "timeMax": "={{ $json.beforeTime }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "be1cf1f8-60f9-49ca-a4ac-d146aa672a2b",
+      "name": "Get many events",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dCZ8M5ZWxYvzU4gK",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "76162ee2-92f6-4f5c-9376-3381250f0c9c",
+              "leftValue": "={{ $json.summary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "91502c04-1db9-4d62-9fd8-abd4ba222573",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1488c01b-d1e4-4c3c-81a9-7bf579287d71",
+              "name": "message",
+              "value": "the entire day is available",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        96
+      ],
+      "id": "063d4ed5-fa69-4b5f-93bc-53711e6bed56",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3d827a03-9c0b-44ed-8650-fb7c8dbcec3c",
+  "activeVersionId": "3d827a03-9c0b-44ed-8650-fb7c8dbcec3c",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-08T19:02:10.574Z",
+      "createdAt": "2026-03-08T19:02:10.574Z",
+      "role": "workflow:owner",
+      "workflowId": "PBH3T0O2A8qgWR2f",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T22:40:49.000Z",
+    "createdAt": "2026-03-08T22:35:00.914Z",
+    "versionId": "3d827a03-9c0b-44ed-8650-fb7c8dbcec3c",
+    "workflowId": "PBH3T0O2A8qgWR2f",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "afterTime"
+              },
+              {
+                "name": "beforeTime"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "62f12fe1-ec0a-4432-bc18-bf3eda885d2e",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "itsridalakhani@gmail.com",
+            "mode": "list",
+            "cachedResultName": "itsridalakhani@gmail.com"
+          },
+          "returnAll": true,
+          "timeMin": "={{ $json.afterTime }}",
+          "timeMax": "={{ $json.beforeTime }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          208,
+          0
+        ],
+        "id": "be1cf1f8-60f9-49ca-a4ac-d146aa672a2b",
+        "name": "Get many events",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dCZ8M5ZWxYvzU4gK",
+            "name": "Google Calendar account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "76162ee2-92f6-4f5c-9376-3381250f0c9c",
+                "leftValue": "={{ $json.summary }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          416,
+          0
+        ],
+        "id": "91502c04-1db9-4d62-9fd8-abd4ba222573",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "1488c01b-d1e4-4c3c-81a9-7bf579287d71",
+                "name": "message",
+                "value": "the entire day is available",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          624,
+          96
+        ],
+        "id": "063d4ed5-fa69-4b5f-93bc-53711e6bed56",
+        "name": "Edit Fields"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Get many events",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many events": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 3d827a03",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
