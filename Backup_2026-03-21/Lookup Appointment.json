@@ -1,0 +1,176 @@
+{
+  "updatedAt": "2026-03-08T22:41:49.072Z",
+  "createdAt": "2026-03-08T19:00:57.163Z",
+  "id": "Oc5HlGbIhMOkjxu7",
+  "name": "Lookup Appointment",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "afterTime"
+            },
+            {
+              "name": "beforeTime"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9dd1e27f-ba3f-4c28-a363-3901c64a9119",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "itsridalakhani@gmail.com",
+          "mode": "list",
+          "cachedResultName": "itsridalakhani@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.afterTime }}",
+        "timeMax": "={{ $json.beforeTime }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a9fda7ef-6f2d-4a74-b7c2-36e3297365ea",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dCZ8M5ZWxYvzU4gK",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9b85562c-2e22-4f9a-9768-dc7d384f155c",
+  "activeVersionId": "9b85562c-2e22-4f9a-9768-dc7d384f155c",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-08T19:00:57.166Z",
+      "createdAt": "2026-03-08T19:00:57.166Z",
+      "role": "workflow:owner",
+      "workflowId": "Oc5HlGbIhMOkjxu7",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T22:41:41.000Z",
+    "createdAt": "2026-03-08T22:33:02.391Z",
+    "versionId": "9b85562c-2e22-4f9a-9768-dc7d384f155c",
+    "workflowId": "Oc5HlGbIhMOkjxu7",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "afterTime"
+              },
+              {
+                "name": "beforeTime"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "9dd1e27f-ba3f-4c28-a363-3901c64a9119",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "itsridalakhani@gmail.com",
+            "mode": "list",
+            "cachedResultName": "itsridalakhani@gmail.com"
+          },
+          "returnAll": true,
+          "timeMin": "={{ $json.afterTime }}",
+          "timeMax": "={{ $json.beforeTime }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          208,
+          0
+        ],
+        "id": "a9fda7ef-6f2d-4a74-b7c2-36e3297365ea",
+        "name": "Get many events",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dCZ8M5ZWxYvzU4gK",
+            "name": "Google Calendar account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Get many events",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 9b85562c",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
