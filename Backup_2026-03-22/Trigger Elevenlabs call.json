@@ -1,0 +1,2451 @@
+{
+  "updatedAt": "2026-01-28T18:39:22.887Z",
+  "createdAt": "2025-10-16T01:41:52.689Z",
+  "id": "ayOfTAttKWmwc7ST",
+  "name": "Trigger Elevenlabs call",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "37d33f88-c652-43e1-98ae-e2cc95ce1a08",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bf88b57f-ee2a-4adc-a27c-c2ac8f9540c3",
+      "name": "Webhook",
+      "webhookId": "37d33f88-c652-43e1-98ae-e2cc95ce1a08",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3d88e679-c60e-44b8-bf1f-8bf63470b7e5",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b0125f8b-9b6f-4b2d-813f-6eb2da4eef11",
+      "name": "Wait",
+      "webhookId": "bddc7eb7-0b28-41c3-82a0-47a94fcc4e4c",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8b0ab9e2-8008-440a-9911-5f80972d0fb3",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "62f41116-7ac1-4196-93e2-c619760d51a6",
+      "name": "Code in JavaScript",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24ffca6f-dddd-4db4-be5e-0c3029f667fc",
+              "name": "response",
+              "value": "={{ $json.combined_transcript }}",
+              "type": "string"
+            },
+            {
+              "id": "64450ff3-bc29-4d0f-8a10-32fa31210736",
+              "name": "endedReason",
+              "value": "={{ $('HTTP Request3').item.json.metadata.termination_reason }}",
+              "type": "string"
+            },
+            {
+              "id": "57fe7b06-68d7-4e8c-8c0a-cc449ec8cbc9",
+              "name": "GHL contactID",
+              "value": "={{ $('Webhook1').first().json.body.contact_id }} ",
+              "type": "string"
+            },
+            {
+              "id": "2f74e284-c952-44c8-a459-b5826074a560",
+              "name": "transcript recording",
+              "value": "={{ $json.recordingUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7821ac70-5cee-4bee-9d82-32c784022d42",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        -384
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f15047ad-b86a-4984-b47e-4f0664da10ba",
+              "leftValue": "={{ $json.endedReason }}",
+              "rightValue": "customer-did-not-answer",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "3e40f3cc-616a-4974-9eab-b5cac5bb3723",
+              "leftValue": "={{ $json.endedReason }}",
+              "rightValue": "unknown-error\t",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c9116d0b-4ca6-4a7a-82cb-05eabc3d30d7",
+              "leftValue": "={{ $json.endedReason }}",
+              "rightValue": "silence-timed-out",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "7d7f9136-3bde-4d4a-9743-39d095f7a449",
+              "leftValue": "={{ $json.endedReason }}",
+              "rightValue": "=Call ended by remote party",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1088,
+        -384
+      ],
+      "id": "9af8885c-2b46-40df-8fe5-138f38cecd45",
+      "name": "Call status"
+    },
+    {
+      "parameters": {
+        "content": "## Lead declined call / did not answer\n\n- Updates CRM\n- Can determine if you want to trigger another call after this or after certain period..",
+        "height": 548,
+        "width": 684
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -944
+      ],
+      "id": "37cabaab-6509-43d2-89f2-9aafa82005d7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Lead Answered\n1. Determine if lead booked a call or not\n2. Analyze if there's any actions needing to be taken (ex. adding to DNC list)\n3. Determine what could be done better (used for improving the agent)",
+        "height": 1096,
+        "width": 692
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -320
+      ],
+      "id": "a427cc0b-e8a4-4a6a-8e81-8419c94a99f1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.transcript }} {{ $json.response }}",
+        "options": {
+          "categories": "Booked Consultation,\nDidn't Book Consultation",
+          "systemPromptTemplate": "You are to analyze the transcript and determine. ifa meeting/consultation/appointment was scheduled or not. If you choose the Booked Consultation route then you must be sure that an appointment was actually scheduled and that they agreed on a day and time."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -144
+      ],
+      "id": "91a8cb58-af96-472f-b071-6829a8064215",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.response }}",
+        "options": {
+          "systemMessage": "You are to analyze the transcript and determine what actions to take. If the customer / lead sounds pissed off or asks to be removed then you must call the do not contact tool (DNC). Use common sense to determine what action to take. Remember that you must only call the DNC tool if the user explicitly said to not contact them again or something similar to them not wanting to be reached out to again."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -544,
+        96
+      ],
+      "id": "a109a84f-4c05-4312-8be1-c73b187c99bf",
+      "name": "analyze actions needed"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        -592
+      ],
+      "id": "a1959613-d114-4da4-b238-aef374effedd",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Transcript to analyze: {{ $('Call status').item.json.response }}",
+              "role": "system"
+            },
+            {
+              "content": "You are to analyze the transcript and determine why a meeting was not booked. If anything went wrong you need to output that and also identify areas for improvement. \n\nYour output should be in \n'Reason call was not booked'\n'Area for improvement'"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -624,
+        560
+      ],
+      "id": "187daed8-9282-4a99-83fb-699860dfc1e1",
+      "name": "Feedback Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -624,
+        288
+      ],
+      "id": "660ed153-84a0-4b8c-aaf0-9583fe0c1036",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -752,
+        48
+      ],
+      "id": "030850c1-fced-475a-b9d3-9840bd08dfd0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Your job is to update the status in GoHighLevel to a no reply follow up 1. You must pass the email to the tool as well: {{ $('Webhook1').first().json.body.email }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -608,
+        -768
+      ],
+      "id": "b3451027-b984-4f64-8bbc-74b098806cd8",
+      "name": "Update CRM Status"
+    },
+    {
+      "parameters": {
+        "name": "updateStatus_noReplyFUP1",
+        "description": "=Your job is to update the status in GoHighLevel to a no reply follow up one (also known as no reply). You must pass the email to the tool as well: {{ $('Webhook1').first().json.body.email }}",
+        "workflowId": {
+          "__rl": true,
+          "value": "sbs7MsYfIJaqhraY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sbs7MsYfIJaqhraY",
+          "cachedResultName": "no-reply FUP1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        -592
+      ],
+      "id": "0c647c70-6439-4a9f-b022-6b452bd433d2",
+      "name": "Tool Calling My CRM",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "name": "updateStatus_DNC",
+        "description": "Call this tool to update the status in GoHighLevel to do not contact (do not contact)",
+        "workflowId": {
+          "__rl": true,
+          "value": "sFhfjvThTTVejhTe",
+          "mode": "list",
+          "cachedResultName": "DNC"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Webhook1').item.json.body.email }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        320
+      ],
+      "id": "0114e0c4-0b00-4e88-bcbf-5a950373d515",
+      "name": "Update CRM Status1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c",
+          "mode": "list",
+          "cachedResultName": "Elevenlabs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone_number": "={{ $('Webhook1').item.json.body.phone }}",
+            "reason call was not booked": "={{ $json.message.content['Reason call was not booked'] }}",
+            "ai area for improvement": "={{ $json.message.content['Area for improvement'] }}",
+            "results": "answered, didn't book",
+            "transcript": "="
+          },
+          "matchingColumns": [
+            "phone_number"
+          ],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "about",
+              "displayName": "about",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "results",
+              "displayName": "results",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason call was not booked",
+              "displayName": "reason call was not booked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ai area for improvement",
+              "displayName": "ai area for improvement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        560
+      ],
+      "id": "11a90d44-f880-4f83-a53c-627fa79feb0d",
+      "name": "Append or update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c",
+          "mode": "list",
+          "cachedResultName": "Elevenlabs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone_number": "={{ $('Webhook1').item.json.body.phone }}",
+            "results": "booked call",
+            "transcript": "={{ $('Edit Fields').item.json.user.transcript }}"
+          },
+          "matchingColumns": [
+            "phone_number"
+          ],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "about",
+              "displayName": "about",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "results",
+              "displayName": "results",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason call was not booked",
+              "displayName": "reason call was not booked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ai area for improvement",
+              "displayName": "ai area for improvement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -336,
+        -160
+      ],
+      "id": "0aba8d65-f9a1-4593-8faa-0e3352f4a16c",
+      "name": "Append or update row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c",
+          "mode": "list",
+          "cachedResultName": "Elevenlabs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone_number": "={{ $('Webhook1').item.json.body.phone }}",
+            "results": "no answer"
+          },
+          "matchingColumns": [
+            "phone_number"
+          ],
+          "schema": [
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "about",
+              "displayName": "about",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "results",
+              "displayName": "results",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason call was not booked",
+              "displayName": "reason call was not booked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai area for improvement",
+              "displayName": "ai area for improvement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -256,
+        -784
+      ],
+      "id": "7baa71a3-b1e5-4a16-a1b2-e83a90c7e478",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/convai/twilio/outbound-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "xi-api-key",
+              "value": "sk_efe69a57621f11a69520049c8f4ad5994f9ba8205e6e801a"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "agent_4001k7n7yee4enbsthf8a8z112g5"
+            },
+            {
+              "name": "agent_phone_number_id",
+              "value": "phnum_6601k7qmrmr7fpbsggv12qzxdbak"
+            },
+            {
+              "name": "to_number",
+              "value": "+12165703136"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2144,
+        -384
+      ],
+      "id": "e1e6857d-7869-4c26-83e3-88b2197fcbb2",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e416ac04-f91e-4f72-9780-e5485e1875d8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2352,
+        -384
+      ],
+      "id": "ae9ba0b6-115d-44bc-8145-8387fa233bf2",
+      "name": "Webhook1",
+      "webhookId": "e416ac04-f91e-4f72-9780-e5485e1875d8"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.elevenlabs.io/v1/convai/conversations/{{ $json.conversation_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_efe69a57621f11a69520049c8f4ad5994f9ba8205e6e801a"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1728,
+        -384
+      ],
+      "id": "b45609d3-aa87-4618-a004-abc5b9176cc5",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1936,
+        -384
+      ],
+      "id": "8a171f2d-52d9-4f10-938a-2d2205a7d889",
+      "name": "Wait1",
+      "webhookId": "670dcca8-844e-4202-a853-9837c502f46e"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the transcript array from the input\nconst transcript = $input.item.json.transcript;\n\n// Initialize arrays to separate messages\nlet conversation = [];\n\n// Process each transcript entry\ntranscript.forEach((entry, index) => {\n  const role = entry.role === 'agent' ? 'Agent' : 'User';\n  const message = entry.message;\n  \n  conversation.push(`${role}: ${message}`);\n});\n\n// Combine into a single formatted message\nconst combinedMessage = conversation.join('\\n\\n');\n\n// Return the combined transcript\nreturn {\n  json: {\n    combined_transcript: combinedMessage,\n    total_messages: transcript.length,\n    conversation_id: $input.item.json.conversation_id,\n    agent_id: $input.item.json.agent_id,\n    status: $input.item.json.status\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        -384
+      ],
+      "id": "f0bf046d-3b54-4934-b5de-d22073428bd8",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Call status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call status": {
+      "main": [
+        [
+          {
+            "node": "Update CRM Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "analyze actions needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze actions needed": {
+      "main": [
+        [
+          {
+            "node": "Feedback Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Update CRM Status",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Agent": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "analyze actions needed",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CRM Status": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Calling My CRM": {
+      "ai_tool": [
+        [
+          {
+            "node": "Update CRM Status",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CRM Status1": {
+      "ai_tool": [
+        [
+          {
+            "node": "analyze actions needed",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b65c8290-e6cd-4ed5-8f02-4330bb45c0c2",
+  "activeVersionId": "b65c8290-e6cd-4ed5-8f02-4330bb45c0c2",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-10-16T01:41:52.695Z",
+      "createdAt": "2025-10-16T01:41:52.695Z",
+      "role": "workflow:owner",
+      "workflowId": "ayOfTAttKWmwc7ST",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-11-27T23:57:16.304Z",
+    "createdAt": "2025-11-27T23:57:16.304Z",
+    "versionId": "b65c8290-e6cd-4ed5-8f02-4330bb45c0c2",
+    "workflowId": "ayOfTAttKWmwc7ST",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "37d33f88-c652-43e1-98ae-e2cc95ce1a08",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "bf88b57f-ee2a-4adc-a27c-c2ac8f9540c3",
+        "name": "Webhook",
+        "webhookId": "37d33f88-c652-43e1-98ae-e2cc95ce1a08",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "3d88e679-c60e-44b8-bf1f-8bf63470b7e5",
+        "name": "HTTP Request",
+        "disabled": true
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          416,
+          0
+        ],
+        "id": "b0125f8b-9b6f-4b2d-813f-6eb2da4eef11",
+        "name": "Wait",
+        "webhookId": "bddc7eb7-0b28-41c3-82a0-47a94fcc4e4c",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          624,
+          0
+        ],
+        "id": "8b0ab9e2-8008-440a-9911-5f80972d0fb3",
+        "name": "HTTP Request1",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          832,
+          0
+        ],
+        "id": "62f41116-7ac1-4196-93e2-c619760d51a6",
+        "name": "Code in JavaScript",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "24ffca6f-dddd-4db4-be5e-0c3029f667fc",
+                "name": "response",
+                "value": "={{ $json.combined_transcript }}",
+                "type": "string"
+              },
+              {
+                "id": "64450ff3-bc29-4d0f-8a10-32fa31210736",
+                "name": "endedReason",
+                "value": "={{ $('HTTP Request3').item.json.metadata.termination_reason }}",
+                "type": "string"
+              },
+              {
+                "id": "57fe7b06-68d7-4e8c-8c0a-cc449ec8cbc9",
+                "name": "GHL contactID",
+                "value": "={{ $('Webhook1').first().json.body.contact_id }} ",
+                "type": "string"
+              },
+              {
+                "id": "2f74e284-c952-44c8-a459-b5826074a560",
+                "name": "transcript recording",
+                "value": "={{ $json.recordingUrl }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "7821ac70-5cee-4bee-9d82-32c784022d42",
+        "name": "Edit Fields",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -1296,
+          -384
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "f15047ad-b86a-4984-b47e-4f0664da10ba",
+                "leftValue": "={{ $json.endedReason }}",
+                "rightValue": "customer-did-not-answer",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              },
+              {
+                "id": "3e40f3cc-616a-4974-9eab-b5cac5bb3723",
+                "leftValue": "={{ $json.endedReason }}",
+                "rightValue": "unknown-error\t",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              },
+              {
+                "id": "c9116d0b-4ca6-4a7a-82cb-05eabc3d30d7",
+                "leftValue": "={{ $json.endedReason }}",
+                "rightValue": "silence-timed-out",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              },
+              {
+                "id": "7d7f9136-3bde-4d4a-9743-39d095f7a449",
+                "leftValue": "={{ $json.endedReason }}",
+                "rightValue": "=Call ended by remote party",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "or"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -1088,
+          -384
+        ],
+        "id": "9af8885c-2b46-40df-8fe5-138f38cecd45",
+        "name": "Call status"
+      },
+      {
+        "parameters": {
+          "content": "## Lead declined call / did not answer\n\n- Updates CRM\n- Can determine if you want to trigger another call after this or after certain period..",
+          "height": 548,
+          "width": 684
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -768,
+          -944
+        ],
+        "id": "37cabaab-6509-43d2-89f2-9aafa82005d7",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "## Lead Answered\n1. Determine if lead booked a call or not\n2. Analyze if there's any actions needing to be taken (ex. adding to DNC list)\n3. Determine what could be done better (used for improving the agent)",
+          "height": 1096,
+          "width": 692
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -768,
+          -320
+        ],
+        "id": "a427cc0b-e8a4-4a6a-8e81-8419c94a99f1",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "inputText": "={{ $json.transcript }} {{ $json.response }}",
+          "options": {
+            "categories": "Booked Consultation,\nDidn't Book Consultation",
+            "systemPromptTemplate": "You are to analyze the transcript and determine. ifa meeting/consultation/appointment was scheduled or not. If you choose the Booked Consultation route then you must be sure that an appointment was actually scheduled and that they agreed on a day and time."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+        "typeVersion": 1,
+        "position": [
+          -736,
+          -144
+        ],
+        "id": "91a8cb58-af96-472f-b071-6829a8064215",
+        "name": "Sentiment Analysis"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.response }}",
+          "options": {
+            "systemMessage": "You are to analyze the transcript and determine what actions to take. If the customer / lead sounds pissed off or asks to be removed then you must call the do not contact tool (DNC). Use common sense to determine what action to take. Remember that you must only call the DNC tool if the user explicitly said to not contact them again or something similar to them not wanting to be reached out to again."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          -544,
+          96
+        ],
+        "id": "a109a84f-4c05-4312-8be1-c73b187c99bf",
+        "name": "analyze actions needed"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o",
+            "mode": "list",
+            "cachedResultName": "gpt-4o"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -720,
+          -592
+        ],
+        "id": "a1959613-d114-4da4-b238-aef374effedd",
+        "name": "OpenAI Chat Model2",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o",
+            "mode": "list",
+            "cachedResultName": "GPT-4O"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "=Transcript to analyze: {{ $('Call status').item.json.response }}",
+                "role": "system"
+              },
+              {
+                "content": "You are to analyze the transcript and determine why a meeting was not booked. If anything went wrong you need to output that and also identify areas for improvement. \n\nYour output should be in \n'Reason call was not booked'\n'Area for improvement'"
+              }
+            ]
+          },
+          "jsonOutput": true,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.8,
+        "position": [
+          -624,
+          560
+        ],
+        "id": "187daed8-9282-4a99-83fb-699860dfc1e1",
+        "name": "Feedback Agent",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o",
+            "mode": "list",
+            "cachedResultName": "gpt-4o"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -624,
+          288
+        ],
+        "id": "660ed153-84a0-4b8c-aaf0-9583fe0c1036",
+        "name": "OpenAI Chat Model1",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o",
+            "mode": "list",
+            "cachedResultName": "gpt-4o"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -752,
+          48
+        ],
+        "id": "030850c1-fced-475a-b9d3-9840bd08dfd0",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Your job is to update the status in GoHighLevel to a no reply follow up 1. You must pass the email to the tool as well: {{ $('Webhook1').first().json.body.email }}",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          -608,
+          -768
+        ],
+        "id": "b3451027-b984-4f64-8bbc-74b098806cd8",
+        "name": "Update CRM Status"
+      },
+      {
+        "parameters": {
+          "name": "updateStatus_noReplyFUP1",
+          "description": "=Your job is to update the status in GoHighLevel to a no reply follow up one (also known as no reply). You must pass the email to the tool as well: {{ $('Webhook1').first().json.body.email }}",
+          "workflowId": {
+            "__rl": true,
+            "value": "sbs7MsYfIJaqhraY",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/sbs7MsYfIJaqhraY",
+            "cachedResultName": "no-reply FUP1"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
+            },
+            "matchingColumns": [
+              "email"
+            ],
+            "schema": [
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2,
+        "position": [
+          -368,
+          -592
+        ],
+        "id": "0c647c70-6439-4a9f-b022-6b452bd433d2",
+        "name": "Tool Calling My CRM",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "name": "updateStatus_DNC",
+          "description": "Call this tool to update the status in GoHighLevel to do not contact (do not contact)",
+          "workflowId": {
+            "__rl": true,
+            "value": "sFhfjvThTTVejhTe",
+            "mode": "list",
+            "cachedResultName": "DNC"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "email": "={{ $('Webhook1').item.json.body.email }}"
+            },
+            "matchingColumns": [
+              "email"
+            ],
+            "schema": [
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2,
+        "position": [
+          -288,
+          320
+        ],
+        "id": "0114e0c4-0b00-4e88-bcbf-5a950373d515",
+        "name": "Update CRM Status1"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c",
+            "mode": "list",
+            "cachedResultName": "Elevenlabs",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "phone_number": "={{ $('Webhook1').item.json.body.phone }}",
+              "reason call was not booked": "={{ $json.message.content['Reason call was not booked'] }}",
+              "ai area for improvement": "={{ $json.message.content['Area for improvement'] }}",
+              "results": "answered, didn't book",
+              "transcript": "="
+            },
+            "matchingColumns": [
+              "phone_number"
+            ],
+            "schema": [
+              {
+                "id": "first_name",
+                "displayName": "first_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "last_name",
+                "displayName": "last_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "phone_number",
+                "displayName": "phone_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "about",
+                "displayName": "about",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "results",
+                "displayName": "results",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "transcript",
+                "displayName": "transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "reason call was not booked",
+                "displayName": "reason call was not booked",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ai area for improvement",
+                "displayName": "ai area for improvement",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -272,
+          560
+        ],
+        "id": "11a90d44-f880-4f83-a53c-627fa79feb0d",
+        "name": "Append or update row in sheet2",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c",
+            "mode": "list",
+            "cachedResultName": "Elevenlabs",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "phone_number": "={{ $('Webhook1').item.json.body.phone }}",
+              "results": "booked call",
+              "transcript": "={{ $('Edit Fields').item.json.user.transcript }}"
+            },
+            "matchingColumns": [
+              "phone_number"
+            ],
+            "schema": [
+              {
+                "id": "first_name",
+                "displayName": "first_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "last_name",
+                "displayName": "last_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "phone_number",
+                "displayName": "phone_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "about",
+                "displayName": "about",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "results",
+                "displayName": "results",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "transcript",
+                "displayName": "transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "reason call was not booked",
+                "displayName": "reason call was not booked",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ai area for improvement",
+                "displayName": "ai area for improvement",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -336,
+          -160
+        ],
+        "id": "0aba8d65-f9a1-4593-8faa-0e3352f4a16c",
+        "name": "Append or update row in sheet3",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c",
+            "mode": "list",
+            "cachedResultName": "Elevenlabs",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w6iLkywaGqRubObZ0xF9Fg5-k9lckOxPJMrGNwh2P1c/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "phone_number": "={{ $('Webhook1').item.json.body.phone }}",
+              "results": "no answer"
+            },
+            "matchingColumns": [
+              "phone_number"
+            ],
+            "schema": [
+              {
+                "id": "first_name",
+                "displayName": "first_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "last_name",
+                "displayName": "last_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "phone_number",
+                "displayName": "phone_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "about",
+                "displayName": "about",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "results",
+                "displayName": "results",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "transcript",
+                "displayName": "transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "reason call was not booked",
+                "displayName": "reason call was not booked",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "ai area for improvement",
+                "displayName": "ai area for improvement",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -256,
+          -784
+        ],
+        "id": "7baa71a3-b1e5-4a16-a1b2-e83a90c7e478",
+        "name": "Append or update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.elevenlabs.io/v1/convai/twilio/outbound-call",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "xi-api-key",
+                "value": "sk_efe69a57621f11a69520049c8f4ad5994f9ba8205e6e801a"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "agent_id",
+                "value": "agent_4001k7n7yee4enbsthf8a8z112g5"
+              },
+              {
+                "name": "agent_phone_number_id",
+                "value": "phnum_6601k7qmrmr7fpbsggv12qzxdbak"
+              },
+              {
+                "name": "to_number",
+                "value": "+12165703136"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -2144,
+          -384
+        ],
+        "id": "e1e6857d-7869-4c26-83e3-88b2197fcbb2",
+        "name": "HTTP Request2"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "e416ac04-f91e-4f72-9780-e5485e1875d8",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -2352,
+          -384
+        ],
+        "id": "ae9ba0b6-115d-44bc-8145-8387fa233bf2",
+        "name": "Webhook1",
+        "webhookId": "e416ac04-f91e-4f72-9780-e5485e1875d8"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.elevenlabs.io/v1/convai/conversations/{{ $json.conversation_id }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "xi-api-key",
+                "value": "sk_efe69a57621f11a69520049c8f4ad5994f9ba8205e6e801a"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -1728,
+          -384
+        ],
+        "id": "b45609d3-aa87-4618-a004-abc5b9176cc5",
+        "name": "HTTP Request3"
+      },
+      {
+        "parameters": {
+          "amount": 2,
+          "unit": "minutes"
+        },
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          -1936,
+          -384
+        ],
+        "id": "8a171f2d-52d9-4f10-938a-2d2205a7d889",
+        "name": "Wait1",
+        "webhookId": "670dcca8-844e-4202-a853-9837c502f46e"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get the transcript array from the input\nconst transcript = $input.item.json.transcript;\n\n// Initialize arrays to separate messages\nlet conversation = [];\n\n// Process each transcript entry\ntranscript.forEach((entry, index) => {\n  const role = entry.role === 'agent' ? 'Agent' : 'User';\n  const message = entry.message;\n  \n  conversation.push(`${role}: ${message}`);\n});\n\n// Combine into a single formatted message\nconst combinedMessage = conversation.join('\\n\\n');\n\n// Return the combined transcript\nreturn {\n  json: {\n    combined_transcript: combinedMessage,\n    total_messages: transcript.length,\n    conversation_id: $input.item.json.conversation_id,\n    agent_id: $input.item.json.agent_id,\n    status: $input.item.json.status\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1520,
+          -384
+        ],
+        "id": "f0bf046d-3b54-4934-b5de-d22073428bd8",
+        "name": "Code in JavaScript1"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Call status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call status": {
+        "main": [
+          [
+            {
+              "node": "Update CRM Status",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Sentiment Analysis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sentiment Analysis": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet3",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "analyze actions needed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "analyze actions needed": {
+        "main": [
+          [
+            {
+              "node": "Feedback Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Update CRM Status",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Feedback Agent": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "analyze actions needed",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Sentiment Analysis",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update CRM Status": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tool Calling My CRM": {
+        "ai_tool": [
+          [
+            {
+              "node": "Update CRM Status",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update CRM Status1": {
+        "ai_tool": [
+          [
+            {
+              "node": "analyze actions needed",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request2": {
+        "main": [
+          [
+            {
+              "node": "Wait1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook1": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait1": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
