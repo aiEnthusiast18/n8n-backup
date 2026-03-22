@@ -1,0 +1,2035 @@
+{
+  "updatedAt": "2026-03-09T01:18:21.949Z",
+  "createdAt": "2026-03-09T00:50:45.676Z",
+  "id": "MKKgBCwues0ufuBR",
+  "name": "analysis",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date & Time": "={{ $now}}",
+            "Call Duration (ms)": "={{ $json.body.call.duration_ms }}",
+            "Call Transcript": "={{ $json.body.call.transcript }}",
+            "Call Recording": "={{ $json.body.call.recording_url }}",
+            "Call Summary": "={{ $json.body.call.call_analysis.call_summary }}",
+            "reason_for_call": "={{ $json.body.call.call_analysis.custom_analysis_data.reason_for_call }}",
+            "Call Successful": "={{ $json.body.call.call_analysis.call_successful }}",
+            "caller_type": "={{ $json.body.call.call_analysis.custom_analysis_data.caller_type }}",
+            "complaint_received": "={{ $json.body.call.call_analysis.custom_analysis_data.commplaint_received }}",
+            "transfer_occurred": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_occurred }}",
+            "transfer_department": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+            "resolution_status": "={{ $json.body.call.call_analysis.custom_analysis_data.resolution_status }}",
+            "ai_confidence_level": "={{ $json.body.call.call_analysis.custom_analysis_data.ai_confidence_level }}",
+            "customer_sentiment": "={{ $json.body.call.call_analysis.custom_analysis_data.customer_sentiment }}",
+            "call_outcome": "={{ $json.body.call.call_analysis.custom_analysis_data.call_outcome }}",
+            "disconnection_reason": "={{ $json.body.call.disconnection_reason }}",
+            "Phone number": "={{ $json.body.call.from_number }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date & Time",
+              "displayName": "Date & Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Call Duration (ms)",
+              "displayName": "Call Duration (ms)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Call Summary",
+              "displayName": "Call Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Call Transcript",
+              "displayName": "Call Transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Call Recording",
+              "displayName": "Call Recording",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Call Successful",
+              "displayName": "Call Successful",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caller_type",
+              "displayName": "caller_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason_for_call",
+              "displayName": "reason_for_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "disconnection_reason",
+              "displayName": "disconnection_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "call_outcome",
+              "displayName": "call_outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "complaint_received",
+              "displayName": "complaint_received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transfer_occurred",
+              "displayName": "transfer_occurred",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transfer_department",
+              "displayName": "transfer_department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "resolution_status",
+              "displayName": "resolution_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_sentiment",
+              "displayName": "customer_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ai_confidence_level",
+              "displayName": "ai_confidence_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "department_to_email",
+              "displayName": "department_to_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        128,
+        -144
+      ],
+      "id": "885c2892-0c41-46b0-a85b-84cf9aa9aae3",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ede6dbc6-214c-4ae6-ba14-021b558a1db3",
+              "leftValue": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "800f3c72-183a-477c-9ae2-36a0cdea4c34",
+              "leftValue": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        80
+      ],
+      "id": "303ebda8-662c-4b2a-8038-738dcdaa4c0f",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9193f5a0-5fa1-4af1-9cd9-d7bbb0aad407",
+              "name": "department_to_email",
+              "value": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        48
+      ],
+      "id": "da0ecf01-4f71-4929-a8d9-ef0c362d4a84",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Call Summary: {{ $json.body.call.call_analysis.call_summary }}\n\nCall Transcript: {{ $json.body.call.transcript }}",
+        "options": {
+          "systemMessage": "You are an ai analysis assistant. The user prompt will include two parts: a call transcript and a call summary. Analyze both and decide which single company department should follow up with the caller. Choose exactly one of: admin, operations, finance, sales, management, hr.\n\nRules:\n- Output MUST be exactly one lowercase word from the list above and nothing else (no punctuation, no explanation, no JSON, no extra whitespace or newlines).\n- Use both transcript and summary; if they conflict, prioritize the summary for caller intent but confirm with transcript when available.\n- Select the department that should *take ownership and follow up with the caller* (not just a related topic).\n- If multiple departments could apply, pick the single best-fit department based on who should own the follow-up.\n- If the call is spam, irrelevant to company business, or none of the teams fit, output \"management\".\n\nHeuristic examples (use these as guidance, not strict rules):\n- finance → billing, invoices, payments, refunds, charge disputes\n- sales → product inquiries, quotes, demos, purchase intent, leads\n- operations → delivery/shipping, installation, service scheduling, outages, on-site logistics, technical setup\n- admin → account details/changes, credentials, documentation requests, appointment logistics, general admin tasks\n- hr → job applications, employee relations, benefits, payroll issues tied to employees\n- management → escalations, policy decisions, legal/compliance issues, strategic partnerships, or when no other department fits\n\nRemember: output only the single department word and nothing else."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "5a29820a-19c1-4566-91dc-69b0eb2d9d87",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "department_to_email": "={{ $json.department_to_email }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Date & Time",
+              "displayName": "Date & Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Call Duration (ms)",
+              "displayName": "Call Duration (ms)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Call Summary",
+              "displayName": "Call Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Call Transcript",
+              "displayName": "Call Transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Call Recording",
+              "displayName": "Call Recording",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Call Successful",
+              "displayName": "Call Successful",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caller_type",
+              "displayName": "caller_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reason_for_call",
+              "displayName": "reason_for_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "disconnection_reason",
+              "displayName": "disconnection_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "call_outcome",
+              "displayName": "call_outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "complaint_received",
+              "displayName": "complaint_received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "transfer_occurred",
+              "displayName": "transfer_occurred",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "transfer_department",
+              "displayName": "transfer_department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "resolution_status",
+              "displayName": "resolution_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_sentiment",
+              "displayName": "customer_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ai_confidence_level",
+              "displayName": "ai_confidence_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "department_to_email",
+              "displayName": "department_to_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1104,
+        48
+      ],
+      "id": "1f160ad3-baf6-4570-8921-d37265ce8f3b",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.department_to_email }}",
+        "options": {
+          "systemMessage": "You are an assistant inside an n8n workflow. You will receive a single department name as the user input. Using only the mapping below, output exactly the email address for that department and nothing else.\n\nMappings:\nadmin -> administrator@anagomb.ca\noperations -> operations@anagomb.ca\nfinance -> ar@anagomb.ca\nsales -> sales@anagomb.ca\nmanagement -> rlakhani@anagomb.ca\nhr -> rida@anagomb.ca\n\nRules:\n- Match the department name case-insensitively and trim any surrounding whitespace.\n- Output MUST be exactly one lowercase email address from the mapping and nothing else (no punctuation, labels, JSON, explanation, extra whitespace, or newlines).\n- If the input does not match any of the six departments, output the admin email (administrator@anagomb.ca) and nothing else.\n- Do not attempt any external lookups or validation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1408,
+        48
+      ],
+      "id": "d82834cb-5bd5-4153-ab0c-90253e1af849",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "AI Receptionist - Call Summary",
+        "bodyContent": "=Caller Name : {{ $json.body.call.collected_dynamic_variables.contact_name }}\nCaller Phone # : {{ $json.body.call.from_number }}\nCaller Email Address: {{ $json.body.call.collected_dynamic_variables.contact_email }}\n\nCaller Type : {{ $json.body.call.collected_dynamic_variables.caller_type }}\nCompany Name : {{ $json.body.call.collected_dynamic_variables.business_name }}\n\nIssue/Needs: {{ $json.body.call.collected_dynamic_variables.issue_type }} - {{ $json.body.call.collected_dynamic_variables.service_needs }}\nResolution Status : {{ $json.body.call.call_analysis.custom_analysis_data.resolution_status }}\n\nSummary: {{ $json.body.call.call_analysis.call_summary }}\n\nComplete Details - Please refer to  this google sheet : https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=sharing ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        -48
+      ],
+      "id": "d902b88b-4e88-4ceb-9551-6325c6f36a60",
+      "name": "Send a message1",
+      "webhookId": "58715837-b95e-4d90-8223-caa5dcab92d2",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        240
+      ],
+      "id": "94b28aa9-4376-4af8-a747-9df4b3096752",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        400
+      ],
+      "id": "d49b0d94-689e-4778-8ae9-64277e038992",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9193f5a0-5fa1-4af1-9cd9-d7bbb0aad407",
+              "name": "department_to_email",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        208
+      ],
+      "id": "1d76043b-5f69-40f5-aff5-27b7e77a1eb8",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      ...items[0].json,\n      ...items[1].json\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        48
+      ],
+      "id": "b6a186bf-16c2-4be6-b0da-343669295761",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Call Transcript",
+              "lookupValue": "={{ $json['Call Transcript'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        336,
+        -144
+      ],
+      "id": "fea35067-902e-4fbd-901d-ee2b3880c16a",
+      "name": "Get row(s) in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        688,
+        48
+      ],
+      "id": "651e4938-0506-4fa9-8bd6-bc1ac1fba9ad",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      ...items[1].json,\n      ...items[0].json\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        -48
+      ],
+      "id": "84bb1fb6-7624-480c-bff1-48dabef63585",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        -48
+      ],
+      "id": "97551ac5-6b12-4ad6-a22a-65e6e56bc94c",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e0aa9bee-b990-4893-976a-d2187c6cb0fd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -32
+      ],
+      "id": "1bee84f6-61f5-4bd2-a76c-c2c1dac52d2d",
+      "name": "Webhook",
+      "webhookId": "e0aa9bee-b990-4893-976a-d2187c6cb0fd"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "57a3fd13-e457-4f16-93d4-97943651ff88",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "call_analyzed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "240a1692-13eb-47fa-b48b-21ee2f8e4486",
+      "name": "Filter"
+    }
+  ],
+  "connections": {
+    "Append row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d9358d71-6619-4380-9d3c-ad4c27f4a1f6",
+  "activeVersionId": "d9358d71-6619-4380-9d3c-ad4c27f4a1f6",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-09T00:50:45.678Z",
+      "createdAt": "2026-03-09T00:50:45.678Z",
+      "role": "workflow:owner",
+      "workflowId": "MKKgBCwues0ufuBR",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-09T01:18:23.000Z",
+    "createdAt": "2026-03-09T01:18:21.951Z",
+    "versionId": "d9358d71-6619-4380-9d3c-ad4c27f4a1f6",
+    "workflowId": "MKKgBCwues0ufuBR",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k",
+            "mode": "list",
+            "cachedResultName": "Untitled spreadsheet",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Date & Time": "={{ $now}}",
+              "Call Duration (ms)": "={{ $json.body.call.duration_ms }}",
+              "Call Transcript": "={{ $json.body.call.transcript }}",
+              "Call Recording": "={{ $json.body.call.recording_url }}",
+              "Call Summary": "={{ $json.body.call.call_analysis.call_summary }}",
+              "reason_for_call": "={{ $json.body.call.call_analysis.custom_analysis_data.reason_for_call }}",
+              "Call Successful": "={{ $json.body.call.call_analysis.call_successful }}",
+              "caller_type": "={{ $json.body.call.call_analysis.custom_analysis_data.caller_type }}",
+              "complaint_received": "={{ $json.body.call.call_analysis.custom_analysis_data.commplaint_received }}",
+              "transfer_occurred": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_occurred }}",
+              "transfer_department": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+              "resolution_status": "={{ $json.body.call.call_analysis.custom_analysis_data.resolution_status }}",
+              "ai_confidence_level": "={{ $json.body.call.call_analysis.custom_analysis_data.ai_confidence_level }}",
+              "customer_sentiment": "={{ $json.body.call.call_analysis.custom_analysis_data.customer_sentiment }}",
+              "call_outcome": "={{ $json.body.call.call_analysis.custom_analysis_data.call_outcome }}",
+              "disconnection_reason": "={{ $json.body.call.disconnection_reason }}",
+              "Phone number": "={{ $json.body.call.from_number }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Date & Time",
+                "displayName": "Date & Time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Call Duration (ms)",
+                "displayName": "Call Duration (ms)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Phone number",
+                "displayName": "Phone number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Call Summary",
+                "displayName": "Call Summary",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Call Transcript",
+                "displayName": "Call Transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Call Recording",
+                "displayName": "Call Recording",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Call Successful",
+                "displayName": "Call Successful",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "caller_type",
+                "displayName": "caller_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "reason_for_call",
+                "displayName": "reason_for_call",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "disconnection_reason",
+                "displayName": "disconnection_reason",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "call_outcome",
+                "displayName": "call_outcome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "complaint_received",
+                "displayName": "complaint_received",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "transfer_occurred",
+                "displayName": "transfer_occurred",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "transfer_department",
+                "displayName": "transfer_department",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "resolution_status",
+                "displayName": "resolution_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "customer_sentiment",
+                "displayName": "customer_sentiment",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ai_confidence_level",
+                "displayName": "ai_confidence_level",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "department_to_email",
+                "displayName": "department_to_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          128,
+          -144
+        ],
+        "id": "885c2892-0c41-46b0-a85b-84cf9aa9aae3",
+        "name": "Append row in sheet2",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ede6dbc6-214c-4ae6-ba14-021b558a1db3",
+                "leftValue": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "800f3c72-183a-477c-9ae2-36a0cdea4c34",
+                "leftValue": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -48,
+          80
+        ],
+        "id": "303ebda8-662c-4b2a-8038-738dcdaa4c0f",
+        "name": "If1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "9193f5a0-5fa1-4af1-9cd9-d7bbb0aad407",
+                "name": "department_to_email",
+                "value": "={{ $json.body.call.call_analysis.custom_analysis_data.transfer_department }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          224,
+          48
+        ],
+        "id": "da0ecf01-4f71-4929-a8d9-ef0c362d4a84",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Call Summary: {{ $json.body.call.call_analysis.call_summary }}\n\nCall Transcript: {{ $json.body.call.transcript }}",
+          "options": {
+            "systemMessage": "You are an ai analysis assistant. The user prompt will include two parts: a call transcript and a call summary. Analyze both and decide which single company department should follow up with the caller. Choose exactly one of: admin, operations, finance, sales, management, hr.\n\nRules:\n- Output MUST be exactly one lowercase word from the list above and nothing else (no punctuation, no explanation, no JSON, no extra whitespace or newlines).\n- Use both transcript and summary; if they conflict, prioritize the summary for caller intent but confirm with transcript when available.\n- Select the department that should *take ownership and follow up with the caller* (not just a related topic).\n- If multiple departments could apply, pick the single best-fit department based on who should own the follow-up.\n- If the call is spam, irrelevant to company business, or none of the teams fit, output \"management\".\n\nHeuristic examples (use these as guidance, not strict rules):\n- finance → billing, invoices, payments, refunds, charge disputes\n- sales → product inquiries, quotes, demos, purchase intent, leads\n- operations → delivery/shipping, installation, service scheduling, outages, on-site logistics, technical setup\n- admin → account details/changes, credentials, documentation requests, appointment logistics, general admin tasks\n- hr → job applications, employee relations, benefits, payroll issues tied to employees\n- management → escalations, policy decisions, legal/compliance issues, strategic partnerships, or when no other department fits\n\nRemember: output only the single department word and nothing else."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          144,
+          208
+        ],
+        "id": "5a29820a-19c1-4566-91dc-69b0eb2d9d87",
+        "name": "AI Agent2"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k",
+            "mode": "list",
+            "cachedResultName": "Untitled spreadsheet",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "row_number": "={{ $json.row_number }}",
+              "department_to_email": "={{ $json.department_to_email }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "Date & Time",
+                "displayName": "Date & Time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Call Duration (ms)",
+                "displayName": "Call Duration (ms)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Call Summary",
+                "displayName": "Call Summary",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Call Transcript",
+                "displayName": "Call Transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Call Recording",
+                "displayName": "Call Recording",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Call Successful",
+                "displayName": "Call Successful",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "caller_type",
+                "displayName": "caller_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "reason_for_call",
+                "displayName": "reason_for_call",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "disconnection_reason",
+                "displayName": "disconnection_reason",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "call_outcome",
+                "displayName": "call_outcome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "complaint_received",
+                "displayName": "complaint_received",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "transfer_occurred",
+                "displayName": "transfer_occurred",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "transfer_department",
+                "displayName": "transfer_department",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "resolution_status",
+                "displayName": "resolution_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "customer_sentiment",
+                "displayName": "customer_sentiment",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "ai_confidence_level",
+                "displayName": "ai_confidence_level",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "department_to_email",
+                "displayName": "department_to_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1104,
+          48
+        ],
+        "id": "1f160ad3-baf6-4570-8921-d37265ce8f3b",
+        "name": "Update row in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.department_to_email }}",
+          "options": {
+            "systemMessage": "You are an assistant inside an n8n workflow. You will receive a single department name as the user input. Using only the mapping below, output exactly the email address for that department and nothing else.\n\nMappings:\nadmin -> administrator@anagomb.ca\noperations -> operations@anagomb.ca\nfinance -> ar@anagomb.ca\nsales -> sales@anagomb.ca\nmanagement -> rlakhani@anagomb.ca\nhr -> rida@anagomb.ca\n\nRules:\n- Match the department name case-insensitively and trim any surrounding whitespace.\n- Output MUST be exactly one lowercase email address from the mapping and nothing else (no punctuation, labels, JSON, explanation, extra whitespace, or newlines).\n- If the input does not match any of the six departments, output the admin email (administrator@anagomb.ca) and nothing else.\n- Do not attempt any external lookups or validation."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          1408,
+          48
+        ],
+        "id": "d82834cb-5bd5-4153-ab0c-90253e1af849",
+        "name": "AI Agent3"
+      },
+      {
+        "parameters": {
+          "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "AI Receptionist - Call Summary",
+          "bodyContent": "=Caller Name : {{ $json.body.call.collected_dynamic_variables.contact_name }}\nCaller Phone # : {{ $json.body.call.from_number }}\nCaller Email Address: {{ $json.body.call.collected_dynamic_variables.contact_email }}\n\nCaller Type : {{ $json.body.call.collected_dynamic_variables.caller_type }}\nCompany Name : {{ $json.body.call.collected_dynamic_variables.business_name }}\n\nIssue/Needs: {{ $json.body.call.collected_dynamic_variables.issue_type }} - {{ $json.body.call.collected_dynamic_variables.service_needs }}\nResolution Status : {{ $json.body.call.call_analysis.custom_analysis_data.resolution_status }}\n\nSummary: {{ $json.body.call.call_analysis.call_summary }}\n\nComplete Details - Please refer to  this google sheet : https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=sharing ",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          2176,
+          -48
+        ],
+        "id": "d902b88b-4e88-4ceb-9551-6325c6f36a60",
+        "name": "Send a message1",
+        "webhookId": "58715837-b95e-4d90-8223-caa5dcab92d2",
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "4BDt5SAYt7JiWG5R",
+            "name": "ITsupport Microsoft Outlook account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          1376,
+          240
+        ],
+        "id": "94b28aa9-4376-4af8-a747-9df4b3096752",
+        "name": "OpenAI Chat Model4",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          96,
+          400
+        ],
+        "id": "d49b0d94-689e-4778-8ae9-64277e038992",
+        "name": "OpenAI Chat Model5",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "9193f5a0-5fa1-4af1-9cd9-d7bbb0aad407",
+                "name": "department_to_email",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          448,
+          208
+        ],
+        "id": "1d76043b-5f69-40f5-aff5-27b7e77a1eb8",
+        "name": "Edit Fields3"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  {\n    json: {\n      ...items[0].json,\n      ...items[1].json\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          48
+        ],
+        "id": "b6a186bf-16c2-4be6-b0da-343669295761",
+        "name": "Code in JavaScript5"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k",
+            "mode": "list",
+            "cachedResultName": "Untitled spreadsheet",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ixBKObEvuORpExLtutv9ogCJDTcK_r3QaU5s5Izne8k/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Call Transcript",
+                "lookupValue": "={{ $json['Call Transcript'] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          336,
+          -144
+        ],
+        "id": "fea35067-902e-4fbd-901d-ee2b3880c16a",
+        "name": "Get row(s) in sheet3",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          688,
+          48
+        ],
+        "id": "651e4938-0506-4fa9-8bd6-bc1ac1fba9ad",
+        "name": "Merge2"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  {\n    json: {\n      ...items[1].json,\n      ...items[0].json\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1968,
+          -48
+        ],
+        "id": "84bb1fb6-7624-480c-bff1-48dabef63585",
+        "name": "Code in JavaScript6"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          1792,
+          -48
+        ],
+        "id": "97551ac5-6b12-4ad6-a22a-65e6e56bc94c",
+        "name": "Merge3"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "e0aa9bee-b990-4893-976a-d2187c6cb0fd",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -544,
+          -32
+        ],
+        "id": "1bee84f6-61f5-4bd2-a76c-c2c1dac52d2d",
+        "name": "Webhook",
+        "webhookId": "e0aa9bee-b990-4893-976a-d2187c6cb0fd"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "57a3fd13-e457-4f16-93d4-97943651ff88",
+                "leftValue": "={{ $json.body.event }}",
+                "rightValue": "call_analyzed",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          -336,
+          -32
+        ],
+        "id": "240a1692-13eb-47fa-b48b-21ee2f8e4486",
+        "name": "Filter"
+      }
+    ],
+    "connections": {
+      "Append row in sheet2": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "AI Agent2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "AI Agent2": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row in sheet1": {
+        "main": [
+          [
+            {
+              "node": "AI Agent3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent3": {
+        "main": [
+          [
+            {
+              "node": "Merge3",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model4": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent3",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model5": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent2",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields3": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript5": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet3": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript6": {
+        "main": [
+          [
+            {
+              "node": "Send a message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge3": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version d9358d71",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
