@@ -1,0 +1,530 @@
+{
+  "updatedAt": "2025-09-12T01:07:46.000Z",
+  "createdAt": "2025-08-11T16:41:24.387Z",
+  "id": "hseJEHDgwzsDTJ3G",
+  "name": "#Trigger Retell AI Call",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.bettercontact.rocks/api/v2/async/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "96979200f4c0b9ca1b7e"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"data\": [\n    {  \n      \"first_name\": \"{{ $json['first Name'] }}\",\n      \"last_name\": \"{{ $json['Last Name'] }}\",\n      \"linkedin_url\": \"{{ $json.Contact }}\"\n    }\n  ],\n  \"enrich_phone_number\": true,\n  \"enrich_email_address\": false,\n  \"webhook\": \"https://rlakhani.app.n8n.cloud/webhook-test/81d6a6bf-7f31-4251-aa5f-25e671b30369\"\n}  ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "c98e338d-dd6e-40ca-a5fe-de4dc7ad7cf7",
+      "name": "BetterContact - Get Phone number"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1qCY5LmPjzZrIDpiY-7GTOHyEKceUy5tLaMfg1f99XyU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 998860207,
+          "mode": "list",
+          "cachedResultName": "Apify Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qCY5LmPjzZrIDpiY-7GTOHyEKceUy5tLaMfg1f99XyU/edit#gid=998860207"
+        },
+        "event": "rowUpdate",
+        "options": {
+          "columnsToWatch": [
+            "Call Using Retell AI Agent?"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        432
+      ],
+      "id": "a61e2afa-a112-422a-b550-5fd39b809eac",
+      "name": "Trigger new contact to call",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "ql7mNqYBd9UPLAJe",
+          "name": "Google Sheets VA IT Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1qCY5LmPjzZrIDpiY-7GTOHyEKceUy5tLaMfg1f99XyU",
+          "mode": "list",
+          "cachedResultName": "AI agent to source leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qCY5LmPjzZrIDpiY-7GTOHyEKceUy5tLaMfg1f99XyU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 998860207,
+          "mode": "list",
+          "cachedResultName": "Apify Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qCY5LmPjzZrIDpiY-7GTOHyEKceUy5tLaMfg1f99XyU/edit#gid=998860207"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ $json.to_number }}",
+            "Call Outcome": "Called"
+          },
+          "matchingColumns": [
+            "Phone Number"
+          ],
+          "schema": [
+            {
+              "id": "Business Name",
+              "displayName": "Business Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter",
+              "displayName": "Twitter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn",
+              "displayName": "LinkedIn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Call Using Retell AI Agent?",
+              "displayName": "Call Using Retell AI Agent?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Call Outcome",
+              "displayName": "Call Outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        80,
+        432
+      ],
+      "id": "4b07a570-9b99-4ad1-bed1-dca4a8a8cc99",
+      "name": "Save Phone number and set as called",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "byB2xXfrapuxChwj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "81d6a6bf-7f31-4251-aa5f-25e671b30369",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        432
+      ],
+      "id": "6bea5090-ff1d-4b54-a3a2-7f0622f6870c",
+      "name": "Webhook - BetterContact response",
+      "webhookId": "81d6a6bf-7f31-4251-aa5f-25e671b30369"
+    },
+    {
+      "parameters": {
+        "content": "Trigger call in Retell AI, make sure there's phone number",
+        "height": 240,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        352
+      ],
+      "id": "d2893417-b3c1-42a3-9202-1164909fb521",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Push contact to cold call AI agent",
+        "height": 280,
+        "width": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        336
+      ],
+      "id": "7bcca69e-a5e3-4d29-bfb7-fd9835426a27",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.retellai.com/v2/create-phone-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_1d3dd8c9f8b75fd42b6ee8a4deef"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from_number\": \"+14313411115\",\n  \"to_number\": \"{{ $json['Phone Number'] }}\",\n  \"agent_tag\": \"agent_7b44aa6ddd8017778f268c059b\",\n  \"retell_llm_dynamic_variables\": {\n      \"first_name\": \"{{ $json['First Name'] }}\",\n      \"last_name\" : \"{{ $('Trigger new contact to call').item.json['Last Name'] }}\",\n      \"Business_Name\" : \"{{ $json['Business Name'] }}\",\n      \"phone\" : \"{{ $json['Phone Number'] }}\",\n      \"address\" : \"{{ $json.Location }}\",\n      \"email\" : \"{{ $json.Email }}\"\n   }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        432
+      ],
+      "id": "822f7b9c-326c-4ebf-9d01-6ea5e811f712",
+      "name": "Retell AI - Do an outbound call"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1173d9b4-55f0-47e7-9833-1692e4187aaf",
+              "leftValue": "={{ $json['Call Using AI Agent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "1fbe9d45-80b6-4a7a-b6e2-c52aa7df2fd2",
+              "leftValue": "={{ $json['Phone number'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -112
+      ],
+      "id": "d92dda9b-a75c-43ac-abaa-3d45f72329c1",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8296f499-4550-413a-b610-c47eeeb7a46f",
+              "leftValue": "={{ $json['Call Using Retell AI Agent?'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "089464cc-af38-4087-bf1f-a98012a54fdd",
+              "leftValue": "=.toString({{ $json['Phone Number'] }})",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -672,
+        432
+      ],
+      "id": "1f37e60e-f263-43b7-9b8b-9b4b42246bd5",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "content": "Currently using the webhook: https://hook.us2.make.com/k7egfd0k9nypkysymgqnji4h0nbgcgyk",
+        "height": 280,
+        "width": 640
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        336
+      ],
+      "id": "411a631c-7e61-4f00-aacc-98549c9109fd",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "- workflow triggered when new contacted added in sheet\n- ensuring number exits and user wants to call using retell, http request sent to retell for outbound call\n\n- webhook watches, once call done, states updated to called in sheet",
+        "height": 192,
+        "width": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        704
+      ],
+      "id": "49b4ec66-a0bb-4169-b43b-f2d1bef13d05",
+      "name": "Sticky Note3"
+    }
+  ],
+  "connections": {
+    "Trigger new contact to call": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - BetterContact response": {
+      "main": [
+        [
+          {
+            "node": "Save Phone number and set as called",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Retell AI - Do an outbound call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0537e759-dd35-442d-a977-a4b5ead710e0",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-08-11T16:41:24.392Z",
+      "createdAt": "2025-08-11T16:41:24.392Z",
+      "role": "workflow:owner",
+      "workflowId": "hseJEHDgwzsDTJ3G",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
