@@ -1,0 +1,157 @@
+{
+  "updatedAt": "2025-11-22T23:13:47.000Z",
+  "createdAt": "2025-11-22T22:54:25.404Z",
+  "id": "7E60suPohD1fMiIq",
+  "name": "GPT Social Media Automation",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 10
+            }
+          ]
+        }
+      },
+      "name": "Weekly Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        48
+      ],
+      "id": "ff5b02f6-af00-4972-94f2-a5bc228dadae"
+    },
+    {
+      "parameters": {},
+      "name": "Generate Topics",
+      "type": "CustomAI.Node",
+      "typeVersion": 1,
+      "position": [
+        80,
+        48
+      ],
+      "id": "31fcd19c-1c1a-4e78-ba67-df1ccc629ca6"
+    },
+    {
+      "parameters": {},
+      "name": "Generate Captions",
+      "type": "CustomAI.Node",
+      "typeVersion": 1,
+      "position": [
+        336,
+        48
+      ],
+      "id": "86055e84-8c32-4a03-8284-be6ba493b793"
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage"
+      },
+      "name": "Send Caption to Slack for Approval",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        576,
+        48
+      ],
+      "id": "426aa14b-3ae8-4d34-a7bd-96dea306b8ac"
+    },
+    {
+      "parameters": {},
+      "name": "Caption Approval Check",
+      "type": "CustomApproval.Node",
+      "typeVersion": 1,
+      "position": [
+        832,
+        48
+      ],
+      "id": "62dc8738-245a-49ef-98b8-76426a039ed1"
+    },
+    {
+      "parameters": {},
+      "name": "Generate Visual",
+      "type": "CustomAI.Node",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        48
+      ],
+      "id": "58b58d6a-76b6-4593-bf10-dab05e25beb7"
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage"
+      },
+      "name": "Send Visual to Slack for Approval",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        48
+      ],
+      "id": "0c80b2d1-9de7-4d53-8844-7c1764eda97d"
+    },
+    {
+      "parameters": {},
+      "name": "Visual Approval Check",
+      "type": "CustomApproval.Node",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        48
+      ],
+      "id": "36382f0b-d870-492d-8395-1c5834f9d840"
+    },
+    {
+      "parameters": {},
+      "name": "Schedule Post",
+      "type": "SocialMedia.Scheduler",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        48
+      ],
+      "id": "1a2165ac-72aa-41a0-acb4-0d21e7e1586a"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "YOUR_GOOGLE_SHEET_ID",
+        "options": {}
+      },
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        48
+      ],
+      "id": "ba5339d0-9d24-4abe-9ea1-b7fdbb1f6246"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "51c8e811-0d81-4637-be32-bc4a6f2786bc",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-22T22:54:25.406Z",
+      "createdAt": "2025-11-22T22:54:25.406Z",
+      "role": "workflow:owner",
+      "workflowId": "7E60suPohD1fMiIq",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
