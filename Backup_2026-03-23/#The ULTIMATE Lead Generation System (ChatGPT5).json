@@ -1,0 +1,506 @@
+{
+  "updatedAt": "2026-01-28T18:40:18.788Z",
+  "createdAt": "2025-08-15T15:16:36.686Z",
+  "id": "06yXchvqRqJzjiNI",
+  "name": "#The ULTIMATE Lead Generation System (ChatGPT5)",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Lead Generation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Search Term",
+              "placeholder": "businesses",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Location",
+              "placeholder": "Winnipeg",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4a398123-ff01-402d-8633-ae98e075f8e7",
+      "name": "On form submission",
+      "webhookId": "cc56964d-d3e5-4c68-9da8-c7a3ffb852b7",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d932b18e-6d3d-40c0-aaf6-cc87877af049",
+              "name": "First Name",
+              "value": "Chloe",
+              "type": "string"
+            },
+            {
+              "id": "84aac2bf-94bd-4214-9bc5-fc3e36e09560",
+              "name": "Company",
+              "value": "Anago Cleaning",
+              "type": "string"
+            },
+            {
+              "id": "4b7ff32c-95fc-4da3-892c-7586ff7f64a9",
+              "name": "Email",
+              "value": "vaitanago@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e657ce0d-178c-4d78-96b6-568fe4484a54",
+      "name": "About Anago/Agent"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "name": "={{ $('On form submission').item.json['Search Term'] }} - {{ $('On form submission').item.json.Location }} ({{ $now.format('yyyy-MM-dd') }})",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        144,
+        224
+      ],
+      "id": "914e8cfa-c7b5-4c6f-a7bf-53142ff886bd",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yyOMN1bO2gFzSRaP",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Target audience: {{ $('On form submission').item.json['Search Term'] }} in {{ $('On form submission').item.json.Location }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a URL generation agent. Your task is to convert natural language input into a valid Apollo search URL string.\n\n[OUTPUT FORMAT]\n\nhttps://app.apollo.io/#/people?[query_parameters]\n\n[RULES]\nEncode all values using URL encoding (e.g., spaces become %20, commas become %2C).\nUse query parameters based on recognized Apollo filters:\n\t- organizationLocations[] for countries or cities\n\t- organizationNumEmployeesRanges[] for employee countries\n\t- qKeywords for keyword search\n\t-sortAscending=false and sortByField=%5Bnone%5D by default\n\t- page=1 by default\nConcatenate parameters using &.\nOutput must match this example style:\n\nhttps://app.apollo.io/#/people?organizationLocations[]=United%20States&sortAscending=false&sortByField=%5Bnone%5D&page=1&Keywords=digital%20marketing%20agency&organizationNumEmployeesRanges[]=1%2C10\n\nNATURAL LANGUAGE EXAMPLES -> OUTPUT BEHAVIOR]\n= “Digital marketing agencies in the US with 1-10 employees”\n-> organizationLocations[]=United%20States,\norganizationNumEmployeesRanges[]=1%2C10,\nqKeywords=digital%20marketing%20agency\n\n“AI startups in Canada with under 50 employees”\n-> organizationLocations[]=Canada,\norganizationNumEmployeesRanges[]=1%2C50,\nqKeywords=AI%20startup\n\nAlways return the URL exactly in the format shown\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c094e3b6-19b1-4315-b565-f9c6e2dd1b06",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        256
+      ],
+      "id": "39810ba3-926c-4351-8c1f-ee0795a4b49d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "actorId": {
+          "__rl": true,
+          "value": "jljBwyyQakqrL1wae",
+          "mode": "id"
+        },
+        "customBody": "={\n    \"cleanOutput\": false,\n    \"url\": \"\"\n} {{ $json.text }}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        768,
+        0
+      ],
+      "id": "6d825633-3c25-4b43-8844-f4fbb1daeb9e",
+      "name": "Run an Actor",
+      "credentials": {
+        "apifyApi": {
+          "id": "254VdmuuVB9Dan3o",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "workflow looks incomplete",
+        "height": 80,
+        "width": 150,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        784,
+        400
+      ],
+      "id": "ce959b01-a7be-4742-9c58-bd803a49cfdf",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "About Anago/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "About Anago/Agent": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Search Term": "physical businesses",
+          "Location": "Winnipeg",
+          "submittedAt": "2025-08-15T10:30:23.376-05:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "4198e906-8ea9-474c-a92d-e1bf9655db50",
+  "activeVersionId": "4198e906-8ea9-474c-a92d-e1bf9655db50",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-15T15:16:36.700Z",
+      "createdAt": "2025-08-15T15:16:36.700Z",
+      "role": "workflow:owner",
+      "workflowId": "06yXchvqRqJzjiNI",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-11-27T23:57:16.304Z",
+    "createdAt": "2025-11-27T23:57:16.304Z",
+    "versionId": "4198e906-8ea9-474c-a92d-e1bf9655db50",
+    "workflowId": "06yXchvqRqJzjiNI",
+    "nodes": [
+      {
+        "parameters": {
+          "formTitle": "Lead Generation",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Search Term",
+                "placeholder": "businesses",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Location",
+                "placeholder": "Winnipeg",
+                "requiredField": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.2,
+        "position": [
+          0,
+          0
+        ],
+        "id": "4a398123-ff01-402d-8633-ae98e075f8e7",
+        "name": "On form submission",
+        "webhookId": "cc56964d-d3e5-4c68-9da8-c7a3ffb852b7",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d932b18e-6d3d-40c0-aaf6-cc87877af049",
+                "name": "First Name",
+                "value": "Chloe",
+                "type": "string"
+              },
+              {
+                "id": "84aac2bf-94bd-4214-9bc5-fc3e36e09560",
+                "name": "Company",
+                "value": "Anago Cleaning",
+                "type": "string"
+              },
+              {
+                "id": "4b7ff32c-95fc-4da3-892c-7586ff7f64a9",
+                "name": "Email",
+                "value": "vaitanago@gmail.com",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          208,
+          0
+        ],
+        "id": "e657ce0d-178c-4d78-96b6-568fe4484a54",
+        "name": "About Anago/Agent"
+      },
+      {
+        "parameters": {
+          "operation": "copy",
+          "fileId": {
+            "__rl": true,
+            "mode": "list",
+            "value": ""
+          },
+          "name": "={{ $('On form submission').item.json['Search Term'] }} - {{ $('On form submission').item.json.Location }} ({{ $now.format('yyyy-MM-dd') }})",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          144,
+          224
+        ],
+        "id": "914e8cfa-c7b5-4c6f-a7bf-53142ff886bd",
+        "name": "Copy file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "yyOMN1bO2gFzSRaP",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Target audience: {{ $('On form submission').item.json['Search Term'] }} in {{ $('On form submission').item.json.Location }}",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "=You are a URL generation agent. Your task is to convert natural language input into a valid Apollo search URL string.\n\n[OUTPUT FORMAT]\n\nhttps://app.apollo.io/#/people?[query_parameters]\n\n[RULES]\nEncode all values using URL encoding (e.g., spaces become %20, commas become %2C).\nUse query parameters based on recognized Apollo filters:\n\t- organizationLocations[] for countries or cities\n\t- organizationNumEmployeesRanges[] for employee countries\n\t- qKeywords for keyword search\n\t-sortAscending=false and sortByField=%5Bnone%5D by default\n\t- page=1 by default\nConcatenate parameters using &.\nOutput must match this example style:\n\nhttps://app.apollo.io/#/people?organizationLocations[]=United%20States&sortAscending=false&sortByField=%5Bnone%5D&page=1&Keywords=digital%20marketing%20agency&organizationNumEmployeesRanges[]=1%2C10\n\nNATURAL LANGUAGE EXAMPLES -> OUTPUT BEHAVIOR]\n= “Digital marketing agencies in the US with 1-10 employees”\n-> organizationLocations[]=United%20States,\norganizationNumEmployeesRanges[]=1%2C10,\nqKeywords=digital%20marketing%20agency\n\n“AI startups in Canada with under 50 employees”\n-> organizationLocations[]=Canada,\norganizationNumEmployeesRanges[]=1%2C50,\nqKeywords=AI%20startup\n\nAlways return the URL exactly in the format shown\n"
+              }
+            ]
+          },
+          "batching": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.7,
+        "position": [
+          416,
+          0
+        ],
+        "id": "c094e3b6-19b1-4315-b565-f9c6e2dd1b06",
+        "name": "Basic LLM Chain"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          400,
+          256
+        ],
+        "id": "39810ba3-926c-4351-8c1f-ee0795a4b49d",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "actorId": {
+            "__rl": true,
+            "value": "jljBwyyQakqrL1wae",
+            "mode": "id"
+          },
+          "customBody": "={\n    \"cleanOutput\": false,\n    \"url\": \"\"\n} {{ $json.text }}"
+        },
+        "type": "@apify/n8n-nodes-apify.apify",
+        "typeVersion": 1,
+        "position": [
+          768,
+          0
+        ],
+        "id": "6d825633-3c25-4b43-8844-f4fbb1daeb9e",
+        "name": "Run an Actor",
+        "credentials": {
+          "apifyApi": {
+            "id": "254VdmuuVB9Dan3o",
+            "name": "Apify account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "workflow looks incomplete",
+          "height": 80,
+          "width": 150,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          784,
+          400
+        ],
+        "id": "ce959b01-a7be-4742-9c58-bd803a49cfdf",
+        "name": "Sticky Note1"
+      }
+    ],
+    "connections": {
+      "On form submission": {
+        "main": [
+          [
+            {
+              "node": "About Anago/Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "About Anago/Agent": {
+        "main": [
+          [
+            {
+              "node": "Basic LLM Chain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Basic LLM Chain",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Basic LLM Chain": {
+        "main": [
+          [
+            {
+              "node": "Run an Actor",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
