@@ -1,0 +1,1315 @@
+{
+  "updatedAt": "2026-01-28T18:27:48.831Z",
+  "createdAt": "2025-12-23T23:10:06.822Z",
+  "id": "99hMsje0TZM5Qu0i",
+  "name": "Caregiver shift reminders daily report sub workflow pt.1",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        240
+      ],
+      "id": "4a07a3a9-badd-4946-b911-636dccb7421d",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        240
+      ],
+      "id": "3b9c6db0-4f3d-4415-9108-c05eaf40de64",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount1: rowCount,\n      message1: `Total number of shifts tomorrow: ${rowCount}`\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        240
+      ],
+      "id": "35b9f129-4df0-444b-bf0c-8ffb756cba92",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3de02156-1865-4c91-9707-d840a5b92144",
+              "name": "message1",
+              "value": "={{ $json.message1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        240
+      ],
+      "id": "db6ca05b-eb9f-4c47-b66b-063cdf60386d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa165768-0959-4630-8455-93e87b00154f",
+              "name": "tomorrow",
+              "value": "={{ $json.tomorrow }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        32
+      ],
+      "id": "b155fbf7-bdc5-4135-b5f6-8c9409c32c33",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 4,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        928,
+        240
+      ],
+      "id": "f4a67e8b-e21f-481d-88ce-cbe42301b190",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        240
+      ],
+      "id": "a8d369c8-1f08-4ec5-a9ab-e85cf7fc633a",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "Processed - Pending SMS Confirmation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        560
+      ],
+      "id": "7bab9044-5cde-47b8-bab8-eebd0c2350cd",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount2: rowCount,\n      message2: `Total number of shifts processed: ${rowCount}`\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        560
+      ],
+      "id": "56db4827-13bc-4585-a5d9-f6df84c4be9b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3de02156-1865-4c91-9707-d840a5b92144",
+              "name": "message2",
+              "value": "={{ $json.message2 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        560
+      ],
+      "id": "c8cf503a-81e1-4fa7-94b5-0bd538860e1a",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        240
+      ],
+      "id": "cae531a1-1a9b-432b-8ef9-8f938cd0aa13",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "89b38379-8610-468f-aca2-18489a3ef3b2",
+              "name": "messagea",
+              "value": "={{ $json.messagea }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        400
+      ],
+      "id": "332433fc-c7ec-4a27-8aa6-bc25145d7cf5",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCounta: rowCount,\n      messagea: `Total number of shifts missing caregiver or phone number: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        400
+      ],
+      "id": "0b09f562-106b-4312-ab5a-a202ae8b315e",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        400
+      ],
+      "id": "e6002912-c0db-4c3d-80a2-8625240522b8",
+      "name": "Get row(s) in sheet2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "row_number": 864,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 865,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "row_number": 866,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "row_number": 897,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "row_number": 867,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "row_number": 868,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      },
+      {
+        "json": {
+          "row_number": 869,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 6
+        }
+      },
+      {
+        "json": {
+          "row_number": 870,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 7
+        }
+      },
+      {
+        "json": {
+          "row_number": 871,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 8
+        }
+      },
+      {
+        "json": {
+          "row_number": 872,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 9
+        }
+      },
+      {
+        "json": {
+          "row_number": 873,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 10
+        }
+      },
+      {
+        "json": {
+          "row_number": 874,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 11
+        }
+      },
+      {
+        "json": {
+          "row_number": 875,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 12
+        }
+      },
+      {
+        "json": {
+          "row_number": 876,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 13
+        }
+      },
+      {
+        "json": {
+          "row_number": 877,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 14
+        }
+      },
+      {
+        "json": {
+          "row_number": 878,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 15
+        }
+      },
+      {
+        "json": {
+          "row_number": 879,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 16
+        }
+      },
+      {
+        "json": {
+          "row_number": 880,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 17
+        }
+      },
+      {
+        "json": {
+          "row_number": 881,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 18
+        }
+      },
+      {
+        "json": {
+          "row_number": 882,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 19
+        }
+      },
+      {
+        "json": {
+          "row_number": 883,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 20
+        }
+      },
+      {
+        "json": {
+          "row_number": 884,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 21
+        }
+      },
+      {
+        "json": {
+          "row_number": 885,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 22
+        }
+      },
+      {
+        "json": {
+          "row_number": 886,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 23
+        }
+      },
+      {
+        "json": {
+          "row_number": 887,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 24
+        }
+      },
+      {
+        "json": {
+          "row_number": 888,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 25
+        }
+      },
+      {
+        "json": {
+          "row_number": 889,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 26
+        }
+      },
+      {
+        "json": {
+          "row_number": 894,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 27
+        }
+      },
+      {
+        "json": {
+          "row_number": 890,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 28
+        }
+      },
+      {
+        "json": {
+          "row_number": 891,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 29
+        }
+      },
+      {
+        "json": {
+          "row_number": 892,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 30
+        }
+      },
+      {
+        "json": {
+          "row_number": 893,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 31
+        }
+      },
+      {
+        "json": {
+          "row_number": 895,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 32
+        }
+      },
+      {
+        "json": {
+          "row_number": 896,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 33
+        }
+      },
+      {
+        "json": {
+          "row_number": 898,
+          "text status": "Processed - Pending SMS Confirmation"
+        },
+        "pairedItem": {
+          "item": 34
+        }
+      }
+    ]
+  },
+  "versionId": "28e8c179-8706-4884-965d-9f3a9f0a0af6",
+  "activeVersionId": "28e8c179-8706-4884-965d-9f3a9f0a0af6",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-23T23:10:06.832Z",
+      "createdAt": "2025-12-23T23:10:06.832Z",
+      "role": "workflow:owner",
+      "workflowId": "99hMsje0TZM5Qu0i",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-02T19:28:54.000Z",
+    "createdAt": "2026-01-02T19:28:51.436Z",
+    "versionId": "28e8c179-8706-4884-965d-9f3a9f0a0af6",
+    "workflowId": "99hMsje0TZM5Qu0i",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -256,
+          240
+        ],
+        "id": "4a07a3a9-badd-4946-b911-636dccb7421d",
+        "name": "Code in JavaScript3"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 991995639,
+            "mode": "list",
+            "cachedResultName": "new",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          96,
+          240
+        ],
+        "id": "3b9c6db0-4f3d-4415-9108-c05eaf40de64",
+        "name": "Get row(s) in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount1: rowCount,\n      message1: `Total number of shifts tomorrow: ${rowCount}`\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          304,
+          240
+        ],
+        "id": "35b9f129-4df0-444b-bf0c-8ffb756cba92",
+        "name": "Code in JavaScript4"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3de02156-1865-4c91-9707-d840a5b92144",
+                "name": "message1",
+                "value": "={{ $json.message1 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          528,
+          240
+        ],
+        "id": "db6ca05b-eb9f-4c47-b66b-063cdf60386d",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "fa165768-0959-4630-8455-93e87b00154f",
+                "name": "tomorrow",
+                "value": "={{ $json.tomorrow }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          288,
+          32
+        ],
+        "id": "b155fbf7-bdc5-4135-b5f6-8c9409c32c33",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "numberInputs": 4,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          928,
+          240
+        ],
+        "id": "f4a67e8b-e21f-481d-88ce-cbe42301b190",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -480,
+          240
+        ],
+        "id": "a8d369c8-1f08-4ec5-a9ab-e85cf7fc633a",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 991995639,
+            "mode": "list",
+            "cachedResultName": "new",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "Processed - Pending SMS Confirmation"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          96,
+          560
+        ],
+        "id": "7bab9044-5cde-47b8-bab8-eebd0c2350cd",
+        "name": "Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount2: rowCount,\n      message2: `Total number of shifts processed: ${rowCount}`\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          304,
+          560
+        ],
+        "id": "56db4827-13bc-4585-a5d9-f6df84c4be9b",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3de02156-1865-4c91-9707-d840a5b92144",
+                "name": "message2",
+                "value": "={{ $json.message2 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          528,
+          560
+        ],
+        "id": "c8cf503a-81e1-4fa7-94b5-0bd538860e1a",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1136,
+          240
+        ],
+        "id": "cae531a1-1a9b-432b-8ef9-8f938cd0aa13",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "89b38379-8610-468f-aca2-18489a3ef3b2",
+                "name": "messagea",
+                "value": "={{ $json.messagea }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          528,
+          400
+        ],
+        "id": "332433fc-c7ec-4a27-8aa6-bc25145d7cf5",
+        "name": "Edit Fields3"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCounta: rowCount,\n      messagea: `Total number of shifts missing caregiver or phone number: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          304,
+          400
+        ],
+        "id": "0b09f562-106b-4312-ab5a-a202ae8b315e",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 991995639,
+            "mode": "list",
+            "cachedResultName": "new",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          96,
+          400
+        ],
+        "id": "e6002912-c0db-4c3d-80a2-8625240522b8",
+        "name": "Get row(s) in sheet2",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Code in JavaScript3": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get row(s) in sheet1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get row(s) in sheet2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript4": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 3
+            }
+          ]
+        ]
+      },
+      "Edit Fields3": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 28e8c179",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
