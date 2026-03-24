@@ -1,0 +1,413 @@
+{
+  "updatedAt": "2025-09-26T00:54:09.000Z",
+  "createdAt": "2025-09-13T04:31:38.383Z",
+  "id": "ZocrB5VsLK8lUDns",
+  "name": "Uni Research Agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "responseMode": "responseNode"
+        }
+      },
+      "id": "15348f32-ac6d-43ad-8268-636a09871e9b",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "webhookId": "8fda2f8e-ac8c-455c-ad4f-ddf0f026ba72"
+    },
+    {
+      "parameters": {
+        "content": "## University Application Research Workflow\n\nThis workflow helps Canadian Grade 12 students research undergraduate business programs.",
+        "height": 150,
+        "width": 416
+      },
+      "id": "510e750a-cfc4-4878-acad-b53b4e0429b3",
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are helping Canadian Grade 12 students research undergraduate business programs. Extract the university name from the user's input and respond with just the clean university name for research purposes."
+        }
+      },
+      "id": "6f592eb5-fa90-4854-8ac9-31c5809e6555",
+      "name": "Research Coordinator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        304,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.google.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.output }} undergraduate business admission requirements Canada"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "09d47728-d271-45fb-bc7f-3fc5ef80bb4c",
+      "name": "Web Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        608,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "o4-mini",
+        "prompt": {
+          "messages": [
+            {
+              "content": "=Create a comprehensive application guide using this data: {{ $json.choices[0].message.content }}  Format as a student-friendly document with clear sections and actionable advice."
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "682c517b-f65b-40df-8ecb-14328f7c52bd",
+      "name": "Create Guide Content",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const data = $node['Structure Research'].json.choices[0].message.content;\nlet parsedData;\ntry {\n  parsedData = JSON.parse(data);\n} catch (e) {\n  parsedData = { university: 'University', deadlines: [] };\n}\n\nconst sheetData = [['Descriptor', 'Personal Deadline', 'Hard Deadline']];\n\nif (parsedData.deadlines) {\n  parsedData.deadlines.forEach(deadline => {\n    sheetData.push([deadline, '', '']);\n  });\n}\n\nreturn { json: { sheetData, title: parsedData.university + ' Deadlines' } };"
+      },
+      "id": "f2431675-da14-46ed-8b5c-80cd54a339b7",
+      "name": "Prepare Sheet Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "folderId": "1i3hF3NOrV-m8owpsTWS_UA1YZGA1NWrY",
+        "title": "University Application Guide"
+      },
+      "id": "9dd5a8f0-9d9f-4618-ae41-a63543a03c4d",
+      "name": "Create Google Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        64
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "GuB08CiUTqAj1SGC",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $json.title }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "808c24b9-36bb-4875-8029-2d98e3dfdccf",
+      "name": "Create Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1504,
+        256
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "mergeByIndex",
+        "options": {}
+      },
+      "id": "6506990b-b010-4e6f-b97b-62ca56441960",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "model": "o4-mini",
+        "prompt": "Create a summary response telling the student their research is complete with links to:\n- Google Doc: {{ $node['Create Google Doc'].json.alternateLink }}\n- Google Sheet: {{ $node['Create Google Sheet'].json.spreadsheetUrl }}\n\nInclude next steps and encouragement.",
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "032b1d54-c041-4a7e-9a7a-fed7946e6634",
+      "name": "Final Response",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        160
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        368
+      ],
+      "id": "2e3f4288-4ada-4478-92fe-fcd9aca45b06",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "prompt": {
+          "messages": [
+            {
+              "content": "=Create a structured research response for {{ $node['Research Coordinator'].json.output }} undergraduate business program.\\n\\nProvide a JSON with:\\n{\\n  \\\"university\\\": \\\"University name\\\",\\n  \\\"requirements\\\": \\\"Admission requirements\\\",\\n  \\\"deadlines\\\": [\\\"Important dates\\\"],\\n  \\\"scholarships\\\": [\\\"Available scholarships\\\"],\\n  \\\"tips\\\": [\\\"Application strategies\\\"]\\n}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "276530e9-78bc-4334-8df1-407e9269f8d8",
+      "name": "Generate Research Data",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        864,
+        160
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## University name in user chat message is researched from perspective of 12th grader and google doc and sheet are created for the uni with all relevant links, infos, and dates",
+        "height": 128,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -320
+      ],
+      "id": "da001d12-4481-44d4-a12d-4c8a1e52d479",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Research Coordinator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Coordinator": {
+      "main": [
+        [
+          {
+            "node": "Web Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Web Search": {
+      "main": [
+        [
+          {
+            "node": "Generate Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Guide Content": {
+      "main": [
+        [
+          {
+            "node": "Create Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sheet Data": {
+      "main": [
+        [
+          {
+            "node": "Create Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Coordinator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Research Data": {
+      "main": [
+        [
+          {
+            "node": "Create Guide Content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Sheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "fb696be7-9b99-41b7-bc20-8a9152e43d3d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-13T04:31:38.389Z",
+      "createdAt": "2025-09-13T04:31:38.389Z",
+      "role": "workflow:owner",
+      "workflowId": "ZocrB5VsLK8lUDns",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
