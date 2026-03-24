@@ -1,0 +1,74 @@
+{
+  "updatedAt": "2026-03-22T23:00:50.238Z",
+  "createdAt": "2026-03-22T22:37:19.440Z",
+  "id": "DuD9eziUWTZJgYbZ",
+  "name": "feedback collection",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feedback-collection-42a4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8359e70a-d3e8-40cd-b8a2-158e41bab677",
+      "name": "Webhook1",
+      "webhookId": "fd3e38d4-e234-42a4-986f-44ccb0e94be1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "c51a8260-10cf-4deb-866c-5d60fcea1ff3",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "400e459a-7557-4918-abc3-23cb67e4319f",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T22:37:19.442Z",
+      "createdAt": "2026-03-22T22:37:19.442Z",
+      "role": "workflow:owner",
+      "workflowId": "DuD9eziUWTZJgYbZ",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
