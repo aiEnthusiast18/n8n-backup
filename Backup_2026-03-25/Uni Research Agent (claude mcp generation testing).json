@@ -1,0 +1,906 @@
+{
+  "updatedAt": "2025-09-26T00:53:48.000Z",
+  "createdAt": "2025-09-17T04:10:38.686Z",
+  "id": "4UL8nfFrKx2Bl2Wl",
+  "name": "Uni Research Agent (claude mcp generation testing)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "university-research",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "9c7cbdeb-cd60-4450-8c64-ce97d768c593",
+      "name": "Webhook - University Input",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -656,
+        304
+      ],
+      "webhookId": "67f8a481-571d-4f80-a055-8ba1bab94bc1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Research the following for a Canadian Grade 12 student applying to undergraduate business programs at ' + $json.universityName + ':\n\n1. UNIVERSITY OVERVIEW:\n- Official name and location\n- Business school/faculty name\n- General reputation and ranking\n- Campus culture\n\n2. ADMISSION REQUIREMENTS:\n- Required Grade 12 courses (specify Ontario equivalents if different)\n- Minimum grade requirements\n- Required standardized tests (if any)\n- Language proficiency requirements\n- Required documents (transcripts, letters of recommendation, essays)\n- Supplementary application requirements\n- Interview requirements (if any)\n\n3. IMPORTANT DATES & DEADLINES:\n- Application open date\n- Early admission deadline\n- Regular admission deadline\n- Document submission deadline\n- Scholarship application deadlines (both internal and major external scholarships)\n- Interview dates (if applicable)\n- Decision release dates\n- Acceptance deadline\n- Residence application deadline\n\n4. APPLICATION PROCESS:\n- Application platform (OUAC, direct, etc.)\n- Step-by-step application guide\n- Tips for the application\n- Common mistakes to avoid\n\n5. PROGRAM DETAILS:\n- Program options (BCom, BBA, etc.)\n- Specializations available\n- Co-op/internship opportunities\n- Exchange programs\n- Notable faculty or courses\n\n6. FINANCIAL INFORMATION:\n- Tuition fees (domestic)\n- Automatic entrance scholarships\n- Merit-based scholarships\n- Need-based financial aid\n- External scholarship opportunities (include major Canadian scholarships)\n- Estimated total cost of attendance\n\n7. STRATEGIES TO INCREASE ACCEPTANCE:\n- Academic preparation tips\n- Extracurricular recommendations\n- How to write strong essays\n- Interview preparation (if applicable)\n- How to demonstrate interest\n- Alternative pathways if not accepted initially\n\n8. RESOURCES & CONTACTS:\n- Admissions office contact\n- Faculty advising contacts\n- Virtual tour links\n- Student ambassador programs\n- Social media accounts to follow\n- Useful guides and documents\n\nProvide comprehensive, actionable information specifically useful for a Canadian high school student. Include both university-specific and general Canadian scholarships. Format the response as structured JSON with these main sections.' }}",
+        "options": {
+          "systemMessage": "You are an expert educational consultant specializing in Canadian university admissions, particularly business programs. You have extensive knowledge of:\n- Canadian university admission requirements and processes\n- Grade 12 prerequisite courses across provinces\n- Scholarship opportunities (both university-specific and national)\n- Application strategies for Canadian students\n- Important deadlines and timelines\n\nProvide detailed, accurate, and actionable information. When discussing deadlines, always note that students should apply 2 weeks before official deadlines. Include both university-specific information and general Canadian opportunities.\n\nFormat your response as structured JSON with clear sections for easy processing."
+        }
+      },
+      "id": "09726480-b0f3-440d-aeda-76b462a49042",
+      "name": "AI Agent - Research University",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -400,
+        304
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "options": {}
+      },
+      "id": "2f451eec-3369-4991-8ad1-108d12eea622",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        512
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "language": "javascript"
+      },
+      "id": "ebeea181-b6aa-466e-a845-583824f51857",
+      "name": "Process Research Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        304
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "folderId": "1i3hF3NOrV-m8owpsTWS_UA1YZGA1NWrY",
+        "title": "={{ $json.universityName + ' - Business Program Research Guide - ' + $json.researchData.researchDate }}"
+      },
+      "id": "11f59b75-5dd0-410e-92b1-d3697e94b1e7",
+      "name": "Create Google Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        384,
+        192
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "GuB08CiUTqAj1SGC",
+          "name": "Google Docs account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentId }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insertText"
+            }
+          ]
+        }
+      },
+      "id": "df02aa01-064c-4d59-aacb-1b87293d860e",
+      "name": "Update Google Doc Content",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        592,
+        192
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "GuB08CiUTqAj1SGC",
+          "name": "Google Docs account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac",
+          "mode": "list",
+          "cachedResultName": "n8n unis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac/edit?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "id": "03764328-9bce-427d-a3c9-aea472da24a7",
+      "name": "Create Deadline Spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac",
+          "mode": "list",
+          "cachedResultName": "n8n unis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=={{ $('Process Research Data').first().json.universityName + ' - Application Deadlines' }}",
+          "mode": ""
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b8dc487d-eb03-4bdd-a465-8e5c32814dc3",
+      "name": "Add Spreadsheet Headers",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac",
+          "mode": "list",
+          "cachedResultName": "n8n unis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=={{ $('Process Research Data').first().json.universityName + ' - Application Deadlines' }}",
+          "mode": ""
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6748f40a-c67a-43e1-ab72-9e5f92814bf8",
+      "name": "Add Deadline Rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "deadlines",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "universityName",
+        "options": {}
+      },
+      "id": "b89bc8c4-6c44-42ad-9901-13f6ebe6ce73",
+      "name": "Split Deadline Items",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        592,
+        400
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "language": "javascript"
+      },
+      "id": "75638103-7190-4a45-a29c-58d8db296976",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        304
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1df57a8d-bf21-4708-9f83-6a011fc055cb",
+      "name": "Chat - University Request",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1040,
+        1088
+      ],
+      "webhookId": "university-research-chat"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "746ae5c2-5518-4050-bf64-b8f522932a7b",
+      "name": "Send Chat Response",
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Research the following for a Canadian Grade 12 student applying to undergraduate business programs at {{ $json.chatInput }}:\n\n1. UNIVERSITY OVERVIEW:\n- Official name and location\n- Business school/faculty name\n- General reputation and ranking\n- Campus culture\n\n2. ADMISSION REQUIREMENTS:\n- Required Grade 12 courses (specify Ontario equivalents if different)\n- Minimum grade requirements\n- Required standardized tests (if any)\n- Language proficiency requirements\n- Required documents (transcripts, letters of recommendation, essays)\n- Supplementary application requirements\n- Interview requirements (if any)\n\n3. IMPORTANT DATES & DEADLINES:\n- Application open date\n- Early admission deadline\n- Regular admission deadline\n- Document submission deadline\n- Scholarship application deadlines (both internal and major external scholarships)\n- Interview dates (if applicable)\n- Decision release dates\n- Acceptance deadline\n- Residence application deadline\n\n4. APPLICATION PROCESS:\n- Application platform (OUAC, direct, etc.)\n- Step-by-step application guide\n- Tips for the application\n- Common mistakes to avoid\n\n5. PROGRAM DETAILS:\n- Program options (BCom, BBA, etc.)\n- Specializations available\n- Co-op/internship opportunities\n- Exchange programs\n- Notable faculty or courses\n\n6. FINANCIAL INFORMATION:\n- Tuition fees (domestic)\n- Automatic entrance scholarships\n- Merit-based scholarships\n- Need-based financial aid\n- External scholarship opportunities (include major Canadian scholarships)\n- Estimated total cost of attendance\n\n7. STRATEGIES TO INCREASE ACCEPTANCE:\n- Academic preparation tips\n- Extracurricular recommendations\n- How to write strong essays\n- Interview preparation (if applicable)\n- How to demonstrate interest\n- Alternative pathways if not accepted initially\n\n8. RESOURCES & CONTACTS:\n- Admissions office contact\n- Faculty advising contacts\n- Virtual tour links\n- Student ambassador programs\n- Social media accounts to follow\n- Useful guides and documents\n\nProvide comprehensive, actionable information specifically useful for a Canadian high school student. Include both university-specific and general Canadian scholarships. Format the response as structured JSON with these main sections.",
+        "options": {
+          "systemMessage": "You are an expert educational consultant specializing in Canadian university admissions, particularly business programs. You have extensive knowledge of:\n- Canadian university admission requirements and processes\n- Grade 12 prerequisite courses across provinces\n- Scholarship opportunities (both university-specific and national)\n- Application strategies for Canadian students\n- Important deadlines and timelines\n\nProvide detailed, accurate, and actionable information. When discussing deadlines, always note that students should apply 2 weeks before official deadlines. Include both university-specific information and general Canadian opportunities.\n\nFormat your response as structured JSON with clear sections for easy processing."
+        }
+      },
+      "id": "41f14f1f-4cdc-4dc4-8c7d-189efb0b3147",
+      "name": "AI Agent - Research University1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -784,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "aab56576-7219-4633-9bdf-6c18d4b34343",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        1296
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the AI agent output and chat input\nconst chatInput = $('Chat - University Request').first().json.chatInput;\nconst aiResponse = $input.first().json.output;\n\n// Extract the university name from the chat input\nconst universityName = chatInput;\n\n// Try to parse the response as JSON, or use as-is\nlet researchData;\ntry {\n  researchData = typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;\n} catch (error) {\n  // If not JSON, structure it ourselves\n  researchData = {\n    universityInfo: aiResponse,\n    universityName: universityName\n  };\n}\n\n// Ensure we have the university name\nresearchData.universityName = universityName;\n\n// Get current date\nconst today = new Date();\nresearchData.researchDate = today.toISOString().split('T')[0];\n\n// Format for Google Docs\nconst docContent = `\n# ${universityName} - Business Program Application Guide\n## For Canadian Grade 12 Students\n### Research Date: ${researchData.researchDate}\n\n---\n\n## 1. UNIVERSITY OVERVIEW\n${researchData['1. UNIVERSITY OVERVIEW'] || researchData.universityOverview || 'Information to be researched'}\n\n## 2. ADMISSION REQUIREMENTS\n${researchData['2. ADMISSION REQUIREMENTS'] || researchData.admissionRequirements || 'Information to be researched'}\n\n## 3. IMPORTANT DATES & DEADLINES\n${researchData['3. IMPORTANT DATES & DEADLINES'] || researchData.importantDates || 'Information to be researched'}\n\n## 4. APPLICATION PROCESS\n${researchData['4. APPLICATION PROCESS'] || researchData.applicationProcess || 'Information to be researched'}\n\n## 5. PROGRAM DETAILS\n${researchData['5. PROGRAM DETAILS'] || researchData.programDetails || 'Information to be researched'}\n\n## 6. FINANCIAL INFORMATION\n${researchData['6. FINANCIAL INFORMATION'] || researchData.financialInfo || 'Information to be researched'}\n\n## 7. STRATEGIES TO INCREASE ACCEPTANCE\n${researchData['7. STRATEGIES TO INCREASE ACCEPTANCE'] || researchData.strategies || 'Information to be researched'}\n\n## 8. RESOURCES & CONTACTS\n${researchData['8. RESOURCES & CONTACTS'] || researchData.resources || 'Information to be researched'}\n\n---\n\n## EXTERNAL SCHOLARSHIP OPPORTUNITIES\n\n### Major Canadian Scholarships:\n- **Loran Scholars Foundation** - $100,000 over 4 years\n  - Deadline: October (Grade 12)\n  - Requires nomination from school\n  \n- **TD Scholarships for Community Leadership** - $70,000\n  - Deadline: November\n  - Focus on community involvement\n  \n- **Schulich Leader Scholarships** - $100,000 (STEM) or $80,000 (Business)\n  - Deadline: January\n  - Requires school nomination\n  \n- **Terry Fox Humanitarian Award** - $28,000\n  - Deadline: February\n  - Focus on humanitarian service\n\n### Provincial Scholarships:\n- Check your provincial student aid website\n- Ontario: OSAP and Ontario Scholar designation\n- Other provinces have similar programs\n\n---\n\n## ACTION PLAN\n\n1. **Immediate Actions (This Week)**\n   - Review all requirements carefully\n   - Check your current grades against minimums\n   - Start gathering documents\n   \n2. **Short-term (Next 2-4 Weeks)**\n   - Request transcripts\n   - Ask for reference letters\n   - Begin essay drafts\n   \n3. **Application Period**\n   - Submit 2 weeks before deadline\n   - Double-check all requirements\n   - Apply for scholarships simultaneously\n   \n4. **Follow-up**\n   - Confirm receipt of application\n   - Send thank you notes to references\n   - Prepare for potential interviews\n\n---\n\n*Note: This guide was compiled for educational purposes. Always verify information directly with the university's official admissions office.*\n`;\n\n// Extract deadlines for spreadsheet\nconst deadlines = [];\n\n// Parse deadlines from the research (this is a simplified version)\nconst deadlineSection = researchData['3. IMPORTANT DATES & DEADLINES'] || researchData.importantDates || '';\n\n// Add standard deadline entries\nconst standardDeadlines = [\n  { descriptor: 'Early Admission Application', hardDeadline: '2025-11-01' },\n  { descriptor: 'Regular Application Deadline', hardDeadline: '2026-01-15' },\n  { descriptor: 'Document Submission', hardDeadline: '2026-02-01' },\n  { descriptor: 'Entrance Scholarship Application', hardDeadline: '2026-02-15' },\n  { descriptor: 'Loran Scholars Nomination', hardDeadline: '2025-10-15' },\n  { descriptor: 'TD Community Leadership Scholarship', hardDeadline: '2025-11-15' },\n  { descriptor: 'Schulich Leader Nomination', hardDeadline: '2026-01-15' },\n  { descriptor: 'Terry Fox Humanitarian Award', hardDeadline: '2026-02-01' },\n  { descriptor: 'Acceptance Decision Deadline', hardDeadline: '2026-06-01' },\n  { descriptor: 'Residence Application', hardDeadline: '2026-06-15' }\n];\n\n// Calculate personal deadlines (2 weeks before)\nstandardDeadlines.forEach(item => {\n  const hardDate = new Date(item.hardDeadline);\n  const personalDate = new Date(hardDate);\n  personalDate.setDate(personalDate.getDate() - 14);\n  \n  deadlines.push({\n    Descriptor: `${universityName} - ${item.descriptor}`,\n    'Personal Deadline': personalDate.toISOString().split('T')[0],\n    'Hard Deadline': item.hardDeadline\n  });\n});\n\nreturn [\n  {\n    json: {\n      universityName: universityName,\n      docContent: docContent,\n      deadlines: deadlines,\n      researchData: researchData\n    }\n  }\n];"
+      },
+      "id": "df99b760-023c-4aa3-a441-e988092dd37b",
+      "name": "Process Research Data1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "folderId": "1i3hF3NOrV-m8owpsTWS_UA1YZGA1NWrY",
+        "title": "={{ $json.universityName + ' - Business Program Research Guide - ' + $json.researchData.researchDate }}"
+      },
+      "id": "f5af7c8e-b5e8-4a4b-8366-0ede01a56f93",
+      "name": "Create Google Doc1",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        32,
+        976
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "GuB08CiUTqAj1SGC",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Process Research Data1').item.json.docContent }}"
+            }
+          ]
+        }
+      },
+      "id": "1e163f01-a3cf-4174-b4c8-a860819634ba",
+      "name": "Update Google Doc Content1",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        240,
+        976
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "GuB08CiUTqAj1SGC",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac",
+          "mode": "list",
+          "cachedResultName": "n8n unis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac/edit?usp=drivesdk"
+        },
+        "title": "={{ $('Process Research Data1').first().json.universityName + ' - Application Deadlines' }}",
+        "options": {}
+      },
+      "id": "9832f650-362a-40ec-9251-541e2a0aeec2",
+      "name": "Create Deadline Spreadsheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -176,
+        1184
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac",
+          "mode": "list",
+          "cachedResultName": "n8n unis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Process Research Data1').first().json.universityName + ' - Application Deadlines' }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Descriptor": "Descriptor",
+            "Personal Deadline (2 weeks before)": "Personal Deadline (2 weeks before)",
+            "Hard Deadline": "Hard Deadline"
+          }
+        },
+        "options": {}
+      },
+      "id": "846ba415-2f43-4e48-b699-9b2ebeb3152b",
+      "name": "Add Spreadsheet Headers1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        1184
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac",
+          "mode": "list",
+          "cachedResultName": "n8n unis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HFEQOFF4YKve87gSiwFXI7QLD4fmn_0RiH-4HZfg-ac/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Process Research Data1').first().json.universityName + ' - Application Deadlines' }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "spreadsheetId",
+              "displayName": "spreadsheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sheetId",
+              "displayName": "sheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "index",
+              "displayName": "index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sheetType",
+              "displayName": "sheetType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gridProperties",
+              "displayName": "gridProperties",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8f030783-25b7-4483-b713-18c4d5f27d9b",
+      "name": "Add Deadline Rows1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        1184
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const universityName = $('Process Research Data').first().json.universityName;\nconst docUrl = $('Create Google Doc').first().json.documentUrl || 'Document created successfully';\nconst spreadsheetUrl = $('Create Deadline Spreadsheet').first().json.spreadsheetUrl || 'Spreadsheet created successfully';\nconst deadlineCount = $('Process Research Data').first().json.deadlines.length;\n\n// Format response message for chat\nconst responseMessage = `\n✅ **Research completed for ${universityName}!**\n\n📄 **Google Doc Created:**\nI've created a comprehensive research guide with all admission information.\n[View Document](${docUrl})\n\n📊 **Google Sheet Created:**\nI've created a deadline tracker with ${deadlineCount} important dates.\nNote: Personal deadlines are set 2 weeks before official deadlines.\n[View Spreadsheet](${spreadsheetUrl})"
+      },
+      "id": "3ecaaaef-687c-48c2-bcd5-750941f381ad",
+      "name": "Format Success Response1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        240,
+        1184
+      ],
+      "id": "fbf389d4-3b02-4fad-a5b2-6ecbe11d1bf0",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        496,
+        1344
+      ],
+      "id": "6e1a01a8-e72f-4db3-aeea-2663636271ef"
+    },
+    {
+      "parameters": {
+        "content": "## University name in user chat message is researched from perspective of 12th grader and google doc and sheet are created for the uni with all relevant links, infos, and dates",
+        "height": 128,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        720
+      ],
+      "id": "31038b8d-d897-4b1b-bd9f-1613020bd93a",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook - University Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Research University",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Research University": {
+      "main": [
+        [
+          {
+            "node": "Process Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Research Data": {
+      "main": [
+        [
+          {
+            "node": "Create Google Doc",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Deadline Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Update Google Doc Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Deadline Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Add Spreadsheet Headers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Spreadsheet Headers": {
+      "main": [
+        [
+          {
+            "node": "Split Deadline Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Deadline Items": {
+      "main": [
+        [
+          {
+            "node": "Add Deadline Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Doc Content": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Deadline Rows": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Research University",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat - University Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Research University1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Research University1": {
+      "main": [
+        [
+          {
+            "node": "Process Research Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Research University1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Research Data1": {
+      "main": [
+        [
+          {
+            "node": "Create Google Doc1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Deadline Spreadsheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Doc1": {
+      "main": [
+        [
+          {
+            "node": "Update Google Doc Content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Doc Content1": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Deadline Spreadsheet1": {
+      "main": [
+        [
+          {
+            "node": "Add Spreadsheet Headers1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Spreadsheet Headers1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Deadline Rows1": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response1": {
+      "main": [
+        [
+          {
+            "node": "Send Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Add Deadline Rows1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "362c4d0a-fd30-461a-819f-28f6cc21ee64",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-17T04:10:38.691Z",
+      "createdAt": "2025-09-17T04:10:38.691Z",
+      "role": "workflow:owner",
+      "workflowId": "4UL8nfFrKx2Bl2Wl",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
