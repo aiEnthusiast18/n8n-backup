@@ -1,0 +1,554 @@
+{
+  "updatedAt": "2025-09-26T00:10:20.000Z",
+  "createdAt": "2025-09-21T12:14:17.510Z",
+  "id": "xjnYKIkvw2suKI9g",
+  "name": "Personalized Weekly AI Newsletter",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "feeds",
+        "options": {}
+      },
+      "id": "d160258e-2e51-4b51-9836-b4d07af8f467",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        1008,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "05b8451c-028a-4722-80eb-c0bb5dd4e21b",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        1552,
+        368
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9c41b21b-5d64-4494-b3db-29b42a8d4b93",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        1936,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "c28ea42e-d86e-46f1-9064-6d596c453c6c",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        1744,
+        480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "80fcc352-3b31-4b1f-9c02-6f28be0aeb5e",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        992,
+        992
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "61d483ac-322b-419e-b34d-e5f1b626209b",
+      "name": "Get Articles Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        560,
+        160
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "a30815fe-b774-424e-be6d-07ed84b9112d",
+      "name": "Send Weekly Summary",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        544,
+        832
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "1493c835-2f21-4d87-986a-3e6a256b08da",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "16c62982-86c5-4157-83b1-175f0173899a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        672
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={\n  \"text\": \"={{ $json.values.string[0].value }}\",\n  \"options\": {\n    \"systemMessage\": \"You are a tech news curator. Based on the user's interests, find and summarize the most relevant and important tech news from the stored articles. Focus on: 1) Major product launches, 2) Industry developments, 3) Breakthrough technologies, 4) Business news affecting tech companies. Create a well-structured summary with headlines and brief descriptions. Limit to the requested number of items and prioritize by importance and relevance to the stated interests.\"\n  },\n  \"promptType\": \"define\"\n}",
+        "options": {}
+      },
+      "id": "1bbd386d-4360-4521-8773-116b1ae31b8e",
+      "name": "News reader AI",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1008,
+        768
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "sendTo": "ridalakhani@icloud.com",
+        "subject": "=Weekly Tech Newsletter - {{ $now.format('MMMM dd, yyyy') }}",
+        "message": "={{ $json.data }}",
+        "options": {}
+      },
+      "id": "08b8caf3-9932-4652-9798-d488dc3918cd",
+      "name": "Send Newsletter",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1600,
+        832
+      ],
+      "webhookId": "0de8b6e8-8611-48a9-ba25-1d023698f577",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3hqtCAi1EGcgg76C",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output }}",
+        "options": {}
+      },
+      "id": "a5ff1464-9a4d-434b-8878-50b64879d0ac",
+      "name": "Convert Response to an Email-Friendly Format",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        1360,
+        768
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "81e8fded-95b6-4b27-a53d-611c78fc27d6",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        704,
+        768
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"keepOnlySet\": false,\n  \"values\": {\n    \"string\": [\n      {\n        \"name\": \"interests\",\n        \"value\": \"AI and machine learning, mobile technology, startups, AI breakthroughs, AI, new AI tools\"\n      },\n      {\n        \"name\": \"numItems\",\n        \"value\": \"10\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "e59ed3e4-894a-4bcf-a548-47991b3add13",
+      "name": "Your topics of interest",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        768,
+        832
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {},
+      "id": "f2de5cd0-7028-4240-9101-74d4e1411c01",
+      "name": "Store News Articles",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "position": [
+        1680,
+        192
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"feeds\": [\n    \"https://feeds.feedburner.com/TechCrunch\",\n    \"https://www.wired.com/feed/rss\",\n    \"https://www.theverge.com/rss/index.xml\",\n    \"https://www.engadget.com/rss.xml\",\n    \"https://arstechnica.com/feed/\",\n    \"https://feeds.macrumors.com/MacRumors-All\"\n  ]\n}",
+        "options": {}
+      },
+      "id": "5a971568-a39d-4a5d-ba51-83691c702605",
+      "name": "Set Tech News RSS Feeds",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        784,
+        160
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.feeds }}",
+        "options": {}
+      },
+      "id": "4a9a56d0-1826-4f6d-b0b5-87d17d4f4656",
+      "name": "Read RSS News Feeds",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        1232,
+        160
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {},
+      "id": "f9f08a51-d9fe-4846-9c90-57a9915a1246",
+      "name": "Get News Articles",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "position": [
+        1168,
+        992
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5addad75-ff5e-4e33-a644-73151f5e054e",
+      "name": "Embeddings OpenAI2",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        1264,
+        1136
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "73c54810-33cc-495d-a316-2f9306b645ba",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "d90ac64f-3276-4db9-9ef2-103a2c9d71d5",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "8b03de42-2554-437b-9774-201d8433cbfc",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1488,
+        1040
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "id": "d2f9b976-b116-4991-a0f1-2ffd7bae0a01",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        768
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"keepOnlySet\": false,\n  \"values\": {\n    \"string\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"={{ $json.title }}\"\n      },\n      {\n        \"name\": \"description\", \n        \"value\": \"={{ $json.summary }}\"\n      },\n      {\n        \"name\": \"link\",\n        \"value\": \"={{ $json.link }}\"\n      },\n      {\n        \"name\": \"pubDate\",\n        \"value\": \"={{ $json.pubDate }}\"\n      },\n      {\n        \"name\": \"content\",\n        \"value\": \"={{ $json.title + ' ' + $json.summary }}\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "ea9f52e4-4f52-4835-9dd5-8fbe6d9b845a",
+      "name": "Set and Normalize Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1440,
+        160
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## New articles monitored daily, interest aligning articles saved, sent weekly in newsletter format",
+        "height": 96,
+        "width": 640
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        352
+      ],
+      "id": "edd72d3a-afb9-4cb8-b051-43f6f0ab7b23",
+      "name": "Sticky Note7"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Read RSS News Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News reader AI": {
+      "main": [
+        [
+          {
+            "node": "Convert Response to an Email-Friendly Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Store News Articles",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "News reader AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Get News Articles",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Articles Daily": {
+      "main": [
+        [
+          {
+            "node": "Set Tech News RSS Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read RSS News Feeds": {
+      "main": [
+        [
+          {
+            "node": "Set and Normalize Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Weekly Summary": {
+      "main": [
+        [
+          {
+            "node": "Your topics of interest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tech News RSS Feeds": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your topics of interest": {
+      "main": [
+        [
+          {
+            "node": "News reader AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Response to an Email-Friendly Format": {
+      "main": [
+        [
+          {
+            "node": "Send Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store News Articles": {
+      "ai_vectorStore": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ab26f183-74c5-4cab-848a-4f3a23c9a9bd",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-21T12:14:17.517Z",
+      "createdAt": "2025-09-21T12:14:17.517Z",
+      "role": "workflow:owner",
+      "workflowId": "xjnYKIkvw2suKI9g",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
