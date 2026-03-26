@@ -1,0 +1,516 @@
+{
+  "updatedAt": "2025-09-26T00:39:57.000Z",
+  "createdAt": "2025-09-02T14:40:48.408Z",
+  "id": "zbfhIjViKBn9nouM",
+  "name": "email monitor, approve, respond 1 (playing around)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "html": "={{ $json.body.content }}",
+        "options": {}
+      },
+      "id": "cd4b2200-1193-474c-8040-757218a44735",
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        64,
+        400
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operationMode": "nodeInputBinary",
+        "options": {
+          "binaryDataKey": "={{ $json.data }}",
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following in max 100 words:\n\n\"{{ $json.data }}\"\n\nDo not enter the total number of words used.",
+              "prompt": "=Write a concise summary of the following in max 100 words:\n\n\"{{ $json.data }}\"\n\nDo not enter the total number of words used."
+            }
+          }
+        }
+      },
+      "id": "23b72105-ecd4-460c-948c-98ed6f7fe4d8",
+      "name": "Email Summarization Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        368,
+        400
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use the system instructions and the provided guidelines to compose a reply to the incoming email below.\n\nEmail content:\n{{ $('Markdown').item.json.body.content }}\n\nEmail Summary:\n{{ $('Email Summarization Chain').item.json.response.text }}\n\nReturn only the email body text (no extra commentary). If clarification is required, ask one short question and offer one confident next step. Keep the whole response under 100 words.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the email assistant for Anago Cleaning Systems — the administrator’s voice. Draft concise, professional, warm replies that reflect confidence, care, and attentiveness. Use the provided company guidelines as authoritative reference. These guidelines will be your single highest-value resource when it comes to knowing how classifying the incoming email under one of the specified categories. Use only the relevant portion of the guidelines for this reply.\n\nHard rules:\n- Output ONLY the email body text (no subject, no headers, no metadata and no commentary) unless the guidelines explicitly require otherwise. Be sure to include a personalized greeting at the start of your email, as well a signature at the end with the name \"Rida Lakhani\" and add the company name in the next line as well. At the end of the block of text, in the next line, write \"Category: \" and then indicate which category you classified the incoming email under.\n- Max length: 100 words; prefer shorter when appropriate.\n- Tone: friendly, professional, calm, solution-oriented, warm, and attentive.\n- Do NOT disclose, paraphrase, or reveal the guidelines text or internal processes in the reply.\n- If the email is ambiguous and a safe decision cannot be made, include exactly one short clarifying question and one concrete next-step suggestion (both in the same reply), staying within the 100-word limit.\n- Always read through the ENTIRE guidelines before classifying the email under the category that best fits. If the emails falls under more than one category or none of the categories, then select the ONE category that is the best option. Under no circumstances should one email be assigned to more than one category.\n- NEVER create new categories. You must always only select a category from the list provided.\n\nRetrieval guidance:\n- The supplied guidelines text may be long; search it for the most relevant headings/sections (e.g., “Finance”, “Franchisee”, “Operations”) and rely on those sections. Do NOT assume anything that is not supported by the guidelines.\n\nCategories:\n- Finance\n- Franchisee\n- Operations\n- Management\n- Inquiries\n- Admin\n- Unimportant\n\nGuidelines:\n{{ $json.content }}"
+        }
+      },
+      "id": "3563c6db-36ac-445f-ba6a-13d6dc6c6f56",
+      "name": "Write email",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1008,
+        400
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "8617bcfc-ed18-4629-870c-cad1c30d210b",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        960,
+        624
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Chain that summarizes the received email",
+        "height": 240,
+        "width": 320
+      },
+      "id": "89162adb-7e1f-40e9-bf88-71e4776480f3",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Agent that retrieves business information from a vector database and processes the response",
+        "height": 240,
+        "width": 340
+      },
+      "id": "54778227-1b9b-4367-9afc-74b9ed0d4b3a",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Convert email to Markdown format for better understanding of LLM models",
+        "height": 240
+      },
+      "id": "d03ce16b-962c-4c19-83b6-113345ab1e60",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "If the feedback is OK send email",
+        "height": 180
+      },
+      "id": "86a28379-033b-43a9-bf08-77c46c7c223c",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1632,
+        368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "21a6e76a-a20b-4e16-a736-aea18584e2f1",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        496,
+        624
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35d7c303-42f4-4dd1-b41e-6eb087c23c3d",
+              "name": "email",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f5fb1198-2f43-40fa-8c10-9df12852abbb",
+      "name": "Set Email text",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1440,
+        400
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "Human in the loop",
+        "height": 180
+      },
+      "id": "ed7440b1-5086-4544-ae85-d4663722e73a",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1360,
+        352
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "62e26bc5-1732-4699-a602-99490c7406fd",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a15d54e9-dc70-45c3-b941-2a1787161668",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2208,
+        416
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "output": "fields",
+        "fields": [
+          "body",
+          "from",
+          "subject"
+        ],
+        "filters": {
+          "foldersToInclude": [
+            "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQAuAAAAAADAjei6kimUQKCVmDI9bNGcAQBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAAA="
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        400
+      ],
+      "id": "d97881b6-3de3-48dc-a940-983c62c24e1e",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=[Approval Required] {{ $('Microsoft Outlook Trigger').item.json.subject }}",
+        "message": "=<h3>MESSAGE</h3>\n{{ $('Markdown').item.json.data }}\n\n<h3>AI RESPONSE</h3>\n{{ $json.email }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        496
+      ],
+      "id": "2c835c66-09aa-44c9-8630-7fb16a2a5889",
+      "name": "Send message and wait for response",
+      "webhookId": "2ec031cc-beea-4925-9550-54994f788529",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1eJRCAtQRCtAJMWryKvontz3bcpcAM8nhlr1p2equJAg"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        720,
+        400
+      ],
+      "id": "002956c8-0b19-441f-bd4a-5a8a69c367e2",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "GuB08CiUTqAj1SGC",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Microsoft Outlook Trigger').item.json.from.emailAddress.address }}",
+        "subject": "=Re: {{ $('Microsoft Outlook Trigger').item.json.subject }}",
+        "bodyContent": "={{ $('Set Email text').item.json.email }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2656,
+        400
+      ],
+      "id": "578fa6e3-9ae3-48a1-a25d-92ac87187ace",
+      "name": "Send a message",
+      "webhookId": "131708a7-bc10-4b74-b299-6925ae988eed",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1648,
+        400
+      ],
+      "id": "fe7d5d1d-454f-4915-b3bd-fe58f1c60a2a",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Email Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write email": {
+      "main": [
+        [
+          {
+            "node": "Set Email text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Email text": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Write email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Microsoft Outlook Trigger": {
+      "lastTimeChecked": "2025-09-06T10:23:46.004-05:00"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "37235e87-b2e4-4311-a825-8c314b11811d",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-02T14:40:48.413Z",
+      "createdAt": "2025-09-02T14:40:48.413Z",
+      "role": "workflow:owner",
+      "workflowId": "zbfhIjViKBn9nouM",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
