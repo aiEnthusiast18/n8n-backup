@@ -1,0 +1,1987 @@
+{
+  "updatedAt": "2026-03-08T17:40:04.272Z",
+  "createdAt": "2026-02-21T17:24:05.319Z",
+  "id": "u1ml0Ecw8RsE7eBL",
+  "name": "Social Media Rida Subworkflows - Image Generation",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        208
+      ],
+      "id": "7fc15d1b-2bf7-4d03-afda-df92d8cc1cdc",
+      "name": "Wait6",
+      "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1232,
+        208
+      ],
+      "id": "2f10efb6-3b65-45bb-ab0d-ad23dc86515c",
+      "name": "Get Image6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      \"https://i.ibb.co/99JKcX84/rahrevtypetealbox.jpg\"\n    ]\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        208
+      ],
+      "id": "9bfb07b5-12b4-4634-aff8-1864fc362e51",
+      "name": "Edit Images2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+              "name": "image",
+              "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1616,
+        208
+      ],
+      "id": "5e14c658-ee5c-4366-9916-a556c4734e23",
+      "name": "Result6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "generating",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generating"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1392,
+        192
+      ],
+      "id": "fece27cb-191a-481a-9be6-ee27ef7258e4",
+      "name": "Switch6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "prompt"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -272
+      ],
+      "id": "8f87dccf-0f93-48fc-98cf-0385a2de248a",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "formTitle": "Nano Banana Pro",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Please describe your desired image:",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        912
+      ],
+      "id": "04e4136b-3781-4e62-8aca-57e4686192dd",
+      "name": "On form submission1",
+      "webhookId": "35315c01-37f6-48d0-808c-a63970a50371",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generating"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1168,
+        896
+      ],
+      "id": "dd14eba7-1776-4725-9796-fc11785df961",
+      "name": "Switch",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+              "name": "image",
+              "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        912
+      ],
+      "id": "03a94e92-2d2b-43c1-a0ce-fb9424b3b93f",
+      "name": "Result",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "##  Text to Image\n",
+        "height": 272,
+        "width": 1280,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        832
+      ],
+      "id": "66a5f2b4-28a7-4095-b4e5-8f153646d9bc",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da65ddff-3d03-4e66-8b38-3074bc7f7093",
+              "name": "prompt",
+              "value": "={{ $json['Please describe your desired image:'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        912
+      ],
+      "id": "5269197e-a0c6-4d17-a753-b0d32b900603",
+      "name": "Image Prompt",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        992,
+        912
+      ],
+      "id": "1d72e715-717b-43cf-8a4b-15d37b4d9d91",
+      "name": "Get Image",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        912
+      ],
+      "id": "7c27a2a7-7c58-46a6-9913-e1873b3abf62",
+      "name": "Create Image",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        912
+      ],
+      "id": "bf73a8fd-592c-4949-985d-501e2d1999ec",
+      "name": "Wait",
+      "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36031878-8176-430b-a310-b4616bc06a98",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "0b5c15ca-9d20-4788-adfa-41d5ae9af93a",
+              "name": "image1",
+              "value": "=\"https://i.ibb.co/99JKcX84/rahrevtypetealbox.jpg\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        -272
+      ],
+      "id": "b0072ad7-d2f6-4488-8695-4fd7fb53a629",
+      "name": "Prompt/Images2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        -272
+      ],
+      "id": "ed11fdca-51b9-41cb-a046-ddf50f648eec",
+      "name": "Wait7",
+      "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        800,
+        -272
+      ],
+      "id": "35e585a5-1de7-4355-a640-8123942165b6",
+      "name": "Get Image7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      {{ $json.image1 }}\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        -272
+      ],
+      "id": "329ae32e-9d19-445c-ba2a-7aed0135edfb",
+      "name": "Edit Images"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+              "name": "image",
+              "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        -272
+      ],
+      "id": "b8a6d291-900b-481e-a5a7-a6cda35d1110",
+      "name": "Result7"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "generating",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generating"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        960,
+        -288
+      ],
+      "id": "e0d3a315-abfb-40f1-a15d-1151bbdf938d",
+      "name": "Switch7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript)\n// Makes prompt safe to inject into a JSON string\n\nconst input = $json.prompt ?? \"\";\n\nconst jsonSafePrompt = input\n  // escape backslashes FIRST\n  .replace(/\\\\/g, \"\\\\\\\\\")\n  \n  // escape double quotes\n  .replace(/\"/g, '\\\\\"')\n\n  // remove line breaks\n  .replace(/[\\r\\n]+/g, \" \")\n\n  // normalize smart quotes\n  .replace(/[“”]/g, '\\\\\"')\n  .replace(/[‘’]/g, \"'\")\n\n  // normalize long dashes\n  .replace(/[–—]/g, \"-\")\n\n  // collapse extra spaces\n  .replace(/\\s{2,}/g, \" \")\n\n  // trim\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      prompt: jsonSafePrompt\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -272
+      ],
+      "id": "e5cb78c5-2049-4d99-9243-af7932cc1daf",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "Get Image6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image6": {
+      "main": [
+        [
+          {
+            "node": "Switch6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Images2": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch6": {
+      "main": [
+        [
+          {
+            "node": "Result6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission1": {
+      "main": [
+        [
+          {
+            "node": "Image Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Prompt": {
+      "main": [
+        [
+          {
+            "node": "Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Image": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt/Images2": {
+      "main": [
+        [
+          {
+            "node": "Edit Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait7": {
+      "main": [
+        [
+          {
+            "node": "Get Image7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image7": {
+      "main": [
+        [
+          {
+            "node": "Switch7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Images": {
+      "main": [
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch7": {
+      "main": [
+        [
+          {
+            "node": "Result7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Prompt/Images2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "prompt": "Theme and mood: Compassionate, uplifting, community-focused celebration of women — warm, respectful, intimate, and empowering (International Women’s Day).\n\nScene description:\n- Realistic, high-resolution lifestyle photograph of a multi-generational moment in a tidy, sunlit home living room or kitchen nook. Center on three women: an older female client (senior), a female family member (adult daughter or granddaughter), and a female Right at Home caregiver.\n- The senior should be the focal point — smiling gently, engaged and comfortable (could be laughing or holding hands). The family member is next to her, affectionate and supportive (one hand on the senior’s shoulder or holding her other hand). The caregiver is interacting warmly — holding a mug or a small vase of purple flowers, gently touching the senior’s forearm or handing a cup, making eye contact and smiling.\n- Caregiver wardrobe: teal scrubs (true teal, saturated) with a clearly visible Right at Home logo on the chest pocket that reads “Right at Home Winnipeg.” Scrubs must look professional, clean, and authentic.\n- Diversity: portray ethnic diversity — choose models that reflect the Winnipeg community (for example, Indigenous, Black, South Asian, White) — at least one woman of color among the three.\n- Props and details: subtle International Women’s Day purple accents (a small purple flower bouquet or a folded purple scarf on the table). A simple vase, a soft throw, and a modest tablet or notebook on the side to suggest tailored care planning — no clinical equipment. Keep surfaces uncluttered.\n- Background: clean, homey interior with neutral tones and warm wood elements, softly out of focus (shallow depth of field) to keep attention on subjects. Leave negative space (upper-right or left third) with soft bokeh for text/logo overlay.\n- Mood and expressions: calm, dignified, affectionate; expressions convey strength, care, trust, and connection.\n\nStylistic and technical directions:\n- Photographic, authentic documentary style (not overly staged or stylized); natural window light, warm color grading, soft highlights, gentle contrast. Use shallow depth of field (e.g., 50mm equivalent, f/2.8) for subject separation.\n- Color palette: warm neutrals with teal (caregiver scrubs) as a strong accent and small purple elements to tie to International Women’s Day. Avoid busy patterns or bright competing colors.\n- Framing: medium shot (waist to head) or 3/4 shot, slightly angled eye-level perspective. Compose using the rule of thirds so the senior’s face is near a focal point and negative space remains for copy.\n- Image orientation and size: square (1:1) or vertical (4:5) optimized for social media feeds; high resolution for clear logo visibility.\n\nEmotional and branding notes:\n- Convey respect and empowerment for women — show caregiving as collaborative and compassionate.\n- Ensure the Right at Home logo on scrubs is legible and unobstructed (“Right at Home Winnipeg” on chest pocket).\n- Avoid clutter, medical sterility, or clinical hospital imagery; emphasize home, family, and warmth.\n\nOutput style: Deliver a polished, authentic social-media-ready photograph that celebrates women caregivers and seniors, communicates trust and community support, and leaves room for overlay text about International Women’s Day and Right at Home Winnipeg."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "1e0742db-62a8-4707-957a-ae4df2e24bfa",
+  "activeVersionId": "1e0742db-62a8-4707-957a-ae4df2e24bfa",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-21T17:24:05.323Z",
+      "createdAt": "2026-02-21T17:24:05.323Z",
+      "role": "workflow:owner",
+      "workflowId": "u1ml0Ecw8RsE7eBL",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T17:41:05.000Z",
+    "createdAt": "2026-03-08T17:40:04.276Z",
+    "versionId": "1e0742db-62a8-4707-957a-ae4df2e24bfa",
+    "workflowId": "u1ml0Ecw8RsE7eBL",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          1072,
+          208
+        ],
+        "id": "7fc15d1b-2bf7-4d03-afda-df92d8cc1cdc",
+        "name": "Wait6",
+        "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "taskId",
+                "value": "={{ $json.data.taskId }}"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          1232,
+          208
+        ],
+        "id": "2f10efb6-3b65-45bb-ab0d-ad23dc86515c",
+        "name": "Get Image6",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.kie.ai/api/v1/jobs/createTask",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      \"https://i.ibb.co/99JKcX84/rahrevtypetealbox.jpg\"\n    ]\n  }\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          912,
+          208
+        ],
+        "id": "9bfb07b5-12b4-4634-aff8-1864fc362e51",
+        "name": "Edit Images2",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+                "name": "image",
+                "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1616,
+          208
+        ],
+        "id": "5e14c658-ee5c-4366-9916-a556c4734e23",
+        "name": "Result6",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "success",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "success"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "generating",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "generating"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "fail",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "fail"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "waiting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          1392,
+          192
+        ],
+        "id": "fece27cb-191a-481a-9be6-ee27ef7258e4",
+        "name": "Switch6",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "prompt"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -288,
+          -272
+        ],
+        "id": "8f87dccf-0f93-48fc-98cf-0385a2de248a",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "formTitle": "Nano Banana Pro",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Please describe your desired image:",
+                "requiredField": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.3,
+        "position": [
+          320,
+          912
+        ],
+        "id": "04e4136b-3781-4e62-8aca-57e4686192dd",
+        "name": "On form submission1",
+        "webhookId": "35315c01-37f6-48d0-808c-a63970a50371",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "success",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "success"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "waiting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "generating"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "fail",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "fail"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          1168,
+          896
+        ],
+        "id": "dd14eba7-1776-4725-9796-fc11785df961",
+        "name": "Switch",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+                "name": "image",
+                "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1376,
+          912
+        ],
+        "id": "03a94e92-2d2b-43c1-a0ce-fb9424b3b93f",
+        "name": "Result",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "content": "##  Text to Image\n",
+          "height": 272,
+          "width": 1280,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          272,
+          832
+        ],
+        "id": "66a5f2b4-28a7-4095-b4e5-8f153646d9bc",
+        "name": "Sticky Note",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "da65ddff-3d03-4e66-8b38-3074bc7f7093",
+                "name": "prompt",
+                "value": "={{ $json['Please describe your desired image:'] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          512,
+          912
+        ],
+        "id": "5269197e-a0c6-4d17-a753-b0d32b900603",
+        "name": "Image Prompt",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "taskId",
+                "value": "={{ $json.data.taskId }}"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          992,
+          912
+        ],
+        "id": "1d72e715-717b-43cf-8a4b-15d37b4d9d91",
+        "name": "Get Image",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.kie.ai/api/v1/jobs/createTask",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\"\n  }\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          672,
+          912
+        ],
+        "id": "7c27a2a7-7c58-46a6-9913-e1873b3abf62",
+        "name": "Create Image",
+        "disabled": true
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          832,
+          912
+        ],
+        "id": "bf73a8fd-592c-4949-985d-501e2d1999ec",
+        "name": "Wait",
+        "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "36031878-8176-430b-a310-b4616bc06a98",
+                "name": "prompt",
+                "value": "={{ $json.prompt }}",
+                "type": "string"
+              },
+              {
+                "id": "0b5c15ca-9d20-4788-adfa-41d5ae9af93a",
+                "name": "image1",
+                "value": "=\"https://i.ibb.co/99JKcX84/rahrevtypetealbox.jpg\"",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          160,
+          -272
+        ],
+        "id": "b0072ad7-d2f6-4488-8695-4fd7fb53a629",
+        "name": "Prompt/Images2"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          640,
+          -272
+        ],
+        "id": "ed11fdca-51b9-41cb-a046-ddf50f648eec",
+        "name": "Wait7",
+        "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864"
+      },
+      {
+        "parameters": {
+          "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "taskId",
+                "value": "={{ $json.data.taskId }}"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          800,
+          -272
+        ],
+        "id": "35e585a5-1de7-4355-a640-8123942165b6",
+        "name": "Get Image7"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.kie.ai/api/v1/jobs/createTask",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      {{ $json.image1 }}\n    ]\n  }\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          352,
+          -272
+        ],
+        "id": "329ae32e-9d19-445c-ba2a-7aed0135edfb",
+        "name": "Edit Images"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+                "name": "image",
+                "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1184,
+          -272
+        ],
+        "id": "b8a6d291-900b-481e-a5a7-a6cda35d1110",
+        "name": "Result7"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "success",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "success"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "generating",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "generating"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "fail",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "fail"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "waiting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          960,
+          -288
+        ],
+        "id": "e0d3a315-abfb-40f1-a15d-1151bbdf938d",
+        "name": "Switch7"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node (JavaScript)\n// Makes prompt safe to inject into a JSON string\n\nconst input = $json.prompt ?? \"\";\n\nconst jsonSafePrompt = input\n  // escape backslashes FIRST\n  .replace(/\\\\/g, \"\\\\\\\\\")\n  \n  // escape double quotes\n  .replace(/\"/g, '\\\\\"')\n\n  // remove line breaks\n  .replace(/[\\r\\n]+/g, \" \")\n\n  // normalize smart quotes\n  .replace(/[“”]/g, '\\\\\"')\n  .replace(/[‘’]/g, \"'\")\n\n  // normalize long dashes\n  .replace(/[–—]/g, \"-\")\n\n  // collapse extra spaces\n  .replace(/\\s{2,}/g, \" \")\n\n  // trim\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      prompt: jsonSafePrompt\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -80,
+          -272
+        ],
+        "id": "e5cb78c5-2049-4d99-9243-af7932cc1daf",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "Wait6": {
+        "main": [
+          [
+            {
+              "node": "Get Image6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Image6": {
+        "main": [
+          [
+            {
+              "node": "Switch6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Images2": {
+        "main": [
+          [
+            {
+              "node": "Wait6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch6": {
+        "main": [
+          [
+            {
+              "node": "Result6",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait6",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [],
+          [
+            {
+              "node": "Wait6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "On form submission1": {
+        "main": [
+          [
+            {
+              "node": "Image Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "Result",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Image Prompt": {
+        "main": [
+          [
+            {
+              "node": "Create Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Image": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Image": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Get Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prompt/Images2": {
+        "main": [
+          [
+            {
+              "node": "Edit Images",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait7": {
+        "main": [
+          [
+            {
+              "node": "Get Image7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Image7": {
+        "main": [
+          [
+            {
+              "node": "Switch7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Images": {
+        "main": [
+          [
+            {
+              "node": "Wait7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch7": {
+        "main": [
+          [
+            {
+              "node": "Result7",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait7",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [],
+          [
+            {
+              "node": "Wait7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Prompt/Images2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 1e0742db",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
