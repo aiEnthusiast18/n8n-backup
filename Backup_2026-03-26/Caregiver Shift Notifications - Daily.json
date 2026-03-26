@@ -1,0 +1,532 @@
+{
+  "updatedAt": "2026-01-28T18:14:21.602Z",
+  "createdAt": "2026-01-28T18:13:18.773Z",
+  "id": "_6NkqOQXZ6f9ayw4tJ2hF",
+  "name": "Caregiver Shift Notifications - Daily",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "45 11 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger - Daily 11:45 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3552,
+        400
+      ],
+      "id": "a931d4f6-7ace-4f4a-bf80-b4a089c2cca4"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "name": "Google Sheets - Read Shift Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -3328,
+        400
+      ],
+      "id": "91e4c006-d47f-4bc7-baeb-701520db2bab",
+      "notes": "Configuration Required:\n- Update Document ID to your Google Sheet URL or ID\n- Update Sheet Name if different from 'Sheet1'\n- Connect Google OAuth2 credential"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1-date",
+              "leftValue": "={{ $json['Visit Start Date'] }}",
+              "rightValue": "={{ $today.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "condition-2-phone",
+              "leftValue": "={{ $json['Employee Phone (Mobile)'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combineOperation": "all"
+        },
+        "options": {}
+      },
+      "name": "Filter - Tomorrow's Shifts",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.1,
+      "position": [
+        -3120,
+        400
+      ],
+      "id": "e07c5528-8bff-45d2-8997-55ba1adf7566",
+      "notes": "Configuration Required:\n- Adjust date format in toFormat() to match your Google Sheet\n- Common formats: 'yyyy-MM-dd', 'MM/dd/yyyy', 'M/d/yyyy'\n- Test by adding a Set node after this to display the date comparison"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Group shifts by Employee UID\nconst groupedByEmployee = {};\nconst items = $input.all();\n\nfor (const item of items) {\n  const data = item.json;\n  const employeeUID = data['Employee UID'];\n  \n  if (!groupedByEmployee[employeeUID]) {\n    groupedByEmployee[employeeUID] = {\n      employeeUID: employeeUID,\n      employeeName: data['Employee Full Name'],\n      employeeEmail: data['Employee Email'],\n      employeePhone: data['Employee Phone (Mobile)'],\n      shifts: [],\n      rowNumbers: []\n    };\n  }\n  \n  groupedByEmployee[employeeUID].shifts.push({\n    clientName: data['Client Full Name'],\n    clientAddress: data['Client Address'],\n    visitStartTime: data['Visit Start Time'],\n    visitEndTime: data['Visit End Time'],\n    visitStartTimeOfDay: data['Visit Start Time of Day'],\n    visitEndTimeOfDay: data['Visit End Time of Day'],\n    visitDuration: data['Visit Scheduled Duration'],\n    visitStartDate: data['Visit Start Date'],\n    rowNumber: data['row_number']\n  });\n  \n  groupedByEmployee[employeeUID].rowNumbers.push(data['row_number']);\n}\n\nconst output = Object.values(groupedByEmployee).map(employee => {\n  employee.shifts.sort((a, b) => a.visitStartTime.localeCompare(b.visitStartTime));\n  return { json: employee };\n});\n\nreturn output;"
+      },
+      "name": "Code - Group Shifts by Employee",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2896,
+        400
+      ],
+      "id": "54a4ae14-42ab-49ee-bfa9-fa1ad57336eb",
+      "notes": "Groups all shifts by Employee UID and preserves row numbers for status updates"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "name": "Loop Over Items - Process Each Caregiver",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2672,
+        400
+      ],
+      "id": "c8c8b014-1483-4715-9226-9562adf89b02",
+      "continueOnFail": true,
+      "notes": "Processes one caregiver at a time. Continue on Fail enabled for resilience."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const employeeName = $json.employeeName;\nconst shifts = $json.shifts;\nconst visitDate = shifts[0].visitStartDate;\n\nconst dateObj = new Date(visitDate);\nconst formattedDate = dateObj.toLocaleDateString('en-US', {\n  weekday: 'long',\n  month: 'long',\n  day: 'numeric'\n});\n\nlet shiftList = '';\nfor (let i = 0; i < shifts.length; i++) {\n  const shift = shifts[i];\n  shiftList += `\\n${i + 1}. ${shift.clientName}\\n`;\n  shiftList += `   Time: ${shift.visitStartTimeOfDay} - ${shift.visitEndTimeOfDay}\\n`;\n  shiftList += `   Address: ${shift.clientAddress}`;\n  if (i < shifts.length - 1) {\n    shiftList += '\\n';\n  }\n}\n\nconst message = `Hi ${employeeName},\\n\\nYou have ${shifts.length} shift${shifts.length > 1 ? 's' : ''} scheduled for ${formattedDate}:${shiftList}\\n\\nPlease arrive on time. Thank you!`;\n\nreturn {\n  json: {\n    ...item.json,\n    smsMessage: message,\n    phoneNumber: $json.employeePhone\n  }\n};"
+      },
+      "name": "Code - Build SMS Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2448,
+        400
+      ],
+      "id": "3c6ff33d-3c5b-4c82-9956-7b97cdb0e747",
+      "notes": "Creates consolidated SMS message with all shifts for one caregiver"
+    },
+    {
+      "parameters": {},
+      "name": "Twilio - Send SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 2,
+      "position": [
+        -2240,
+        400
+      ],
+      "id": "fcc417e0-2e4b-4dbc-b29d-7bcee0250d42",
+      "credentials": {},
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update 'from' number to your Twilio phone number (E.164 format: +15551234567)\n- Connect Twilio API credential (Account SID + Auth Token)\n- Continue on Fail is enabled for error resilience"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-error",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "any",
+                "operation": "notExists"
+              }
+            }
+          ],
+          "combineOperation": "all"
+        },
+        "options": {}
+      },
+      "name": "IF - Check SMS Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        -2016,
+        400
+      ],
+      "id": "11e15819-c232-4c57-8c2c-294450ca51e6",
+      "notes": "Checks if SMS sent successfully (no error exists)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status-success",
+              "name": "status",
+              "value": "Notified",
+              "type": "string"
+            },
+            {
+              "id": "row-numbers",
+              "name": "rowNumbers",
+              "value": "={{ $('Code - Build SMS Message').item.json.rowNumbers }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set - Prepare Success Status",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1792,
+        288
+      ],
+      "id": "dc637764-dec4-43a2-8409-e502025c90f0",
+      "notes": "Sets status to 'Notified' and retrieves row numbers from earlier node"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status-failed",
+              "name": "status",
+              "value": "Delivery Failed",
+              "type": "string"
+            },
+            {
+              "id": "row-numbers",
+              "name": "rowNumbers",
+              "value": "={{ $('Code - Build SMS Message').item.json.rowNumbers }}",
+              "type": "array"
+            },
+            {
+              "id": "error-message",
+              "name": "errorMessage",
+              "value": "={{ $json.error ? $json.error.message : 'Unknown error' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set - Prepare Failed Status",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1792,
+        496
+      ],
+      "id": "2c72896a-c829-4608-bd64-ee62a178e71f",
+      "notes": "Sets status to 'Delivery Failed' and captures error message"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "options": {}
+      },
+      "name": "Merge - Combine Status Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1568,
+        400
+      ],
+      "id": "0ad96b0f-58f3-4e13-b896-ac2e26693d79",
+      "notes": "Merges success and failure branches back into single flow"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "name": "Loop Over Items - Update Each Row",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1360,
+        400
+      ],
+      "id": "e9c9c177-1ae1-4bfe-b892-711475d49726",
+      "continueOnFail": true,
+      "notes": "Inner loop: processes each row number to update Google Sheets. Continue on Fail enabled."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const rowNumbers = $json.rowNumbers;\nconst loopIndex = $itemIndex;\nconst currentRowNumber = rowNumbers[loopIndex];\n\nreturn {\n  json: {\n    rowNumber: currentRowNumber,\n    status: $json.status\n  }\n};"
+      },
+      "name": "Code - Extract Current Row Number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1136,
+        400
+      ],
+      "id": "06e67714-0f31-43aa-9a38-bb269b50201c",
+      "notes": "Extracts individual row number from array for Google Sheets update"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_DOCUMENT_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "={{ $json.status }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "name": "Google Sheets - Update Row Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -912,
+        400
+      ],
+      "id": "e1763f20-7473-40a3-8080-071492fff479",
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update Document ID to match Node 2 (same Google Sheet)\n- Update Sheet Name if different from 'Sheet1'\n- Uses row_number to match and update status column\n- Continue on Fail enabled for resilience"
+    },
+    {
+      "parameters": {
+        "content": "# Caregiver Shift Notifications Workflow\n\nAn n8n workflow that automatically sends daily SMS notifications to caregivers about their upcoming shifts via Twilio.\n\n## Overview\n\nThis workflow runs daily at 11:45 AM, reads shift data from Google Sheets, filters for tomorrow's shifts with valid phone numbers, groups multiple shifts per caregiver into a single consolidated message, sends SMS notifications via Twilio, and updates the Google Sheets status column based on delivery results.\n\n## Workflow Architecture\n\n```\nSchedule Trigger (11:45 AM daily)\n    ↓\nGoogle Sheets: Read All Rows\n    ↓\nFilter: Tomorrow's Shifts + Valid Phone Numbers\n    ↓\nCode Node: Group Shifts by Employee\n    ↓\nLoop Over Items (One Caregiver at a Time)\n    ↓\nCode Node: Build SMS Message\n    ↓\nTwilio: Send SMS\n    ↓\nIF Node: Check Success/Failure\n    ↓ (success)              ↓ (failure)\nSet: \"Notified\"          Set: \"Delivery Failed\"\n    ↓                           ↓\nMerge: Combine Results\n    ↓\nLoop Over Items (Each Shift Row)\n    ↓\nCode Node: Extract Row Number\n    ↓\nGoogle Sheets: Update Status Column\n    ↓ (loop back until complete)\n```\n\n**Total Nodes:** 13\n**Expected Execution Time:** 60-90 seconds for 20 caregivers with 40 shifts\n**Cost:** ~$0.15/day in Twilio SMS fees (20 caregivers @ $0.0075/SMS)\n\n## Prerequisites\n\n### 1. Google Sheets Setup\n\nYour Google Sheet must contain these columns (exact names, case-sensitive):\n\n| Column Name | Purpose | Example |\n|-------------|---------|---------|\n| `status` | Updated by workflow | \"Notified\" or \"Delivery Failed\" |\n| `Employee UID` | Unique identifier | \"EMP001\" |\n| `Employee Full Name` | Used in SMS greeting | \"Jane Doe\" |\n| `Employee Email` | Not currently used | \"jane@example.com\" |\n| `Employee Phone (Mobile)` | SMS destination | \"+15551234567\" |\n| `Client Full Name` | Displayed in SMS | \"John Smith\" |\n| `Client Address` | Displayed in SMS | \"123 Main St\" |\n| `Visit Scheduled Duration` | Not used in SMS | \"2 hours\" |\n| `Visit Start Date` | Filter for tomorrow | \"2026-01-29\" or \"01/29/2026\" |\n| `Visit Start Time` | For sorting | \"09:00:00\" |\n| `Visit Start Time of Day` | Human-readable start | \"9:00 AM\" |\n| `Visit End Date` | Not currently used | \"2026-01-29\" |\n| `Visit End Time of Day` | Human-readable end | \"11:00 AM\" |\n| `Visit End Time` | Not currently used | \"11:00:00\" |\n\n**Important Notes:**\n- Phone numbers must be in E.164 format: `+[country code][phone number]` (e.g., `+15551234567` for US)\n- Date format in \"Visit Start Date\" must be consistent across all rows\n- Empty phone numbers will be automatically filtered out\n\n### 2. Google OAuth2 Credentials\n\n**In Google Cloud Console:**\n1. Go to [Google Cloud Console](https://console.cloud.google.com)\n2. Create a new project or select an existing one\n3. Enable **Google Sheets API**\n4. Go to \"Credentials\" → \"Create Credentials\" → \"OAuth 2.0 Client ID\"\n5. Application type: **Web application**\n6. Add authorized redirect URI: `https://n8n.204it.ca/rest/oauth2-credential/callback`\n7. Copy **Client ID** and **Client Secret**\n\n**In n8n:**\n1. Go to **Settings → Credentials**\n2. Click **\"Create New Credential\"**\n3. Select **\"Google OAuth2 API\"**\n4. Paste Client ID and Client Secret\n5. Add scope: `https://www.googleapis.com/auth/spreadsheets`\n6. Click **\"Connect to Google\"** and authorize\n7. Save the credential\n\n### 3. Twilio Account Setup\n\n**Sign up and Configure:**\n1. Sign up at [twilio.com](https://www.twilio.com)\n2. Purchase a phone number (costs vary by country, ~$1/month for US)\n3. Fund your account (recommended: $20 minimum)\n4. Find **Account SID** and **Auth Token** in Twilio dashboard\n\n**SMS Pricing:**\n- US: ~$0.0075 per SMS segment\n- Long messages automatically split into multiple segments\n- Messages with multiple shifts typically 2-3 segments\n\n**In n8n:**\n1. Go to **Settings → Credentials**\n2. Click **\"Create New Credential\"**\n3. Select **\"Twilio API\"**\n4. Paste Account SID and Auth Token\n5. Save the credential\n\n## Deployment Instructions\n\n### Option A: Import via n8n UI (Recommended)\n\n1. Open your n8n instance: [https://n8n.204it.ca](https://n8n.204it.ca)\n2. Click **\"Add workflow\"** → **\"Import from File\"**\n3. Select [caregiver-shift-notifications-daily.json](caregiver-shift-notifications-daily.json)\n4. The workflow will open in the editor\n\n5. **Configure credentials and settings:**\n\n   **Node 2: \"Google Sheets - Read Shift Data\"**\n   - Click on the node\n   - Select your Google OAuth2 credential\n   - Update **Document ID**: Enter your Google Sheet URL or ID\n   - Update **Sheet Name**: Enter your sheet name (e.g., \"Shifts\", \"Sheet1\")\n\n   **Node 3: \"Filter - Tomorrow's Shifts\"**\n   - Click on the node\n   - Review the date filter condition\n   - **CRITICAL**: Adjust `.toFormat()` to match your sheet's date format:\n     - If dates look like \"2026-01-29\", use `.toFormat('yyyy-MM-dd')` ✓ (default)\n     - If dates look like \"01/29/2026\", use `.toFormat('MM/dd/yyyy')`\n     - If dates look like \"1/29/2026\", use `.toFormat('M/d/yyyy')`\n\n   **Node 7: \"Twilio - Send SMS\"**\n   - Click on the node\n   - Select your Twilio API credential\n   - Update **\"from\"** field: Replace `+15551234567` with your Twilio phone number\n\n   **Node 13: \"Google Sheets - Update Row Status\"**\n   - Click on the node\n   - Select the same Google OAuth2 credential as Node 2\n   - Update **Document ID** to match Node 2\n   - Update **Sheet Name** to match Node 2\n\n6. **Enable \"Continue on Fail\" on critical nodes:**\n   - Right-click on each of these nodes → **Settings** → **Continue on Fail: ON**\n     - Node 5: Loop Over Items - Process Each Caregiver\n     - Node 7: Twilio - Send SMS\n     - Node 11: Loop Over Items - Update Each Row\n     - Node 13: Google Sheets - Update Row Status\n\n7. **Set timezone for Schedule Trigger:**\n   - Click on Node 1: \"Schedule Trigger - Daily 11:45 AM\"\n   - Expand **Options**\n   - Set **Timezone** to your local timezone\n\n8. Click **\"Save\"**\n\n### Option B: Deploy via n8n API\n\n```bash\n# Set your n8n API key and URL\nN8N_API_KEY=\"your-api-key-here\"\nN8N_URL=\"https://n8n.204it.ca\"\n\n# Deploy workflow\ncurl -X POST \"${N8N_URL}/api/v1/workflows\" \\\n  -H \"X-N8N-API-KEY: ${N8N_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @caregiver-shift-notifications-daily.json\n```\n\n**Note:** After API deployment, you must still configure credentials and placeholders through the n8n UI.\n\n## Configuration Checklist\n\nUse this checklist to ensure everything is set up correctly:\n\n### Before Deployment\n- [ ] Google Sheet exists with all required columns\n- [ ] Column names match exactly (case-sensitive)\n- [ ] Phone numbers formatted as +[country][number] (E.164 format)\n- [ ] Date format in \"Visit Start Date\" is consistent\n- [ ] Twilio account created and funded ($20+ recommended)\n- [ ] Twilio phone number purchased\n- [ ] Google Cloud OAuth2 credentials created\n- [ ] n8n credentials configured for Google Sheets and Twilio\n\n### During Configuration\n- [ ] Workflow imported to n8n\n- [ ] Node 2: Google OAuth2 credential connected\n- [ ] Node 2: Document ID updated to your Google Sheet\n- [ ] Node 2: Sheet Name updated (if not \"Sheet1\")\n- [ ] Node 3: Date format in filter matches your sheet\n- [ ] Node 7: Twilio credential connected\n- [ ] Node 7: \"from\" number updated to your Twilio number\n- [ ] Node 13: Google OAuth2 credential connected (same as Node 2)\n- [ ] Node 13: Document ID matches Node 2\n- [ ] Node 13: Sheet Name matches Node 2\n- [ ] Continue on Fail enabled on Nodes 5, 7, 11, 13\n- [ ] Schedule trigger timezone set correctly\n- [ ] Workflow saved\n\n### Testing Phase\n- [ ] Manual test execution completed\n- [ ] Test SMS received successfully\n- [ ] Message format looks correct\n- [ ] Google Sheets status column updated\n- [ ] Date filtering working (only tomorrow's shifts)\n- [ ] Error handling tested (invalid phone number)\n- [ ] Multiple shifts per caregiver grouped correctly\n\n### Production Activation\n- [ ] All tests passed\n- [ ] Workflow activated (toggle \"Active\" switch to ON)\n- [ ] First automatic execution monitored (11:45 AM next day)\n- [ ] Caregivers confirmed receiving notifications\n- [ ] Status column verified in Google Sheets\n\n## Testing Guide\n\n### Phase 1: Test with Sample Data\n\n**Setup:**\n1. Create a copy of your Google Sheet or add test rows\n2. Set \"Visit Start Date\" to **tomorrow's date**\n3. Use your own phone number in \"Employee Phone (Mobile)\"\n4. Create 2-3 test rows with the same Employee UID (to test grouping)\n\n**Execute:**\n1. Open the workflow in n8n editor\n2. Click **\"Execute Workflow\"** button (play icon at bottom)\n3. Watch each node execute in sequence\n\n**Verify:**\n1. **Filter node output:** Should show only tomorrow's shifts with valid phone numbers\n2. **Grouping node output:** Should show employee object with shifts array\n3. **SMS message node output:** Should show formatted message\n4. **Twilio node output:** Check for success status (no error field)\n5. **Your phone:** Should receive SMS within 1-2 minutes\n6. **Google Sheets:** Status column should update to \"Notified\"\n\n### Phase 2: Test Error Handling\n\n**Test invalid phone number:**\n1. Add a row with tomorrow's date but invalid phone: `1234567890` (missing +)\n2. Execute workflow manually\n3. Verify:\n   - Workflow continues (doesn't crash)\n   - Status for that row = \"Delivery Failed\"\n   - Other caregivers still get notified\n\n**Test empty phone number:**\n1. Add a row with tomorrow's date but empty phone field\n2. Execute workflow manually\n3. Verify:\n   - Row filtered out (not processed at all)\n   - No error occurs\n\n### Phase 3: Production Monitoring\n\n**Day 1 (11:45 AM):**\n- [ ] Check n8n execution history - should be green\n- [ ] Review execution time (should be <2 minutes)\n- [ ] Check Google Sheets status column\n- [ ] Call 2-3 caregivers to verify SMS received\n- [ ] Verify message content accuracy\n\n**Day 2-7:**\n- [ ] Daily execution history check\n- [ ] Review \"Delivery Failed\" rows if any\n- [ ] Fix bad phone numbers in Google Sheets\n- [ ] Monitor caregiver feedback\n\n**Week 2+:**\n- [ ] Weekly execution review\n- [ ] Monthly Twilio cost review\n- [ ] Adjust message format if needed based on feedback\n\n## SMS Message Format\n\nCaregivers receive a message in this format:\n\n```\nHi Jane Doe,\n\nYou have 2 shifts scheduled for Wednesday, January 29:\n\n1. John Smith\n   Time: 9:00 AM - 11:00 AM\n   Address: 123 Main St\n\n2. Mary Johnson\n   Time: 1:00 PM - 3:30 PM\n   Address: 456 Oak Ave\n\nPlease arrive on time. Thank you!\n```\n\n**Message Features:**\n- Friendly greeting with caregiver's name\n- Clear count of shifts (handles singular/plural)\n- Numbered list of all shifts\n- Client name, time, and address for each shift\n- Professional closing\n\n**Character Count:**\n- Single shift: ~150-200 characters (1 SMS segment)\n- Two shifts: ~300-350 characters (2-3 SMS segments)\n- Three+ shifts: May exceed 3 segments\n\n## Troubleshooting\n\n### Issue: No SMS Sent\n\n**Symptoms:** Workflow executes but no texts received\n\n**Check:**\n1. Open workflow execution in n8n\n2. Click on \"Filter - Tomorrow's Shifts\" node\n3. Check output count - is it 0?\n\n**Solutions:**\n- **If filter output = 0:** No shifts scheduled for tomorrow, or date format mismatch\n  - Verify \"Visit Start Date\" in Google Sheets = tomorrow's date\n  - Check date format in Filter node matches your sheet format\n  - Add debug Set node after Filter to display: `{{ $today.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}`\n  - Compare to actual date in your sheet, adjust format accordingly\n\n- **If filter output > 0 but no SMS:**\n  - Click on \"Twilio - Send SMS\" node to see error message\n  - Common errors:\n    - Invalid \"from\" number: Update to your Twilio phone number\n    - Invalid \"to\" number: Check phone format (must be +[country][number])\n    - Insufficient balance: Fund Twilio account\n    - Invalid credentials: Reconnect Twilio credential in n8n\n\n### Issue: Wrong Date Filtered\n\n**Symptoms:** Workflow sends notifications for wrong day (today or next week)\n\n**Cause:** Date format mismatch between filter expression and Google Sheets\n\n**Solution:**\n1. Check how dates appear in your Google Sheets \"Visit Start Date\" column\n2. Update Node 3 (Filter) condition to match:\n\n```javascript\n// If your dates look like: \"2026-01-29\"\n={{ $today.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}\n\n// If your dates look like: \"01/29/2026\"\n={{ $today.plus({ days: 1 }).toFormat('MM/dd/yyyy') }}\n\n// If your dates look like: \"1/29/2026\"\n={{ $today.plus({ days: 1 }).toFormat('M/d/yyyy') }}\n```\n\n3. Test by adding a Set node after Filter with this expression:\n```javascript\n{{ $today.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}\n```\n4. Compare output to actual dates in Google Sheets\n5. Adjust format and re-test\n\n### Issue: Status Column Not Updated\n\n**Symptoms:** SMS sent successfully but Google Sheets status stays empty\n\n**Check:**\n1. Open workflow execution\n2. Click on \"Google Sheets - Update Row Status\" node\n3. Check for error message in output\n\n**Solutions:**\n- **Column name mismatch:**\n  - Verify column is named exactly `status` (lowercase, no spaces)\n  - Column names are case-sensitive\n\n- **Permission issue:**\n  - Reconnect Google OAuth2 credential\n  - Ensure scope includes `https://www.googleapis.com/auth/spreadsheets`\n  - Test credential by manually running Node 2 (Read)\n\n- **Row number mismatch:**\n  - Verify \"Code - Extract Current Row Number\" node output shows valid row numbers\n  - Check that Google Sheets hasn't changed (rows added/deleted)\n  - If rows frequently change, consider alternative matching (by Employee UID + Date)\n\n- **API quota exceeded:**\n  - Check Google Cloud Console for API quota usage\n  - Free tier: 500 requests per 100 seconds (should be sufficient)\n  - If exceeded, wait and retry or increase quota\n\n### Issue: Multiple SMS to Same Caregiver\n\n**Symptoms:** Caregiver receives 2+ separate messages instead of one consolidated message\n\n**Cause:** Grouping by Employee UID not working correctly\n\n**Check:**\n1. Click on \"Code - Group Shifts by Employee\" node in execution\n2. Verify output shows one item per employee with shifts array\n3. If showing multiple items for same employee, check:\n   - Employee UID is consistent in Google Sheets (no typos)\n   - Employee UID field exists and not empty\n\n**Solution:**\n- Standardize Employee UID format in Google Sheets\n- Ensure no trailing spaces or special characters in UID values\n- Alternatively, modify Node 4 code to group by `Employee Full Name` instead of UID\n\n### Issue: Message Format Broken\n\n**Symptoms:** SMS message missing data or showing \"undefined\"\n\n**Cause:** Missing or null values in Google Sheets\n\n**Check:**\n1. Click on \"Code - Build SMS Message\" node in execution\n2. Check output `smsMessage` field for \"undefined\" or missing values\n3. Review Google Sheets for empty cells in required columns\n\n**Solutions:**\n- Fill in missing data in Google Sheets (Client Full Name, Times, Address)\n- Add null checks to Node 6 code:\n\n```javascript\n// Add at top of code\nconst clientName = shift.clientName || 'Client TBD';\nconst clientAddress = shift.clientAddress || 'Address TBD';\n```\n\n- Test with various edge cases (missing address, missing time, etc.)\n\n## Monitoring and Maintenance\n\n### Daily Monitoring (First Week)\n\n**What to check:**\n1. **11:46 AM:** Open n8n execution history\n2. Verify workflow completed successfully (green checkmark)\n3. Check execution time (should be <2 minutes)\n4. Review Google Sheets status column:\n   - Count \"Notified\" rows\n   - Investigate any \"Delivery Failed\" rows\n5. Spot-check with 2-3 caregivers (text or call to confirm receipt)\n\n### Weekly Monitoring (Ongoing)\n\n**Tasks:**\n1. Review execution history for patterns\n   - Any consistent failures?\n   - Execution time increasing?\n2. Check Twilio dashboard:\n   - Message delivery rate (should be >95%)\n   - Cost per day vs budget\n3. Audit \"Delivery Failed\" rows:\n   - Fix bad phone numbers\n   - Remove terminated employees\n4. Gather caregiver feedback:\n   - Is timing good? (11:45 AM)\n   - Is message format clear?\n   - Any information missing?\n\n### Monthly Maintenance\n\n**Review:**\n1. **Cost analysis:**\n   - Twilio spending vs budget\n   - SMS segment count (consider shortening message if high)\n   - API quota usage (Google Sheets, Twilio)\n\n2. **Data quality:**\n   - Remove old/completed shifts\n   - Verify phone numbers still valid\n   - Check for duplicate Employee UIDs\n\n3. **Workflow optimization:**\n   - Consider adding Wait node if >50 caregivers (rate limiting)\n   - Review execution time trends\n   - Update message format based on feedback\n\n4. **Credential maintenance:**\n   - Verify OAuth tokens still valid\n   - Refresh Twilio credentials if needed\n   - Check Google Cloud Console for any security alerts\n\n### Alerts to Configure\n\n**In n8n (if available):**\n- Workflow execution failure → Email to admin\n- Error rate >10% → Slack notification\n\n**In Twilio:**\n- Account balance <$5 → Email alert\n- Message delivery failure spike → SMS to admin\n\n**In Google Sheets (manual):**\n- Conditional formatting: Highlight \"Delivery Failed\" rows in red\n- Formula to count daily notifications: `=COUNTIF(A:A, \"Notified\")`\n- Alert if count significantly lower than expected\n\n## Scaling Considerations\n\n### Current Capacity\n- **Caregivers:** Up to 100 comfortably\n- **Shifts:** Up to 500 per day\n- **Execution time:** 5-10 minutes at scale\n- **Cost:** ~$0.75/day for 100 caregivers\n\n### If You Need to Scale Beyond\n\n**For 100+ caregivers:**\n1. Add Wait node (1 second) after Twilio node to prevent rate limiting\n2. Consider Twilio Messaging Service for higher throughput\n3. Optimize Google Sheets updates (batch instead of individual)\n\n**For 500+ shifts:**\n1. Split workflow by region/team (multiple workflows)\n2. Use Code node for batch Google Sheets updates\n3. Consider database instead of Google Sheets\n\n**For multiple notifications per day:**\n1. Clone workflow with different schedule times\n2. Add parameter to filter by notification type\n3. Consider workflow state management to avoid duplicate sends\n\n## Common Modifications\n\n### Change Notification Time\n\n**To send at different time (e.g., 7:00 AM instead of 11:45 AM):**\n\n1. Click on \"Schedule Trigger - Daily 11:45 AM\" node\n2. Update cron expression:\n   - For 7:00 AM: `0 7 * * *`\n   - For 8:30 PM: `30 20 * * *`\n   - Format: `[minute] [hour] * * *` (24-hour format)\n3. Update node name for clarity\n4. Save workflow\n\n### Send for Today's Shifts (Instead of Tomorrow)\n\n**To notify about same-day shifts:**\n\n1. Click on \"Filter - Tomorrow's Shifts\" node\n2. Change condition from:\n   ```javascript\n   {{ $today.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}\n   ```\n   To:\n   ```javascript\n   {{ $today.toFormat('yyyy-MM-dd') }}\n   ```\n3. Update node name: \"Filter - Today's Shifts\"\n4. Update message text in Node 6: Change \"scheduled for\" to \"scheduled today\"\n5. Save workflow\n\n### Add Multiple Recipients (Admin Copy)\n\n**To send copy of each SMS to admin:**\n\n1. After \"Twilio - Send SMS\" node, add another Twilio node\n2. Configure:\n   - To: `+1555ADMINPHONE` (admin's number)\n   - Message: `={{ \"FYI - Sent to \" + $json.employeeName + \": \" + $json.smsMessage }}`\n3. Connect from original Twilio node\n4. Enable \"Continue on Fail\" on new node\n5. Save workflow\n\n### Customize Message Format\n\n**To change message content:**\n\n1. Click on \"Code - Build SMS Message\" node\n2. Modify the `message` variable in the JavaScript code\n3. Example - Add company name:\n\n```javascript\nconst message = `Hi ${employeeName},\n\n[Your Company Name] Shift Schedule for ${formattedDate}:${shiftList}\n\nQuestions? Call 555-1234.`;\n```\n\n4. Test with manual execution\n5. Save workflow\n\n### Add Shift Notes/Instructions\n\n**To include special instructions from Google Sheets:**\n\n1. Add column to Google Sheets: `Shift Notes`\n2. In Node 4 (Group Shifts), add to shifts array:\n```javascript\nshiftNotes: data['Shift Notes'] || ''\n```\n\n3. In Node 6 (Build Message), add to shift list:\n```javascript\nshiftList += `   Time: ${shift.visitStartTimeOfDay} - ${shift.visitEndTimeOfDay}\\n`;\nshiftList += `   Address: ${shift.clientAddress}`;\nif (shift.shiftNotes) {\n  shiftList += `\\n   Note: ${shift.shiftNotes}`;\n}\n```\n\n4. Test and save\n\n## API Quota Usage\n\n### Google Sheets API\n- **Free tier:** 300 requests per minute per project\n- **Our usage:** 1 read + ~40 updates per day (far below limit)\n- **Cost:** $0/month\n- **Monitoring:** [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Dashboard\n\n### Twilio API\n- **Rate limit:** 100 SMS/second (default)\n- **Trial accounts:** 1 SMS/second\n- **Our usage:** 20-100 SMS/day (well below limit)\n- **Cost:** $0.0075 per SMS segment (US)\n- **Monitoring:** [Twilio Console](https://console.twilio.com) → Monitor → Logs\n\n### n8n Workflow Executions\n- **Free tier (cloud):** 2,500 executions/month\n- **Our usage:** 30 executions/month (1 per day)\n- **Self-hosted:** Unlimited executions\n- **Monitoring:** n8n Settings → Usage\n\n## Security Best Practices\n\n1. **Credentials:**\n   - Never commit `.mcp.json` to git (contains API key)\n   - Rotate Twilio Auth Token periodically (every 90 days)\n   - Use OAuth2 for Google Sheets (not API keys)\n   - Store credentials only in n8n encrypted database\n\n2. **Phone Numbers:**\n   - Validate format before importing to Google Sheets\n   - Consider phone number verification flow (opt-in)\n   - Comply with SMS consent regulations (TCPA, GDPR)\n\n3. **Data Privacy:**\n   - Limit access to Google Sheets (view-only for most staff)\n   - Use Google Workspace audit logs\n   - Consider data retention policy (delete old shifts)\n   - Ensure caregivers consent to SMS notifications\n\n4. **n8n Access:**\n   - Use strong passwords for n8n accounts\n   - Enable 2FA if available\n   - Review workflow permissions regularly\n   - Audit execution history for anomalies\n\n## Support and Resources\n\n- **n8n Instance:** [https://n8n.204it.ca](https://n8n.204it.ca)\n- **n8n Documentation:** [docs.n8n.io](https://docs.n8n.io)\n- **n8n Community Forum:** [community.n8n.io](https://community.n8n.io)\n- **Google Sheets API Docs:** [developers.google.com/sheets](https://developers.google.com/sheets)\n- **Twilio SMS Docs:** [twilio.com/docs/sms](https://www.twilio.com/docs/sms)\n- **Twilio Support:** [support.twilio.com](https://support.twilio.com)\n\n## Workflow Files\n\n- **Workflow JSON:** [caregiver-shift-notifications-daily.json](caregiver-shift-notifications-daily.json)\n- **Implementation Plan:** `/Users/ridalakhani/.claude/plans/abundant-munching-lynx.md`\n- **This README:** [CAREGIVER-NOTIFICATIONS-README.md](CAREGIVER-NOTIFICATIONS-README.md)\n\n## Changelog\n\n### 2026-01-28 - Initial Creation\n- Created 13-node workflow for daily caregiver shift notifications\n- Configured daily schedule trigger at 11:45 AM\n- Implemented filtering for tomorrow's shifts with valid phone numbers\n- Built grouping logic to consolidate multiple shifts per caregiver\n- Integrated Twilio SMS sending with error handling\n- Added Google Sheets status update with success/failure tracking\n- Included comprehensive documentation and troubleshooting guide\n\n---\n\n**Status:** Ready for deployment\n**Last Updated:** 2026-01-28\n**Version:** 1.0\n**Author:** Claude Code\n\n## Quick Start Summary\n\n1. ✅ Set up Google Sheet with required columns\n2. ✅ Create Google OAuth2 credentials and connect in n8n\n3. ✅ Create Twilio account, get phone number, connect in n8n\n4. ✅ Import workflow to n8n\n5. ✅ Configure: Document ID, Sheet Name, Twilio \"from\" number, date format\n6. ✅ Enable \"Continue on Fail\" on Nodes 5, 7, 11, 13\n7. ✅ Test with sample data using your phone number\n8. ✅ Activate workflow\n9. ✅ Monitor first execution at 11:45 AM next day\n\n**Need help?** Check the Troubleshooting section or reach out to n8n community.\n",
+        "height": 15376,
+        "width": 2096
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -208
+      ],
+      "id": "5a385c41-f660-4292-82f9-19372df279f9",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - Daily 11:45 AM": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Shift Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Shift Data": {
+      "main": [
+        [
+          {
+            "node": "Filter - Tomorrow's Shifts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter - Tomorrow's Shifts": {
+      "main": [
+        [
+          {
+            "node": "Code - Group Shifts by Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Group Shifts by Employee": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - Process Each Caregiver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items - Process Each Caregiver": {
+      "main": [
+        [
+          {
+            "node": "Code - Build SMS Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Check SMS Success": {
+      "main": [
+        [
+          {
+            "node": "Set - Prepare Success Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set - Prepare Failed Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Prepare Success Status": {
+      "main": [
+        [
+          {
+            "node": "Merge - Combine Status Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Prepare Failed Status": {
+      "main": [
+        [
+          {
+            "node": "Merge - Combine Status Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge - Combine Status Results": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - Update Each Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items - Update Each Row": {
+      "main": [
+        [
+          {
+            "node": "Code - Extract Current Row Number",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items - Process Each Caregiver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extract Current Row Number": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Row Status": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - Update Each Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "721b72fb-a3ec-4031-b391-85d1e525ab7c",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T18:13:18.777Z",
+      "createdAt": "2026-01-28T18:13:18.777Z",
+      "role": "workflow:owner",
+      "workflowId": "_6NkqOQXZ6f9ayw4tJ2hF",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
