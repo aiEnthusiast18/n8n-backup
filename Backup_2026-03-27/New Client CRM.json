@@ -1,0 +1,296 @@
+{
+  "updatedAt": "2026-03-08T22:42:02.268Z",
+  "createdAt": "2026-03-08T19:00:35.130Z",
+  "id": "Xw66XGB9UDG0H01q",
+  "name": "New Client CRM",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "email"
+            },
+            {
+              "name": "fullName"
+            },
+            {
+              "name": "phoneNumber",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        -48
+      ],
+      "id": "e586b674-5201-49d2-8ef3-41a461c758e1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+          "mode": "list",
+          "cachedResultName": "Call Agent CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AgDO-r3qUk8y2HoYW8pw13dkkyHLqf1XB93ou9nGBE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.email }}",
+            "Name": "={{ $json.fullName }}",
+            "Phone": "={{ $json.phoneNumber }}",
+            "Caller Type": "=(( $json.callerType))"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Caller Type",
+              "displayName": "Caller Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        -48
+      ],
+      "id": "eeb3db34-0670-4ede-bcf6-ee6ddfc10c40",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ddb4d575-d768-425e-be0c-47304f476abe",
+  "activeVersionId": "ddb4d575-d768-425e-be0c-47304f476abe",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-08T19:00:35.134Z",
+      "createdAt": "2026-03-08T19:00:35.134Z",
+      "role": "workflow:owner",
+      "workflowId": "Xw66XGB9UDG0H01q",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T22:21:51.000Z",
+    "createdAt": "2026-03-08T22:21:35.191Z",
+    "versionId": "ddb4d575-d768-425e-be0c-47304f476abe",
+    "workflowId": "Xw66XGB9UDG0H01q",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "email"
+              },
+              {
+                "name": "fullName"
+              },
+              {
+                "name": "phoneNumber",
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -240,
+          -48
+        ],
+        "id": "e586b674-5201-49d2-8ef3-41a461c758e1",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+            "mode": "list",
+            "cachedResultName": "Call Agent CRM",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Clients",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AgDO-r3qUk8y2HoYW8pw13dkkyHLqf1XB93ou9nGBE/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Email": "={{ $json.email }}",
+              "Name": "={{ $json.fullName }}",
+              "Phone": "={{ $json.phoneNumber }}",
+              "Caller Type": "=(( $json.callerType))"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Email",
+                "displayName": "Email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Name",
+                "displayName": "Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Phone",
+                "displayName": "Phone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Caller Type",
+                "displayName": "Caller Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -32,
+          -48
+        ],
+        "id": "eeb3db34-0670-4ede-bcf6-ee6ddfc10c40",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version ddb4d575",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
