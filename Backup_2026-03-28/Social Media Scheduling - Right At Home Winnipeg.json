@@ -1,0 +1,961 @@
+{
+  "updatedAt": "2026-01-28T21:36:57.161Z",
+  "createdAt": "2026-01-28T18:29:18.525Z",
+  "id": "iqqL4yfEl7veGwg0HJ8EL",
+  "name": "Social Media Scheduling - Right At Home Winnipeg",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "social-media/topic-approval",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "2b1be2d4-d09d-4245-8bbe-24c2d544fc09",
+      "name": "Webhook - Topic Approval",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1984,
+        112
+      ],
+      "webhookId": "topic-approval-webhook",
+      "notes": "Triggered when user clicks approval link from Workflow 1.\nExpected query params: week_of, action (approve_all, approve_12, approve_13, approve_23)"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        }
+      },
+      "id": "aa4247ae-0e61-4cb8-a902-1691d0e9f20e",
+      "name": "Google Sheets - Read Approved Topics",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -1760,
+        112
+      ],
+      "notes": "Configuration Required:\n- Update State Sheet ID (the central tracking sheet)\n- Update Sheet Name if different from 'Sheet1'\n- Filters by week_of from webhook query params"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Determine which topics were approved based on action parameter\nconst action = $('Webhook - Topic Approval').first().json.query.action;\nconst sheetData = $json;\n\nconst approvedTopics = [];\n\nif (action === 'approve_all') {\n  approvedTopics.push(\n    { topicKey: 'topic_1', topicText: sheetData.topic_1 },\n    { topicKey: 'topic_2', topicText: sheetData.topic_2 },\n    { topicKey: 'topic_3', topicText: sheetData.topic_3 }\n  );\n} else if (action === 'approve_12') {\n  approvedTopics.push(\n    { topicKey: 'topic_1', topicText: sheetData.topic_1 },\n    { topicKey: 'topic_2', topicText: sheetData.topic_2 }\n  );\n} else if (action === 'approve_13') {\n  approvedTopics.push(\n    { topicKey: 'topic_1', topicText: sheetData.topic_1 },\n    { topicKey: 'topic_3', topicText: sheetData.topic_3 }\n  );\n} else if (action === 'approve_23') {\n  approvedTopics.push(\n    { topicKey: 'topic_2', topicText: sheetData.topic_2 },\n    { topicKey: 'topic_3', topicText: sheetData.topic_3 }\n  );\n} else if (action === 'approve_1') {\n  approvedTopics.push(\n    { topicKey: 'topic_1', topicText: sheetData.topic_1 }\n  );\n} else if (action === 'approve_2') {\n  approvedTopics.push(\n    { topicKey: 'topic_2', topicText: sheetData.topic_2 }\n  );\n} else if (action === 'approve_3') {\n  approvedTopics.push(\n    { topicKey: 'topic_3', topicText: sheetData.topic_3 }\n  );\n}\n\n// Return array of approved topics with context\nreturn approvedTopics.map(topic => ({\n  json: {\n    topicKey: topic.topicKey,\n    topicText: topic.topicText,\n    weekOf: sheetData.week_of,\n    businessUpdates: sheetData.business_updates || 'No updates available'\n  }\n}));"
+      },
+      "id": "0a305f8f-8f65-4371-b0bc-49e79a3dc7a7",
+      "name": "Code - Determine Approved Topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        112
+      ],
+      "notes": "Parses approval action and returns array of approved topics"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "b6be7eb1-9875-4ff0-92ae-9ad16a7e94e1",
+      "name": "Loop - Process Each Topic",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1328,
+        112
+      ],
+      "continueOnFail": true,
+      "notes": "Processes one topic at a time to generate post text and image"
+    },
+    {
+      "parameters": {},
+      "id": "be264ae3-ce9e-4b38-89b5-dc5cdc37d25d",
+      "name": "OpenAI - Generate Post Text",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        -1104,
+        112
+      ],
+      "credentials": {},
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Connect OpenAI API credential\n- Model: gpt-4 (or gpt-3.5-turbo for lower cost)\n- Generates 150-200 word post with 5-7 hashtags"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "PLACEHOLDER_KIEAI_ENDPOINT",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "application/json",
+        "options": {}
+      },
+      "id": "230e2f62-fe76-414b-95db-cba9540eea73",
+      "name": "HTTP Request - kie.ai Image Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        112
+      ],
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update endpoint URL with actual kie.ai nano-banana pro endpoint\n- Update authentication method (Basic Auth, Bearer Token, API Key, etc.)\n- Update request body format to match kie.ai API specification\n- Update contact info placeholders in prompt\n- Update response parsing in next Code node\n\nUSER ACTION REQUIRED: This is a placeholder. User must configure actual API details."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract post text from OpenAI response\nconst openaiResponse = $('OpenAI - Generate Post Text').first().json;\nconst postText = openaiResponse.choices?.[0]?.message?.content || openaiResponse.message?.content || 'Error generating post';\n\n// Extract image URL from kie.ai response\n// NOTE: User must update this based on actual kie.ai API response format\nconst kieaiResponse = $json;\nconst imageUrl = kieaiResponse.image_url || kieaiResponse.url || kieaiResponse.data?.url || 'PLACEHOLDER_IMAGE_URL';\n\n// Get topic context from loop\nconst topicKey = $('Code - Determine Approved Topics').item.json.topicKey;\nconst weekOf = $('Code - Determine Approved Topics').item.json.weekOf;\n\nreturn {\n  json: {\n    topicKey: topicKey,\n    weekOf: weekOf,\n    postText: postText,\n    imageUrl: imageUrl,\n    generatedAt: new Date().toISOString()\n  }\n};"
+      },
+      "id": "80927280-a8ae-4c01-be18-1cfb33b6e0cd",
+      "name": "Code - Combine Post and Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        112
+      ],
+      "notes": "USER ACTION REQUIRED: Update image URL extraction logic based on actual kie.ai API response format"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "={{ $json.topicKey }}_post": "={{ $json.postText }}",
+            "={{ $json.topicKey }}_image_url": "={{ $json.imageUrl }}"
+          },
+          "matchingColumns": [
+            "week_of"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "a61d3421-1f19-4da5-a4a2-315609dc6cae",
+      "name": "Google Sheets - Update Post Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -448,
+        112
+      ],
+      "continueOnFail": true,
+      "notes": "Updates state sheet with generated post text and image URL.\nMatches by week_of, updates dynamic columns based on topicKey."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-completion",
+              "leftValue": "={{ $('Loop - Process Each Topic').context.noItemsLeft }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combineOperation": "all"
+        },
+        "options": {}
+      },
+      "id": "893e6dcb-4cc2-4fb6-b1fd-f6fc875e13c3",
+      "name": "IF - All Topics Processed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        112
+      ],
+      "notes": "Checks if all topics have been processed before sending approval email"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        }
+      },
+      "id": "db4eda72-b612-494e-9d8b-4a97d39399dc",
+      "name": "Google Sheets - Read All Generated Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        0
+      ],
+      "notes": "Re-reads the state sheet to get all generated posts for approval email"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Build approval email body with all generated posts\nconst data = $json;\nconst weekOf = data.week_of;\n\n// Collect all posts\nconst posts = [];\nfor (let i = 1; i <= 3; i++) {\n  const topicKey = `topic_${i}`;\n  if (data[`${topicKey}_post`]) {\n    posts.push({\n      number: i,\n      topic: data[topicKey],\n      post: data[`${topicKey}_post`],\n      imageUrl: data[`${topicKey}_image_url`] || 'No image generated'\n    });\n  }\n}\n\n// Build email body\nlet emailBody = `Hi there,\\n\\nThe social media content for the week of ${weekOf} has been generated and is ready for your review.\\n\\n`;\nemailBody += `==================================================\\n\\n`;\n\nfor (const post of posts) {\n  emailBody += `POST ${post.number} - ${post.topic}\\n`;\n  emailBody += `${'-'.repeat(50)}\\n`;\n  emailBody += `${post.post}\\n\\n`;\n  emailBody += `Image: ${post.imageUrl}\\n`;\n  emailBody += `\\n==================================================\\n\\n`;\n}\n\nemailBody += `\\nPlease review the posts and images above, then approve by clicking one of the links below:\\n\\n`;\nemailBody += `Approve All Posts: PLACEHOLDER_WORKFLOW3_WEBHOOK_URL?week_of=${weekOf}&action=approve_all\\n\\n`;\nemailBody += `Edit Required: Access the Google Sheet to make manual edits: PLACEHOLDER_SHEET_URL\\n\\n`;\nemailBody += `Reject All: Reply to this email to regenerate content\\n\\n`;\nemailBody += `Note: You can view the images by clicking the URLs above.\\n\\n`;\nemailBody += `Once approved, posts will be scheduled for Monday, Wednesday, and Friday of the following week at 10:00 AM.`;\n\nreturn {\n  json: {\n    recipientEmail: 'PLACEHOLDER_APPROVER_EMAIL',\n    emailSubject: `Social Media Content Ready for Approval - Week of ${weekOf}`,\n    emailBody: emailBody,\n    weekOf: weekOf\n  }\n};"
+      },
+      "id": "b5bd029e-e566-42a8-bbec-ad96fe5e68f6",
+      "name": "Code - Format Approval Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_WORKFLOW3_WEBHOOK_URL with actual Workflow 3 webhook URL\n- Update PLACEHOLDER_SHEET_URL with Google Sheet URL\n- Update PLACEHOLDER_APPROVER_EMAIL with actual approver email"
+    },
+    {
+      "parameters": {},
+      "id": "d4e738fc-3ba3-4b3b-8b6c-947a53c1acbd",
+      "name": "Outlook - Send Content Approval Email",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        0
+      ],
+      "credentials": {},
+      "notes": "Configuration Required:\n- Connect Microsoft Outlook OAuth2 credential\n- Sends email with all generated posts for approval"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 0"
+            }
+          ]
+        }
+      },
+      "id": "596e4a5a-0418-4a00-b006-15e1dd254b57",
+      "name": "Schedule Trigger - Every Sunday 9:00 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1808,
+        -608
+      ],
+      "notes": "Triggers every Sunday at 9:00 AM to generate social media topics for the week.\nCron: 0 9 * * 0 (minute=0, hour=9, day=*, month=*, dayOfWeek=0/Sunday)"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_BUSINESS_UPDATES_SHEET_ID"
+        }
+      },
+      "id": "62b90eec-c05e-4594-b116-5b2cd1d7e7cc",
+      "name": "Google Sheets - Read Business Updates",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -1584,
+        -608
+      ],
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_BUSINESS_UPDATES_SHEET_ID with your Business Updates Google Sheet ID\n- This sheet should have recent company activities, events, milestones\n- Expected columns: Date | Update Description\n- The most recent row will be used as context for AI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare context for OpenAI topic generation\nconst currentDate = new Date();\nconst weekOf = currentDate.toISOString().split('T')[0];\n\n// Get latest business update from sheet\nconst items = $input.all();\nlet businessUpdates = 'No updates provided this week';\n\nif (items.length > 0) {\n  // Get the most recent update (assuming sorted by date)\n  const latestUpdate = items[items.length - 1].json;\n  businessUpdates = latestUpdate['Update Description'] || latestUpdate.updates || latestUpdate.description || 'No updates available';\n}\n\n// Calculate current month for seasonal/awareness content\nconst month = currentDate.getMonth();\nconst seasonalEvents = {\n  0: \"New Year wellness tips, winter safety for seniors, flu prevention\",\n  1: \"Heart Health Month, Valentine's Day connections for seniors\",\n  2: \"Brain Injury Awareness Month, spring safety tips\",\n  3: \"Parkinson's Awareness Month, spring allergies for seniors\",\n  4: \"Older Americans Month, Mental Health Awareness Month\",\n  5: \"Alzheimer's and Brain Awareness Month, summer safety for seniors\",\n  6: \"Summer activities for seniors, heat safety, staying active\",\n  7: \"Back-to-school for grandparents, late summer wellness\",\n  8: \"World Alzheimer's Month, fall prevention, National Family Caregiver Month (Nov prep)\",\n  9: \"Fall safety, breast cancer awareness, National Family Caregiver Month (Nov prep)\",\n  10: \"National Family Caregivers Month, diabetes awareness, Thanksgiving safety\",\n  11: \"Holiday safety for seniors, winter depression prevention, end-of-year reflection\"\n};\n\nconst context = {\n  weekOf: weekOf,\n  businessUpdates: businessUpdates,\n  seasonalTheme: seasonalEvents[month],\n  currentMonth: currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),\n  companyName: 'Right At Home Winnipeg',\n  targetAudience: 'older adults, their families, and caregivers in Winnipeg, Manitoba',\n  services: 'in-home senior care, companionship, personal care, dementia care, Alzheimer\\'s care, respite care',\n  brandVoice: 'warm, compassionate, professional, dignity-focused'\n};\n\nreturn [{ json: context }];"
+      },
+      "id": "f312f943-4724-4467-ad7d-0a5d9fc19614",
+      "name": "Code - Prepare AI Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        -608
+      ],
+      "notes": "Prepares comprehensive context for OpenAI including:\n- Current date and week\n- Latest business updates\n- Seasonal awareness themes\n- Company info and brand voice"
+    },
+    {
+      "parameters": {},
+      "id": "f9337f87-21d3-41b2-8aff-844df00c3f7e",
+      "name": "OpenAI - Generate Topics",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        -1152,
+        -608
+      ],
+      "credentials": {},
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Connect OpenAI API credential\n- Model: gpt-4 (or gpt-3.5-turbo for lower cost)\n- Temperature: 0.7 (balanced creativity)\n- Generates 3 distinct topic ideas in JSON format"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Parse OpenAI response and extract topics\nconst openaiResponse = $json;\nconst messageContent = openaiResponse.choices?.[0]?.message?.content || openaiResponse.message?.content || '{}';\n\n// Remove markdown code blocks if present\nconst jsonString = messageContent.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet topics;\ntry {\n  topics = JSON.parse(jsonString);\n} catch (error) {\n  // Fallback if parsing fails\n  topics = {\n    topic1: 'Error parsing AI response - please check workflow execution',\n    topic2: 'Error parsing AI response - please check workflow execution',\n    topic3: 'Error parsing AI response - please check workflow execution'\n  };\n}\n\n// Get context from previous node\nconst context = $('Code - Prepare AI Context').first().json;\n\nreturn {\n  json: {\n    week_of: context.weekOf,\n    business_updates: context.businessUpdates,\n    topic_1: topics.topic1 || 'No topic generated',\n    topic_2: topics.topic2 || 'No topic generated',\n    topic_3: topics.topic3 || 'No topic generated',\n    generation_timestamp: new Date().toISOString(),\n    topic_1_approved: false,\n    topic_2_approved: false,\n    topic_3_approved: false,\n    completion_status: 'Topics Generated - Awaiting Approval'\n  }\n};"
+      },
+      "id": "8588a935-0e31-4ff6-a6c5-3ba6b0fcd451",
+      "name": "Code - Parse OpenAI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        -608
+      ],
+      "notes": "Parses JSON response from OpenAI and formats data for Google Sheets"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "0e923f16-ffea-44d1-8f58-ba411e798116",
+      "name": "Google Sheets - Write Topics to State Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -704,
+        -608
+      ],
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_STATE_SHEET_ID with your State Tracking Sheet ID\n- Appends new row with generated topics\n- This sheet tracks the entire workflow state"
+    },
+    {
+      "parameters": {},
+      "id": "eb029683-9f1d-4d90-8653-7d49e6a25199",
+      "name": "Outlook - Send Approval Email",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        -608
+      ],
+      "credentials": {},
+      "notes": "Configuration Required:\n- Connect Microsoft Outlook OAuth2 credential\n- Sends approval request email with clickable webhook links\n- User clicks link to trigger Workflow 2"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Format approval email with webhook links\nconst data = $json;\nconst weekOf = data.week_of;\nconst topic1 = data.topic_1;\nconst topic2 = data.topic_2;\nconst topic3 = data.topic_3;\nconst businessUpdates = data.business_updates;\n\n// Webhook base URL - user must update after deploying Workflow 2\nconst webhookBaseUrl = 'PLACEHOLDER_WORKFLOW2_WEBHOOK_URL';\n\n// Build email body\nlet emailBody = `Hi there,\\n\\n`;\nemailBody += `The AI has generated 3 social media topic ideas for the week of ${weekOf}. Please review and approve the topics you'd like to proceed with.\\n\\n`;\nemailBody += `==================================================\\n\\n`;\n\nemailBody += `TOPIC 1 - BUSINESS UPDATE\\n`;\nemailBody += `${topic1}\\n\\n`;\n\nemailBody += `TOPIC 2 - MARKETING/SERVICE\\n`;\nemailBody += `${topic2}\\n\\n`;\n\nemailBody += `TOPIC 3 - AUDIENCE-RELEVANT\\n`;\nemailBody += `${topic3}\\n\\n`;\n\nemailBody += `==================================================\\n\\n`;\n\nemailBody += `GENERATED FROM:\\n`;\nemailBody += `Business Updates: ${businessUpdates}\\n\\n`;\n\nemailBody += `==================================================\\n\\n`;\nemailBody += `APPROVAL OPTIONS:\\n\\n`;\n\nemailBody += `✓ Approve All 3 Topics:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_all\\n\\n`;\n\nemailBody += `✓ Approve Topics 1 & 2 Only:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_12\\n\\n`;\n\nemailBody += `✓ Approve Topics 1 & 3 Only:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_13\\n\\n`;\n\nemailBody += `✓ Approve Topics 2 & 3 Only:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_23\\n\\n`;\n\nemailBody += `✓ Approve Only Topic 1:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_1\\n\\n`;\n\nemailBody += `✓ Approve Only Topic 2:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_2\\n\\n`;\n\nemailBody += `✓ Approve Only Topic 3:\\n`;\nemailBody += `${webhookBaseUrl}?week_of=${weekOf}&action=approve_3\\n\\n`;\n\nemailBody += `==================================================\\n\\n`;\n\nemailBody += `Once you click an approval link, the system will automatically:\\n`;\nemailBody += `1. Generate full social media posts with hashtags for approved topics\\n`;\nemailBody += `2. Create custom 1080x1080 images for each post\\n`;\nemailBody += `3. Send you another email for final approval\\n\\n`;\n\nemailBody += `If you need different topics, reply to this email and the team will regenerate.\\n\\n`;\n\nemailBody += `State Tracking Sheet: PLACEHOLDER_STATE_SHEET_URL`;\n\nreturn {\n  json: {\n    recipientEmail: 'PLACEHOLDER_APPROVER_EMAIL',\n    emailSubject: `📝 Weekly Social Media Topics for Approval - Week of ${weekOf}`,\n    emailBody: emailBody,\n    weekOf: weekOf\n  }\n};"
+      },
+      "id": "02c8bdb6-c486-4d87-b6f8-49eff28cb7b5",
+      "name": "Code - Format Approval Email1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -608
+      ],
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_WORKFLOW2_WEBHOOK_URL with Workflow 2 webhook URL (get after deploying Workflow 2)\n- Update PLACEHOLDER_APPROVER_EMAIL with actual approver email\n- Update PLACEHOLDER_STATE_SHEET_URL with Google Sheet URL\n\nIMPORTANT: Deploy Workflow 2 first to get the webhook URL, then update this node."
+    },
+    {
+      "parameters": {
+        "path": "social-media/content-approval",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "b50c4ff0-e739-4bb7-acbf-123b54e56e20",
+      "name": "Webhook - Content Approval",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2080,
+        944
+      ],
+      "webhookId": "content-approval-webhook",
+      "notes": "Triggered when user clicks approval link from Workflow 2.\nExpected query params: week_of, action (approve_all)"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        }
+      },
+      "id": "c4d19cc7-41f0-435b-9cce-3d775efb0192",
+      "name": "Google Sheets - Read Approved Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -1856,
+        944
+      ],
+      "notes": "Configuration Required:\n- Update State Sheet ID\n- Reads all approved posts with text and image URLs"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Calculate posting dates: Monday, Wednesday, Friday of the following week\nconst sheetData = $json;\nconst weekOf = new Date(sheetData.week_of);\n\n// Find next Monday after week_of\nconst dayOfWeek = weekOf.getDay();\nconst daysUntilMonday = (1 - dayOfWeek + 7) % 7 || 7;\nconst monday = new Date(weekOf);\nmonday.setDate(weekOf.getDate() + daysUntilMonday);\n\n// Calculate Wednesday and Friday\nconst wednesday = new Date(monday);\nwednesday.setDate(monday.getDate() + 2);\n\nconst friday = new Date(monday);\nfriday.setDate(monday.getDate() + 4);\n\n// Set posting time to 10:00 AM\n[monday, wednesday, friday].forEach(date => {\n  date.setHours(10, 0, 0, 0);\n});\n\n// Build post objects for each day\nconst posts = [];\n\nif (sheetData.topic_1_post) {\n  posts.push({\n    topicKey: 'topic_1',\n    topic: sheetData.topic_1,\n    postText: sheetData.topic_1_post,\n    imageUrl: sheetData.topic_1_image_url,\n    postDate: monday.toISOString(),\n    unixTimestamp: Math.floor(monday.getTime() / 1000),\n    dayLabel: 'Monday',\n    weekOf: sheetData.week_of\n  });\n}\n\nif (sheetData.topic_2_post) {\n  posts.push({\n    topicKey: 'topic_2',\n    topic: sheetData.topic_2,\n    postText: sheetData.topic_2_post,\n    imageUrl: sheetData.topic_2_image_url,\n    postDate: wednesday.toISOString(),\n    unixTimestamp: Math.floor(wednesday.getTime() / 1000),\n    dayLabel: 'Wednesday',\n    weekOf: sheetData.week_of\n  });\n}\n\nif (sheetData.topic_3_post) {\n  posts.push({\n    topicKey: 'topic_3',\n    topic: sheetData.topic_3,\n    postText: sheetData.topic_3_post,\n    imageUrl: sheetData.topic_3_image_url,\n    postDate: friday.toISOString(),\n    unixTimestamp: Math.floor(friday.getTime() / 1000),\n    dayLabel: 'Friday',\n    weekOf: sheetData.week_of\n  });\n}\n\nreturn posts.map(post => ({ json: post }));"
+      },
+      "id": "93e01147-5150-4dcb-9831-7760ed4670fa",
+      "name": "Code - Calculate Posting Dates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1632,
+        944
+      ],
+      "notes": "Calculates Monday, Wednesday, Friday dates for posting.\nSets posting time to 10:00 AM.\nReturns array of posts with calculated dates."
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "8cffdd53-1dd8-4f20-a811-eca4cce73678",
+      "name": "Loop - Schedule Each Post",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1408,
+        944
+      ],
+      "continueOnFail": true,
+      "notes": "Processes one post at a time for scheduling to Facebook and Instagram"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v18.0/PLACEHOLDER_PAGE_ID/feed",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendBody": true,
+        "contentType": "application/json",
+        "options": {}
+      },
+      "id": "130c68a8-fc72-4bd6-90c6-8dce7a748373",
+      "name": "HTTP Request - Schedule Facebook Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1200,
+        944
+      ],
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_PAGE_ID with your Facebook Page ID\n- Connect Facebook Graph API credential (Page Access Token)\n- Required permissions: pages_manage_posts, pages_read_engagement\n\nAPI schedules post to Facebook Page at specified time."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v18.0/PLACEHOLDER_INSTAGRAM_ACCOUNT_ID/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendBody": true,
+        "contentType": "application/json",
+        "options": {}
+      },
+      "id": "9ff2d242-e9df-4d38-96e5-926c9c45063f",
+      "name": "HTTP Request - Instagram Create Media Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -976,
+        944
+      ],
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_INSTAGRAM_ACCOUNT_ID with your Instagram Business Account ID\n- Uses same Facebook credential as previous node\n- Step 1 of 2: Creates media container\n- Returns creation_id for publishing step"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v18.0/PLACEHOLDER_INSTAGRAM_ACCOUNT_ID/media_publish",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendBody": true,
+        "contentType": "application/json",
+        "options": {}
+      },
+      "id": "a9862179-a291-4676-9a5c-1de6fa2209b7",
+      "name": "HTTP Request - Instagram Schedule Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -752,
+        944
+      ],
+      "continueOnFail": true,
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_INSTAGRAM_ACCOUNT_ID (same as previous node)\n- Step 2 of 2: Publishes media container at scheduled time\n- Uses creation_id from previous node\n- Required permissions: instagram_content_publish"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Prepare data for sheet update\nconst topicKey = $('Code - Calculate Posting Dates').item.json.topicKey;\nconst weekOf = $('Code - Calculate Posting Dates').item.json.weekOf;\nconst postDate = $('Code - Calculate Posting Dates').item.json.postDate;\nconst dayLabel = $('Code - Calculate Posting Dates').item.json.dayLabel;\n\n// Check if Facebook and Instagram scheduling succeeded\nconst facebookResponse = $('HTTP Request - Schedule Facebook Post').first().json;\nconst instagramResponse = $json;\n\nconst facebookSuccess = !facebookResponse.error;\nconst instagramSuccess = !instagramResponse.error;\n\nlet status = 'Scheduled';\nif (!facebookSuccess || !instagramSuccess) {\n  status = 'Partially Scheduled';\n}\nif (!facebookSuccess && !instagramSuccess) {\n  status = 'Scheduling Failed';\n}\n\nreturn {\n  json: {\n    weekOf: weekOf,\n    topicKey: topicKey,\n    scheduled: facebookSuccess && instagramSuccess,\n    postDate: postDate,\n    dayLabel: dayLabel,\n    status: status,\n    facebookPostId: facebookResponse.id || 'N/A',\n    instagramMediaId: instagramResponse.id || 'N/A'\n  }\n};"
+      },
+      "id": "332dbe26-b7d9-4a46-a0a3-ef7ef2b02aeb",
+      "name": "Code - Prepare Status Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        944
+      ],
+      "notes": "Checks success of Facebook and Instagram scheduling.\nPrepares data for Google Sheets update."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "={{ $json.topicKey }}_scheduled": "={{ $json.scheduled }}",
+            "={{ $json.topicKey }}_post_date": "={{ $json.postDate }}",
+            "={{ $json.topicKey }}_status": "={{ $json.status }}"
+          },
+          "matchingColumns": [
+            "week_of"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "344b2e44-cd6c-439a-822b-b9006d2ad8b2",
+      "name": "Google Sheets - Update Schedule Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -320,
+        944
+      ],
+      "continueOnFail": true,
+      "notes": "Updates state sheet with scheduling status and post dates.\nMatches by week_of, updates dynamic columns based on topicKey."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-completion",
+              "leftValue": "={{ $('Loop - Schedule Each Post').context.noItemsLeft }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combineOperation": "all"
+        },
+        "options": {}
+      },
+      "id": "9e391af1-5fcf-4470-85d8-d52424b1e259",
+      "name": "IF - All Posts Scheduled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        944
+      ],
+      "notes": "Checks if all posts have been scheduled before sending confirmation email"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PLACEHOLDER_STATE_SHEET_ID"
+        }
+      },
+      "id": "5d4de7fc-f25b-4b86-b40b-6ade66b4935b",
+      "name": "Google Sheets - Read Final Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        128,
+        832
+      ],
+      "notes": "Re-reads state sheet to get final scheduling status for confirmation email"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Build confirmation email with scheduling details\nconst data = $json;\nconst weekOf = data.week_of;\n\n// Collect scheduled posts\nconst scheduledPosts = [];\nfor (let i = 1; i <= 3; i++) {\n  const topicKey = `topic_${i}`;\n  if (data[`${topicKey}_post_date`]) {\n    const postDate = new Date(data[`${topicKey}_post_date`]);\n    const dateStr = postDate.toLocaleDateString('en-US', {\n      weekday: 'long',\n      month: 'long',\n      day: 'numeric',\n      year: 'numeric',\n      hour: 'numeric',\n      minute: '2-digit',\n      timeZoneName: 'short'\n    });\n    \n    scheduledPosts.push({\n      number: i,\n      topic: data[topicKey],\n      postDate: dateStr,\n      status: data[`${topicKey}_status`] || 'Scheduled',\n      scheduled: data[`${topicKey}_scheduled`]\n    });\n  }\n}\n\n// Build email body\nlet emailBody = `Hi there,\\n\\nYour social media posts for the week of ${weekOf} have been successfully scheduled!\\n\\n`;\nemailBody += `==================================================\\n\\n`;\n\nlet allSuccess = true;\nfor (const post of scheduledPosts) {\n  const statusIcon = post.scheduled ? '✓' : '✗';\n  emailBody += `POST ${post.number}: ${post.topic}\\n`;\n  emailBody += `Status: ${statusIcon} ${post.status}\\n`;\n  emailBody += `Scheduled for: ${post.postDate}\\n`;\n  emailBody += `Platforms: Facebook ${post.scheduled ? '✓' : '✗'} | Instagram ${post.scheduled ? '✓' : '✗'}\\n`;\n  emailBody += `\\n==================================================\\n\\n`;\n  \n  if (!post.scheduled) {\n    allSuccess = false;\n  }\n}\n\nif (allSuccess) {\n  emailBody += `\\nAll posts have been successfully scheduled to both Facebook and Instagram.\\n\\n`;\n} else {\n  emailBody += `\\n⚠️ WARNING: Some posts failed to schedule. Please check your n8n workflow execution logs for details.\\n\\n`;\n}\n\nemailBody += `You can monitor and manage your scheduled posts in:\\n`;\nemailBody += `- Meta Business Suite: https://business.facebook.com/latest/posts\\n`;\nemailBody += `- n8n State Sheet: PLACEHOLDER_SHEET_URL\\n\\n`;\nemailBody += `The workflow will run again next Sunday to generate topics for the following week.\\n\\n`;\nemailBody += `Note: Posts can be edited or cancelled in Meta Business Suite if needed before they go live.`;\n\nreturn {\n  json: {\n    recipientEmail: 'PLACEHOLDER_APPROVER_EMAIL',\n    emailSubject: allSuccess \n      ? `✓ Social Media Posts Scheduled - Week of ${weekOf}`\n      : `⚠️ Social Media Scheduling Partially Completed - Week of ${weekOf}`,\n    emailBody: emailBody,\n    weekOf: weekOf,\n    allSuccess: allSuccess\n  }\n};"
+      },
+      "id": "4effbf88-c8b4-4f1b-a8cb-5614efbd2714",
+      "name": "Code - Format Confirmation Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        832
+      ],
+      "notes": "Configuration Required:\n- Update PLACEHOLDER_SHEET_URL with Google Sheet URL\n- Update PLACEHOLDER_APPROVER_EMAIL with actual approver email"
+    },
+    {
+      "parameters": {},
+      "id": "3417cfb2-d13a-4a91-af47-91e11735cda6",
+      "name": "Outlook - Send Confirmation Email",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        832
+      ],
+      "credentials": {},
+      "notes": "Configuration Required:\n- Connect Microsoft Outlook OAuth2 credential\n- Sends confirmation email with scheduling status"
+    },
+    {
+      "parameters": {
+        "content": "# Social Media Automation - Right At Home Winnipeg\n\nThree n8n workflows that automatically generate, approve, and schedule social media content for Facebook and Instagram every week.\n\n## Overview\n\nThis is a comprehensive social media automation system designed for Right At Home Winnipeg. Every Sunday, the system generates 3 social media post topics, creates content and visuals after approval, and schedules posts to Facebook and Instagram for Monday, Wednesday, and Friday.\n\n### The 3 Workflows\n\n1. **social-media-topic-generation.json** - Generates 3 topic ideas every Sunday\n2. **social-media-content-creation.json** - Creates posts and images after topic approval\n3. **social-media-scheduling.json** - Schedules approved posts to Facebook/Instagram\n\n### Content Strategy\n\nEach week, 3 posts are generated:\n- **Post 1 (Monday)**: Business Update - Recent company activities, team highlights, community involvement\n- **Post 2 (Wednesday)**: Marketing/Service - Showcase services, educate about in-home care\n- **Post 3 (Friday)**: Audience-Relevant - Awareness days, seasonal tips, caregiver support\n\n## Architecture\n\n```\n┌─────────────────────────────────────────────────────────────────────────────┐\n│                          WORKFLOW 1: TOPIC GENERATION                        │\n│  Trigger: Every Sunday 9 AM                                                  │\n├─────────────────────────────────────────────────────────────────────────────┤\n│  Schedule Trigger                                                            │\n│    → Read Business Updates (Google Sheets)                                   │\n│    → Prepare Context (Code)                                                  │\n│    → Generate 3 Topics (OpenAI GPT-4)                                        │\n│    → Parse Response (Code)                                                   │\n│    → Write to State Sheet (Google Sheets)                                    │\n│    → Send Approval Email (Outlook)                                           │\n└────────────────────────────┬─────────────────────────────────────────────────┘\n                             │ User clicks approval link in email\n                             ▼\n┌─────────────────────────────────────────────────────────────────────────────┐\n│                      WORKFLOW 2: CONTENT CREATION                            │\n│  Trigger: Webhook (from approval email)                                     │\n├─────────────────────────────────────────────────────────────────────────────┤\n│  Webhook Trigger                                                             │\n│    → Read Approved Topics (Google Sheets)                                    │\n│    → Determine Which Approved (Code)                                         │\n│    → Loop Each Topic:                                                        │\n│         → Generate Post Text (OpenAI GPT-4)                                  │\n│         → Generate Image (kie.ai nano-banana pro)                            │\n│         → Combine Post + Image (Code)                                        │\n│         → Update State Sheet (Google Sheets)                                 │\n│    → Send Content Approval Email (Outlook)                                   │\n└────────────────────────────┬─────────────────────────────────────────────────┘\n                             │ User clicks approval link in email\n                             ▼\n┌─────────────────────────────────────────────────────────────────────────────┐\n│                      WORKFLOW 3: SCHEDULING                                  │\n│  Trigger: Webhook (from approval email)                                     │\n├─────────────────────────────────────────────────────────────────────────────┤\n│  Webhook Trigger                                                             │\n│    → Read Approved Posts (Google Sheets)                                     │\n│    → Calculate Posting Dates (Code) - Mon/Wed/Fri 10 AM                     │\n│    → Loop Each Post:                                                         │\n│         → Schedule Facebook Post (Graph API)                                 │\n│         → Schedule Instagram Post (Graph API)                                │\n│         → Update Status (Google Sheets)                                      │\n│    → Send Confirmation Email (Outlook)                                       │\n└─────────────────────────────────────────────────────────────────────────────┘\n\n                    ┌──────────────────────────────┐\n                    │   CENTRAL STATE TRACKER      │\n                    │   (Google Sheets)            │\n                    │                              │\n                    │  All workflows read/write    │\n                    │  to this sheet to maintain   │\n                    │  state across the process    │\n                    └──────────────────────────────┘\n```\n\n## Prerequisites\n\nBefore deploying, you need to set up multiple API credentials and services.\n\n### 1. Google OAuth2 Credentials\n\n**Required for**: Google Sheets access (state tracking + business updates)\n\n**Setup Steps**:\n1. Go to https://console.cloud.google.com\n2. Create a new project or select existing\n3. Enable Google Sheets API\n4. Go to \"Credentials\" → \"Create Credentials\" → \"OAuth 2.0 Client ID\"\n5. Application type: Web application\n6. Add authorized redirect URI: `https://n8n.204it.ca/rest/oauth2-credential/callback` (replace with your n8n URL)\n7. Copy Client ID and Client Secret\n\n**In n8n**:\n1. Go to Settings → Credentials\n2. Click \"Create New Credential\"\n3. Select \"Google OAuth2 API\"\n4. Paste Client ID and Client Secret\n5. Add scopes:\n   - `https://www.googleapis.com/auth/spreadsheets`\n6. Click \"Connect to Google\" and authorize\n7. Save the credential\n8. Note the credential ID for later\n\n### 2. OpenAI API Key\n\n**Required for**: Topic generation and post text generation\n\n**Setup Steps**:\n1. Go to https://platform.openai.com/api-keys\n2. Click \"Create new secret key\"\n3. Name it \"n8n Right At Home Winnipeg\"\n4. Copy the key (shown only once!)\n\n**In n8n**:\n1. Go to Settings → Credentials\n2. Click \"Create New Credential\"\n3. Select \"OpenAI API\"\n4. Paste API Key\n5. Save the credential\n\n**Cost Estimate**: ~$0.10-0.30 per week (6 API calls to GPT-4)\n\n### 3. kie.ai API Credentials\n\n**Required for**: nano-banana pro image generation\n\n**Setup Steps**:\n⚠️ **USER ACTION REQUIRED**: You must provide:\n- API endpoint URL\n- Authentication method (Bearer token, API key, etc.)\n- Request body format\n- Response structure\n\n**In n8n**:\n1. Go to Settings → Credentials\n2. Create appropriate credential type based on kie.ai authentication\n3. Configure according to kie.ai documentation\n4. Update Workflow 2 HTTP Request node with actual endpoint and format\n\n**Important**: The workflow uses a placeholder. You MUST update the HTTP Request node in Workflow 2 with actual kie.ai API details.\n\n### 4. Facebook/Instagram API Setup\n\n**Required for**: Scheduling posts to Facebook and Instagram\n\n**⚠️ This is the most complex setup - follow carefully**\n\n#### Step 1: Create Facebook App\n\n1. Go to https://developers.facebook.com/apps\n2. Click \"Create App\"\n3. Use case: \"Business\"\n4. App type: \"Business\"\n5. App name: \"Right At Home Winnipeg Social Media\"\n6. App contact email: Your business email\n7. Business account: Select or create\n\n#### Step 2: Add Products\n\n1. In your app dashboard, click \"Add Products\"\n2. Add \"Facebook Login\" → Click \"Set Up\"\n3. Add \"Instagram Graph API\" → Click \"Set Up\"\n\n#### Step 3: Get Facebook Page Access Token\n\n1. Go to https://developers.facebook.com/tools/explorer\n2. Select your app from dropdown\n3. User Token → Get User Access Token\n4. Select permissions:\n   - `pages_manage_posts`\n   - `pages_read_engagement`\n   - `instagram_basic`\n   - `instagram_content_publish`\n5. Click \"Generate Access Token\" and authorize\n6. Copy the short-lived token\n\n#### Step 4: Convert to Long-Lived Token\n\nRun this command (replace placeholders):\n```bash\ncurl -i -X GET \"https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=YOUR_APP_ID&client_secret=YOUR_APP_SECRET&fb_exchange_token=SHORT_LIVED_TOKEN\"\n```\n\nThis returns a long-lived user token (60 days).\n\n#### Step 5: Get Page Access Token (Never Expires)\n\nRun this command with your long-lived user token:\n```bash\ncurl -i -X GET \"https://graph.facebook.com/v18.0/me/accounts?access_token=LONG_LIVED_USER_TOKEN\"\n```\n\nFind your Facebook Page in the response and copy its `access_token`. This token never expires!\n\n#### Step 6: Get Instagram Business Account ID\n\n```bash\ncurl -i -X GET \"https://graph.facebook.com/v18.0/PAGE_ID?fields=instagram_business_account&access_token=PAGE_ACCESS_TOKEN\"\n```\n\nCopy the `instagram_business_account` ID.\n\n#### Step 7: Configure in n8n\n\n1. Go to Settings → Credentials\n2. Click \"Create New Credential\"\n3. Select \"HTTP Header Auth\" (we'll use for Graph API)\n4. Header Name: `Authorization`\n5. Header Value: `Bearer YOUR_PAGE_ACCESS_TOKEN`\n6. Save as \"Facebook Graph API\"\n\n#### Step 8: Update Workflows\n\nIn **Workflow 3** (social-media-scheduling.json), update these placeholders:\n- `PLACEHOLDER_PAGE_ID` → Your Facebook Page ID\n- `PLACEHOLDER_INSTAGRAM_ACCOUNT_ID` → Your Instagram Business Account ID\n\n**Testing**:\n```bash\n# Test Facebook Page access\ncurl -i -X GET \"https://graph.facebook.com/v18.0/PAGE_ID?fields=name,access_token&access_token=PAGE_ACCESS_TOKEN\"\n\n# Test Instagram Account access\ncurl -i -X GET \"https://graph.facebook.com/v18.0/INSTAGRAM_ACCOUNT_ID?fields=username&access_token=PAGE_ACCESS_TOKEN\"\n```\n\n### 5. Microsoft Outlook OAuth2 Credentials\n\n**Required for**: Sending approval emails\n\n**Setup Steps**:\n\n**In Azure Portal**:\n1. Go to https://portal.azure.com\n2. Navigate to Azure Active Directory → App registrations\n3. Click \"New registration\"\n4. Name: \"n8n Right At Home Winnipeg\"\n5. Add redirect URI: `https://n8n.204it.ca/rest/oauth2-credential/callback` (replace with your n8n URL)\n6. Go to \"Certificates & secrets\" → Create new client secret\n7. Copy the secret value (shown only once)\n8. Go to \"API permissions\" → Add permission → Microsoft Graph → Delegated permissions\n9. Add: `Mail.Send`, `offline_access`\n10. Click \"Grant admin consent\"\n11. Copy Application (client) ID and Directory (tenant) ID from Overview page\n\n**In n8n**:\n1. Go to Settings → Credentials\n2. Click \"Create New Credential\"\n3. Select \"Microsoft Outlook OAuth2 API\"\n4. Paste Application ID, Directory ID, and Client Secret\n5. Click \"Connect to Microsoft\" and authorize\n6. Save the credential\n\n### 6. Google Sheets Setup\n\nYou need to create 2 Google Sheets:\n\n#### Sheet 1: Business Updates (Input)\nCreate a new Google Sheet with columns:\n```\nDate | Update Description\n```\n\nExample rows:\n```\n2026-01-20 | Hired 3 new caregivers this week, expanding our team\n2026-01-13 | Celebrated 5-year anniversary with client Mrs. Johnson\n2026-01-06 | Launched new dementia care training program\n```\n\n**Update this sheet weekly** (before Sunday 9 AM) with recent company news.\n\n#### Sheet 2: State Tracker (Central Database)\nCreate a new Google Sheet with these exact column names:\n```\nweek_of\ngeneration_timestamp\nbusiness_updates\ntopic_1\ntopic_1_approved\ntopic_1_post\ntopic_1_image_url\ntopic_1_post_approved\ntopic_1_scheduled\ntopic_1_post_date\ntopic_1_status\ntopic_2\ntopic_2_approved\ntopic_2_post\ntopic_2_image_url\ntopic_2_post_approved\ntopic_2_scheduled\ntopic_2_post_date\ntopic_2_status\ntopic_3\ntopic_3_approved\ntopic_3_post\ntopic_3_image_url\ntopic_3_post_approved\ntopic_3_scheduled\ntopic_3_post_date\ntopic_3_status\ncompletion_status\n```\n\nLeave the sheet empty (just headers). The workflow will populate it automatically.\n\n**Get Sheet IDs**:\n- Open each sheet in browser\n- URL format: `https://docs.google.com/spreadsheets/d/SHEET_ID/edit`\n- Copy the `SHEET_ID` from URL\n- Save these for configuration step\n\n## Deployment Steps\n\n### Step 1: Import Workflows to n8n\n\n**Import Workflow 2 First** (to get webhook URL):\n1. Open your n8n instance: https://n8n.204it.ca\n2. Click \"Add workflow\" → \"Import from File\"\n3. Select `social-media-content-creation.json`\n4. Click \"Save\"\n5. The webhook URL will be displayed (copy it!)\n6. Format: `https://n8n.204it.ca/webhook/social-media/topic-approval`\n\n**Import Workflow 3 Second** (to get webhook URL):\n1. Click \"Add workflow\" → \"Import from File\"\n2. Select `social-media-scheduling.json`\n3. Click \"Save\"\n4. Copy the webhook URL\n5. Format: `https://n8n.204it.ca/webhook/social-media/content-approval`\n\n**Import Workflow 1 Last** (requires webhook URLs from 2 & 3):\n1. Click \"Add workflow\" → \"Import from File\"\n2. Select `social-media-topic-generation.json`\n3. The workflow will import with placeholder webhook URLs\n4. You'll update these in the configuration step\n\n### Step 2: Configure Credentials\n\nFor each workflow, click on nodes and assign credentials:\n\n**Workflow 1 - Topic Generation**:\n- \"Google Sheets - Read Business Updates\" → Google OAuth2 credential\n- \"Google Sheets - Write Topics to State Sheet\" → Same Google OAuth2 credential\n- \"OpenAI - Generate Topics\" → OpenAI API credential\n- \"Outlook - Send Approval Email\" → Microsoft Outlook OAuth2 credential\n\n**Workflow 2 - Content Creation**:\n- All \"Google Sheets\" nodes → Google OAuth2 credential\n- \"OpenAI - Generate Post Text\" → OpenAI API credential\n- \"HTTP Request - kie.ai Image Generation\" → kie.ai credential (you must create)\n- \"Outlook - Send Content Approval Email\" → Microsoft Outlook OAuth2 credential\n\n**Workflow 3 - Scheduling**:\n- All \"Google Sheets\" nodes → Google OAuth2 credential\n- All \"HTTP Request\" nodes (Facebook/Instagram) → Facebook Graph API credential\n- \"Outlook - Send Confirmation Email\" → Microsoft Outlook OAuth2 credential\n\n### Step 3: Update Placeholders\n\n**Critical placeholders to update** (search for \"PLACEHOLDER\" in each workflow):\n\n#### Workflow 1:\n1. `PLACEHOLDER_BUSINESS_UPDATES_SHEET_ID` → Your Business Updates Sheet ID\n2. `PLACEHOLDER_STATE_SHEET_ID` → Your State Tracker Sheet ID\n3. `PLACEHOLDER_APPROVER_EMAIL` → Email address for approvals\n4. `PLACEHOLDER_WORKFLOW2_WEBHOOK_URL` → Webhook URL from Workflow 2\n5. `PLACEHOLDER_STATE_SHEET_URL` → Full Google Sheet URL (for email links)\n\n#### Workflow 2:\n1. `PLACEHOLDER_STATE_SHEET_ID` → Your State Tracker Sheet ID (same as Workflow 1)\n2. `PLACEHOLDER_KIEAI_ENDPOINT` → Actual kie.ai API endpoint\n3. `PLACEHOLDER_KIEAI_CREDENTIAL_ID` → kie.ai credential ID\n4. `PLACEHOLDER_WORKFLOW3_WEBHOOK_URL` → Webhook URL from Workflow 3\n5. `PLACEHOLDER_APPROVER_EMAIL` → Same email as Workflow 1\n6. `PLACEHOLDER_SHEET_URL` → Full Google Sheet URL\n7. **Update HTTP Request body format** for kie.ai based on their API docs\n\n#### Workflow 3:\n1. `PLACEHOLDER_STATE_SHEET_ID` → Your State Tracker Sheet ID\n2. `PLACEHOLDER_PAGE_ID` → Your Facebook Page ID\n3. `PLACEHOLDER_INSTAGRAM_ACCOUNT_ID` → Your Instagram Business Account ID\n4. `PLACEHOLDER_APPROVER_EMAIL` → Same email as Workflows 1 & 2\n5. `PLACEHOLDER_SHEET_URL` → Full Google Sheet URL\n\n### Step 4: Update Contact Info in kie.ai Prompt\n\nIn Workflow 2, find the \"HTTP Request - kie.ai Image Generation\" node.\n\nUpdate this line in the prompt:\n```\n- Include contact info: PLACEHOLDER_PHONE | PLACEHOLDER_WEBSITE | PLACEHOLDER_EMAIL\n```\n\nReplace with actual Right At Home Winnipeg contact info:\n```\n- Include contact info: (204) XXX-XXXX | www.rightathome.ca/winnipeg | winnipeg@rightathome.net\n```\n\n(Update with real contact details)\n\n### Step 5: Test Before Activating\n\n**DO NOT activate workflows yet**. Test each one manually first.\n\n## Testing Guide\n\n### Test 1: Workflow 1 (Topic Generation)\n\n1. Open Workflow 1 in n8n\n2. Make sure Business Updates sheet has at least one row of data\n3. Click \"Execute Workflow\" button (manual trigger)\n4. Check execution results:\n   - ✓ Business updates read successfully\n   - ✓ Context prepared\n   - ✓ OpenAI generated 3 topics\n   - ✓ Topics written to State Sheet\n   - ✓ Approval email sent\n5. Check your email inbox for approval email\n6. Verify State Sheet has new row with topics\n\n**If it fails**:\n- Check Google Sheets credentials are connected\n- Check OpenAI API key is valid\n- Check State Sheet column names match exactly\n- Review execution logs for error messages\n\n### Test 2: Workflow 2 (Content Creation)\n\n1. In your approval email from Test 1, find an approval link\n2. Or manually construct: `WEBHOOK_URL?week_of=2026-01-26&action=approve_all`\n3. Paste URL in browser and hit Enter\n4. Go to Workflow 2 in n8n\n5. Check execution (should auto-trigger):\n   - ✓ Webhook received\n   - ✓ Topics read from sheet\n   - ✓ Loop started\n   - ✓ Post text generated (OpenAI)\n   - ✓ Image generated (kie.ai) - **might fail if not configured**\n   - ✓ Data written to State Sheet\n   - ✓ Content approval email sent\n6. Check email for content approval\n7. Check State Sheet for post text and image URLs\n\n**If kie.ai fails**:\n- This is expected if kie.ai API not configured yet\n- You can update the HTTP Request node with real API details later\n- For now, verify everything else works\n\n### Test 3: Workflow 3 (Scheduling)\n\n**⚠️ Warning**: This will actually schedule posts to Facebook/Instagram!\n\nFor safe testing, modify the dates:\n1. In Workflow 3, \"Code - Calculate Posting Dates\" node\n2. Temporarily change posting dates to past dates (posts immediately) OR\n3. Use a test Facebook Page/Instagram account\n\n**Test execution**:\n1. From Test 2 approval email, click \"Approve All Posts\" link\n2. Or manually: `WEBHOOK_URL?week_of=2026-01-26&action=approve_all`\n3. Go to Workflow 3 in n8n\n4. Check execution:\n   - ✓ Webhook received\n   - ✓ Posts read from sheet\n   - ✓ Dates calculated\n   - ✓ Facebook posts scheduled\n   - ✓ Instagram posts scheduled\n   - ✓ Status updated in sheet\n   - ✓ Confirmation email sent\n5. Check Facebook Business Suite → Publishing Tools → Scheduled Posts\n6. Check Instagram (via Facebook Business Suite) for scheduled posts\n7. Check email for confirmation\n\n**If Facebook/Instagram fails**:\n- Verify Page Access Token is valid and never-expiring\n- Check Page ID and Instagram Account ID are correct\n- Verify permissions include `pages_manage_posts` and `instagram_content_publish`\n- Test API access with curl commands (see Prerequisites)\n\n## Configuration Checklist\n\nUse this checklist to ensure everything is configured:\n\n### Credentials\n- [ ] Google OAuth2 configured and authorized\n- [ ] OpenAI API key added\n- [ ] kie.ai credentials configured (endpoint + auth)\n- [ ] Facebook Graph API credential (Page Access Token)\n- [ ] Microsoft Outlook OAuth2 configured and authorized\n\n### Google Sheets\n- [ ] Business Updates sheet created with Date | Update Description columns\n- [ ] State Tracker sheet created with all required columns\n- [ ] Both sheet IDs copied and saved\n- [ ] Test data added to Business Updates sheet\n\n### Workflow 1 Configuration\n- [ ] Business Updates Sheet ID updated\n- [ ] State Sheet ID updated\n- [ ] Approver email updated\n- [ ] Workflow 2 webhook URL updated\n- [ ] State Sheet URL updated (for email links)\n- [ ] All Google Sheets nodes have credentials assigned\n- [ ] OpenAI node has credential assigned\n- [ ] Outlook node has credential assigned\n\n### Workflow 2 Configuration\n- [ ] State Sheet ID updated (same as Workflow 1)\n- [ ] kie.ai API endpoint configured\n- [ ] kie.ai request body format updated\n- [ ] kie.ai response parsing updated (Code node)\n- [ ] Contact info updated in image prompt (phone, website, email)\n- [ ] Workflow 3 webhook URL updated\n- [ ] Approver email updated\n- [ ] State Sheet URL updated\n- [ ] All credentials assigned to nodes\n\n### Workflow 3 Configuration\n- [ ] State Sheet ID updated\n- [ ] Facebook Page ID updated\n- [ ] Instagram Business Account ID updated\n- [ ] Approver email updated\n- [ ] State Sheet URL updated\n- [ ] All credentials assigned to nodes\n- [ ] Facebook/Instagram API tested with curl\n\n### Testing\n- [ ] Workflow 1 executed manually and succeeded\n- [ ] Approval email received with working links\n- [ ] Workflow 2 triggered via webhook and succeeded\n- [ ] Content approval email received\n- [ ] Workflow 3 triggered via webhook and succeeded\n- [ ] Posts appear in Facebook/Instagram scheduled posts\n- [ ] Confirmation email received\n- [ ] State Sheet updated correctly through all 3 workflows\n\n### Final Activation\n- [ ] All tests passed\n- [ ] Workflow 1 activated (toggle \"Active\" switch)\n- [ ] Workflows 2 & 3 remain inactive (webhook-triggered, always listening)\n\n## Weekly Operation Guide\n\nOnce deployed and tested, here's what happens each week:\n\n### Sunday 9:00 AM (Automated)\n- Workflow 1 executes automatically\n- Reads latest business update from Google Sheet\n- Generates 3 topic ideas using OpenAI\n- Writes topics to State Sheet\n- Emails you for approval\n\n### Sunday (Your Action Required)\n1. Check your email for \"Weekly Social Media Topics for Approval\"\n2. Review the 3 topics\n3. Click one of the approval links (e.g., \"Approve All 3 Topics\")\n4. Workflow 2 automatically starts\n\n### Sunday/Monday (Automated)\n- Workflow 2 generates full posts + images\n- Writes to State Sheet\n- Emails you for content approval\n\n### Monday (Your Action Required)\n1. Check email for \"Social Media Content Ready for Approval\"\n2. Review each post and image (click image URLs to view)\n3. Click \"Approve All Posts\" if satisfied\n4. OR click link to Google Sheet to edit posts manually\n5. Workflow 3 automatically starts\n\n### Monday (Automated)\n- Workflow 3 schedules posts to Facebook & Instagram\n- Monday post scheduled for Mon 10 AM\n- Wednesday post scheduled for Wed 10 AM\n- Friday post scheduled for Fri 10 AM\n- Updates State Sheet\n- Emails you confirmation\n\n### Monday, Wednesday, Friday 10:00 AM (Automated)\n- Posts automatically publish to Facebook & Instagram\n- No action required from you\n\n### Before Next Sunday (Your Action)\n- Update Business Updates Google Sheet with latest company news\n- This will be used for next week's topic generation\n\n## Monitoring and Maintenance\n\n### Daily Monitoring\n\n**Check n8n execution history**:\n1. Open each workflow\n2. Click \"Executions\" tab\n3. Look for any failed executions (red)\n4. Click failed execution to see error details\n\n**Check scheduled posts**:\n1. Open Meta Business Suite: https://business.facebook.com\n2. Go to \"Publishing Tools\" → \"Scheduled Posts\"\n3. Verify posts are scheduled for correct dates/times\n4. Edit if needed (changes won't reflect in State Sheet)\n\n### Weekly Tasks\n\n- [ ] **Before Sunday 9 AM**: Update Business Updates sheet with recent news\n- [ ] **Sunday**: Respond to topic approval email\n- [ ] **Monday**: Respond to content approval email\n- [ ] **Mon/Wed/Fri**: Verify posts published successfully\n\n### Monthly Maintenance\n\n- [ ] Review State Sheet for any errors or anomalies\n- [ ] Check OpenAI API usage and costs\n- [ ] Check kie.ai API usage and costs\n- [ ] Verify Facebook Page Access Token still valid (shouldn't expire)\n- [ ] Review post engagement and adjust strategy if needed\n\n### Common Issues & Solutions\n\n#### Issue: Workflow 1 doesn't trigger on Sunday\n**Solutions**:\n- Check Workflow 1 is activated (green toggle)\n- Check cron expression: `0 9 * * 0` (minute, hour, day, month, dayOfWeek)\n- Check n8n timezone settings\n- Manually trigger to test, then reactivate\n\n#### Issue: OpenAI returns error\n**Solutions**:\n- Check API key is valid\n- Check OpenAI account has credits\n- Check rate limits (shouldn't hit with weekly use)\n- Review error message in execution log\n\n#### Issue: kie.ai image generation fails\n**Solutions**:\n- Verify API endpoint URL is correct\n- Check authentication credentials\n- Verify request body format matches kie.ai docs\n- Check response parsing in Code node\n- Test API directly with curl to isolate issue\n\n#### Issue: Facebook/Instagram scheduling fails\n**Solutions**:\n- Verify Page Access Token hasn't expired\n- Check Page ID and Instagram Account ID are correct\n- Verify scheduled_publish_time is in future (not past)\n- Check image URL is publicly accessible (Instagram requires public URL)\n- Review Facebook error response in execution log\n- Check permissions: `pages_manage_posts`, `instagram_content_publish`\n\n#### Issue: Webhook doesn't trigger Workflow 2 or 3\n**Solutions**:\n- Check webhook URL in approval email is correct\n- Verify Workflow 2 and 3 are saved (they auto-listen when saved)\n- Check n8n webhook settings (should be enabled)\n- Test webhook with Postman or browser\n- Check n8n logs for webhook requests\n\n#### Issue: State Sheet not updating\n**Solutions**:\n- Verify column names match exactly (case-sensitive)\n- Check Google Sheets credential is valid\n- Check sheet permissions (should be editable by service account)\n- Review execution log for specific error\n- Test read/write manually in n8n\n\n#### Issue: Approval emails not received\n**Solutions**:\n- Check Outlook credential is valid\n- Verify approver email address is correct\n- Check spam folder\n- Test sending email manually from Outlook node\n- Review execution log for SMTP errors\n\n## Cost Estimation\n\n### Monthly Costs (4 weeks)\n\n**OpenAI API (GPT-4)**:\n- Topic generation: 4 calls/month × $0.03 = $0.12\n- Post text generation: 12 calls/month × $0.02 = $0.24\n- **Total**: ~$0.36/month\n\n**kie.ai nano-banana pro**:\n- Image generation: 12 images/month\n- Cost depends on kie.ai pricing\n- Estimate: $0.50-2.00/month (user to confirm)\n\n**Facebook/Instagram Graph API**:\n- Free (within rate limits)\n- Scheduling posts: No cost\n- **Total**: $0.00/month\n\n**Google APIs**:\n- Free (within quotas)\n- Sheets API: Well within free tier\n- **Total**: $0.00/month\n\n**Microsoft Outlook API**:\n- Free (with Office 365 account)\n- **Total**: $0.00/month\n\n**n8n Hosting**:\n- Self-hosted or cloud plan\n- Not included in this estimate\n\n**Grand Total**: ~$0.86-2.36/month (excluding kie.ai and n8n hosting)\n\n### ROI Comparison\n\n**Manual social media management**:\n- 1 hour/week × 4 weeks = 4 hours/month\n- At $50/hour = $200/month\n\n**Automated system**:\n- 30 minutes/week review time × 4 weeks = 2 hours/month\n- At $50/hour = $100/month\n- Plus API costs = ~$2/month\n- **Total**: ~$102/month\n\n**Savings**: ~$98/month (~49% reduction)\n\n## Security Best Practices\n\n### Credential Security\n- ✓ Never commit `.mcp.json` or credential files to git\n- ✓ Use OAuth2 instead of API keys when possible\n- ✓ Rotate OpenAI API key quarterly\n- ✓ Store Facebook Page Access Token securely (encrypted in n8n)\n- ✓ Limit approver email to trusted stakeholders\n\n### Google Sheets Security\n- ✓ Set State Sheet to \"Editor\" access only for service account\n- ✓ Set Business Updates sheet to \"Editor\" for your team\n- ✓ Don't share sheets publicly\n- ✓ Enable 2FA on Google account\n\n### n8n Security\n- ✓ Use strong n8n admin password\n- ✓ Enable HTTPS for n8n instance\n- ✓ Limit n8n access to authorized IPs if possible\n- ✓ Regularly update n8n to latest version\n\n### Facebook/Instagram Security\n- ✓ Use never-expiring Page Access Token (not user token)\n- ✓ Don't share access tokens in plaintext\n- ✓ Limit app permissions to minimum required\n- ✓ Monitor app activity in Facebook App Dashboard\n\n### Email Security\n- ✓ Use dedicated Outlook account for automation (not personal)\n- ✓ Enable 2FA on Outlook account\n- ✓ Review approved emails before clicking webhook links\n- ✓ Verify webhook URLs match your n8n instance domain\n\n## Troubleshooting Webhook Issues\n\nWebhooks are critical for this system. Here's how to debug webhook issues:\n\n### Get Webhook URLs\n1. Open Workflow 2 in n8n\n2. Click on \"Webhook - Topic Approval\" node\n3. Copy \"Test URL\" or \"Production URL\"\n4. Should look like: `https://n8n.204it.ca/webhook/social-media/topic-approval`\n\n### Test Webhook Manually\n```bash\n# Test Workflow 2 webhook\ncurl \"https://n8n.204it.ca/webhook/social-media/topic-approval?week_of=2026-01-26&action=approve_all\"\n\n# Test Workflow 3 webhook\ncurl \"https://n8n.204it.ca/webhook/social-media/content-approval?week_of=2026-01-26&action=approve_all\"\n```\n\nShould return: \"Topics received, generating content...\" or similar\n\n### Webhook Not Triggering\n1. Check workflow is saved (webhooks auto-activate on save)\n2. Check n8n webhook path settings\n3. Check firewall/network allows incoming webhooks\n4. Check n8n logs: `docker logs n8n` (if using Docker)\n5. Use n8n webhook debugger: Add \"Respond to Webhook\" node at end\n\n### Update Webhook URLs\nIf your n8n URL changes:\n1. Update Workflow 1 → \"Code - Format Approval Email\" → `PLACEHOLDER_WORKFLOW2_WEBHOOK_URL`\n2. Update Workflow 2 → \"Code - Format Approval Email\" → `PLACEHOLDER_WORKFLOW3_WEBHOOK_URL`\n3. Save workflows\n\n## Extending the System\n\n### Add More Platforms (LinkedIn, Twitter)\n1. Duplicate Workflow 3\n2. Add HTTP Request nodes for LinkedIn/Twitter APIs\n3. Update scheduling logic\n4. Add credentials for new platforms\n\n### Add A/B Testing\n1. Modify OpenAI prompt to generate multiple variants per topic\n2. Add Code node to randomly select variant\n3. Track performance in separate sheet\n4. Adjust prompts based on results\n\n### Add Analytics Tracking\n1. After posts publish, add n8n workflow to fetch engagement metrics\n2. Use Facebook Graph API: `/PAGE_ID/posts?fields=insights`\n3. Write metrics to Google Sheet\n4. Create weekly analytics report\n\n### Add Image Editing Step\n1. After kie.ai generation, add Cloudinary API node\n2. Overlay logo file (upload to Cloudinary first)\n3. Add text overlays with exact positioning\n4. Return edited image URL\n\n### Add Slack Notifications\n1. Add Slack nodes after key steps\n2. Send topic approval request to Slack channel\n3. Use Slack buttons for approval (instead of email)\n4. Send confirmation to team channel\n\n## Support and Resources\n\n- **n8n Instance**: https://n8n.204it.ca\n- **n8n Documentation**: https://docs.n8n.io\n- **OpenAI API Docs**: https://platform.openai.com/docs\n- **Facebook Graph API Docs**: https://developers.facebook.com/docs/graph-api\n- **Instagram Graph API Docs**: https://developers.facebook.com/docs/instagram-api\n- **Microsoft Graph API Docs**: https://docs.microsoft.com/graph\n\n## Workflow File Locations\n\n- Workflow 1: `/workflows/social-media-topic-generation.json`\n- Workflow 2: `/workflows/social-media-content-creation.json`\n- Workflow 3: `/workflows/social-media-scheduling.json`\n- This README: `/workflows/SOCIAL-MEDIA-AUTOMATION-README.md`\n\n## Changelog\n\n### 2026-01-28 - Initial Creation\n- Created 3-workflow social media automation system\n- Implemented Sunday trigger for topic generation\n- Added dual approval gates (topics + content)\n- Integrated OpenAI GPT-4 for content generation\n- Integrated kie.ai nano-banana pro for image generation\n- Added Facebook and Instagram scheduling\n- Created comprehensive documentation\n- Built central state tracking system with Google Sheets\n\n---\n\n**Status**: Ready for deployment (requires configuration)\n**Last Updated**: 2026-01-28\n**Maintainer**: Right At Home Winnipeg Team\n**Version**: 1.0.0",
+        "height": 18944,
+        "width": 1104
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3472,
+        -912
+      ],
+      "id": "229d1414-2084-4abe-9613-fcdc39366ce6",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook - Topic Approval": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Approved Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Approved Topics": {
+      "main": [
+        [
+          {
+            "node": "Code - Determine Approved Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Determine Approved Topics": {
+      "main": [
+        [
+          {
+            "node": "Loop - Process Each Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop - Process Each Topic": {
+      "main": [
+        [],
+        [
+          {
+            "node": "IF - All Topics Processed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - kie.ai Image Generation": {
+      "main": [
+        [
+          {
+            "node": "Code - Combine Post and Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Combine Post and Image": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Post Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Post Data": {
+      "main": [
+        [
+          {
+            "node": "Loop - Process Each Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - All Topics Processed?": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read All Generated Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read All Generated Posts": {
+      "main": [
+        [
+          {
+            "node": "Code - Format Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger - Every Sunday 9:00 AM": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Business Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Business Updates": {
+      "main": [
+        [
+          {
+            "node": "Code - Prepare AI Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse OpenAI Response": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Write Topics to State Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Write Topics to State Sheet": {
+      "main": [
+        [
+          {
+            "node": "Code - Format Approval Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Content Approval": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Approved Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Approved Posts": {
+      "main": [
+        [
+          {
+            "node": "Code - Calculate Posting Dates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Calculate Posting Dates": {
+      "main": [
+        [
+          {
+            "node": "Loop - Schedule Each Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop - Schedule Each Post": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Schedule Facebook Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF - All Posts Scheduled?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Schedule Facebook Post": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Instagram Create Media Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Instagram Create Media Container": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Instagram Schedule Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Instagram Schedule Post": {
+      "main": [
+        [
+          {
+            "node": "Code - Prepare Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Prepare Status Update": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Schedule Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Schedule Status": {
+      "main": [
+        [
+          {
+            "node": "Loop - Schedule Each Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - All Posts Scheduled?": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Final Status": {
+      "main": [
+        [
+          {
+            "node": "Code - Format Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "bd6036bf-c227-49a2-9f3b-dc74036d6aab",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T18:29:18.528Z",
+      "createdAt": "2026-01-28T18:29:18.528Z",
+      "role": "workflow:owner",
+      "workflowId": "iqqL4yfEl7veGwg0HJ8EL",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
