@@ -1,0 +1,3744 @@
+{
+  "updatedAt": "2026-03-26T22:29:52.096Z",
+  "createdAt": "2026-03-26T22:20:26.785Z",
+  "id": "b6FBBuhI4ffefhrf",
+  "name": "My workflow 11",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "options": {}
+      },
+      "id": "5916e026-6ab9-4824-98e0-1ac47a068ec7",
+      "name": "Get shift and caregiver information from sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1264,
+        336
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Get shift and caregiver information from sheet\n",
+        "height": 304,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        224
+      ],
+      "id": "3fe5a3c5-91f7-4eff-8dc0-3f0aa298ad29",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Daily Trigger",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1680,
+        224
+      ],
+      "id": "eb3c7f9d-8ef3-40e6-b3af-4928b91f90c6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Filter only unprocessed shifts\n",
+        "height": 304,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        224
+      ],
+      "id": "655179da-6916-4b6b-bd2c-066287da4740",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Check that shift is assigned and phone number is available for caregiver\n\n",
+        "height": 304,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        224
+      ],
+      "id": "714782e1-496b-4af5-a906-fa0713cf07c5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Update ERROR status in sheet\n\n",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9b47d9ab-3561-4def-8bd3-bf98205b909a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a802d85f-4d8c-442d-b23d-2b0087c3aacd",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "99227993-674f-46db-9b38-aceea8a89c8a",
+              "leftValue": "={{ $json['Employee Phone (Mobile)'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "53c404ac-b0a3-4939-8827-772a1bd7ac44",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "Virtual Scheduler",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5bd0b6f4-5db5-4511-a004-38f32f8b8e93",
+              "leftValue": "={{ $json['Employee Phone (Mobile)'] }}",
+              "rightValue": "#N/A ()",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4cb77b29-3dd9-408f-8efd-fe6563e9cb81",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "Office Admin",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "0191209c-7099-4d09-aa19-6c2a1132d769",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "8af7a998-8fc6-4507-be55-c7e0af2ba076",
+              "leftValue": "={{ $json['Employee UID'] }}",
+              "rightValue": "S2",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "21c2fec6-07a8-4278-90af-20f2c43ddc10",
+              "leftValue": "={{ $json['Employee UID'] }}",
+              "rightValue": "S9249",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "bb004ada-8e97-41e0-9973-ab0fed3c236e",
+              "leftValue": "={{ $json['Employee UID'] }}",
+              "rightValue": "S7677",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        336
+      ],
+      "id": "b3cc11b3-7627-42eb-a788-e697517380b5",
+      "name": "Caregiver assignment and phone number check"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Get tomorrow's date in YYYY-MM-DD format\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\n\nconst tomorrowStr = `${yyyy}-${mm}-${dd}`; // NEW FORMAT\n\n// Filter items whose Visit Start Date matches tomorrow\nconst shiftsForTomorrow = allItems.filter(\n  item => item.json['Visit Start Date'] === tomorrowStr\n);\n\nreturn shiftsForTomorrow;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        464
+      ],
+      "id": "e8e499e9-639e-4f08-b97b-88fa2f9583b3",
+      "name": "Filter tomorrow's shifts"
+    },
+    {
+      "parameters": {
+        "content": "## Filter only tomorrow's shifts\n",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        336
+      ],
+      "id": "92b9d557-ddb2-4c97-a1fb-114894cfdf52",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Group shift info by caregiver",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        336
+      ],
+      "id": "0f2f9fbf-2308-464f-b55a-8c5147a43ab0",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allShifts = $input.all();\nconst grouped = {};\n\nallShifts.forEach(item => {\n  const id = item.json['Employee UID'];\n\n  if (!grouped[id]) {\n    grouped[id] = {\n      name: item.json['Employee Full Name'],\n      id,\n      phone: item.json['Employee Phone (Mobile)'], // ✅ Add caregiver phone number\n      shifts: [],\n    };\n  }\n\n  grouped[id].shifts.push({\n    client: item.json['Client Full Name'],\n    start: item.json['Visit Start Time of Day'],\n    end: item.json['Visit End Time of Day'],\n  });\n});\n\n// Convert grouped object → n8n output array\nconst output = Object.values(grouped).map(entry => ({\n  json: {\n    name: entry.name,\n    id: entry.id,\n    phone: entry.phone, // ✅ Include phone in final output\n    shifts: entry.shifts,\n    shiftCount: entry.shifts.length,\n  }\n}));\n\nreturn output;"
+      },
+      "id": "baeb4d7c-91ae-4e3a-8a27-e9cef62ac482",
+      "name": "Group by caregiver",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Generate message text",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        544,
+        336
+      ],
+      "id": "b91b7e24-c5ed-469a-9f7e-eae6024f1c48",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Format phone number",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        816,
+        336
+      ],
+      "id": "479d36dd-fcfe-418a-9f5d-22c8d3ea408c",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Incoming fields from previous node\nconst name = $json.name;\nconst shiftCount = $json.shiftCount;\nconst shifts = $json.shifts;\n\n// Use tomorrow's date for reference\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Helper to pad times (if needed)\nconst padTime = t => {\n  if (!t) return '';\n  const [h, m] = t.split(':');\n  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;\n};\n\n// Collect client names and start times\nconst details = shifts.map(s => `${s.client} at ${padTime(s.start)}`);\n\n// Build message\nlet msg = `VISIT REMINDER: You have ${shiftCount} RAH Winnipeg visit${shiftCount > 1 ? 's' : ''} tomorrow with `;\n\nif (shiftCount === 1) {\n  msg += `${details[0]}. Check details in Alayacare App.`;\n} else if (shiftCount === 2) {\n  msg += `${details[0]}, and ${details[1]}. Check details in Alayacare App.`;\n} else {\n  const lastDetail = details.pop();\n  msg += `${details.join(', ')}, and ${lastDetail}. Check details in Alayacare App.`;\n}\n\n// Add \"do not reply\" on a new line\nmsg += `Kindly DO NOT reply to this number. For any queries, kindly call RAH After Hours @ (431) 887-2273.`;\n\n$json.message = msg;\nreturn $json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        464
+      ],
+      "id": "fa127b1e-2065-47d4-b791-27d714ba347a",
+      "name": "Generate message text"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the phone number from either field\nlet phoneNumber = $json['phone'];\n\nif (!phoneNumber) {\n  throw new Error('No phone number found');\n}\n\n// Convert to string in case it's a number\nphoneNumber = String(phoneNumber).trim();\n\n// STEP 1 — Remove ALL non-digit characters (fixes dashes, spaces, parentheses, etc.)\nphoneNumber = phoneNumber.replace(/\\D/g, '');\n\n// STEP 2 — Validate phone number length AFTER cleaning\nif (phoneNumber.length < 10) {\n  throw new Error(`Invalid phone number: ${phoneNumber} (too short)`);\n}\n\n// STEP 3 — Add country code if missing (assuming +1)\nif (phoneNumber.length === 10) {\n  phoneNumber = '1' + phoneNumber;\n}\n\n// STEP 4 — Add \"+\" prefix\nif (!phoneNumber.startsWith('+')) {\n  phoneNumber = '+' + phoneNumber;\n}\n\n// STEP 5 — Final validation\nif (!/^\\+1\\d{10}$/.test(phoneNumber)) {\n  console.warn(`Phone number may not be properly formatted: ${phoneNumber}`);\n}\n\n// Add formatted phone number to the data\n$json.formattedPhoneNumber = phoneNumber;\n$json.originalPhoneNumber = $json['Employee Phone (Mobile)'];\n\n// Ensure formatted field is a string\n$json.formattedPhoneNumber = String($json.formattedPhoneNumber).trim();\n\nreturn $json;"
+      },
+      "id": "66ebe8b5-c09a-4aed-991a-20ebf4957d28",
+      "name": "Format phone number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        464
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1264,
+        464
+      ],
+      "id": "22674d26-5de2-48f1-be55-6ed38cc1ae11",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        496
+      ],
+      "id": "35e21aaa-3486-472c-8e78-3ef141cfb50a",
+      "name": "Wait",
+      "webhookId": "51c3f9d2-b735-4010-af42-61ac64b24f48"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "G3G0MTVQflx34SRs",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/G3G0MTVQflx34SRs",
+          "cachedResultName": "Twillio sub workflow copy"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        624
+      ],
+      "id": "29f815bb-2126-4ef8-973e-585bb7cb694f",
+      "name": "Call 'Twillio sub workflow copy'"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expecting exactly 2 items:\n// Item 0 → caregiver row\n// Item 1 → SID object\n\nconst items = $input.all();\n\nif (items.length < 2) {\n  throw new Error('Expected at least 2 input items');\n}\n\nconst row = items[0].json;\nconst sidObj = items[1].json;\n\n// Extract SID safely\nconst sid = sidObj.sid;\n\nif (!sid) {\n  throw new Error('SID not found in second input');\n}\n\n// Return ONE merged row\nreturn [\n  {\n    json: {\n      ...row,\n      sid: sid\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        560
+      ],
+      "id": "3af09dd0-7899-41a1-b600-1ef0379c12a1",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1984,
+        560
+      ],
+      "id": "05d15e1b-7398-4f52-a741-1e6d3a5ac41d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2208,
+        128
+      ],
+      "id": "1d5ce463-046b-4964-96b9-d93e97ee5eb0",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Employee UID",
+              "lookupValue": "={{ $json.id }}"
+            },
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $now.plus({ days: 1 }).toISODate() }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "={{\"\"}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2432,
+        160
+      ],
+      "id": "778f5690-248f-49c4-b5d2-d9dbb7155daf",
+      "name": "Get row(s)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WpzImojZ5OYmx58Q",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WpzImojZ5OYmx58Q",
+          "cachedResultName": "Twillio status check sub workflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2928,
+        464
+      ],
+      "id": "4b5d5729-6f85-48d9-8fb9-f4aa815c23a3",
+      "name": "Call 'Twillio status check sub workflow'"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        400
+      ],
+      "id": "57d8c476-28e6-4018-b753-a1163acb27fd",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Employee UID",
+              "lookupValue": "={{ $('Loop Over Items3').item.json.id }}"
+            },
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $now.plus({ days: 1 }).toISODate() }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "Processed - Pending SMS Confirmation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3104,
+        464
+      ],
+      "id": "1d588865-f81d-406c-a32d-381c61ca25be",
+      "name": "Get row(s)2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tjY9CyFMidUKBvpF",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/tjY9CyFMidUKBvpF",
+          "cachedResultName": "Caregiver shift reminders daily report sub workflow pt.2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3664,
+        256
+      ],
+      "id": "a44b2779-5af0-4eaf-9854-caa7c7520d7d",
+      "name": "Call 'Caregiver shift reminders daily report sub workflow pt.2'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "99hMsje0TZM5Qu0i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/99hMsje0TZM5Qu0i",
+          "cachedResultName": "Caregiver shift reminders daily report sub workflow pt.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3424,
+        0
+      ],
+      "id": "a86f59d4-7284-401e-933c-f72279b8ae6a",
+      "name": "Call 'Caregiver shift reminders daily report sub workflow pt.1'"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=Shift Reminders Workflow Summary {{ $json.tomorrow }}",
+        "bodyContent": "=Date: {{ $json.tomorrow }}\n{{ $json.message1 }}\n{{ $json.messagea }}\n{{ $json.message2 }}\n{{ $json.message3 }}\n{{ $json.message4 }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        4480,
+        128
+      ],
+      "id": "4f6121c5-c6f5-4039-b583-064ca174db0f",
+      "name": "Send a message1",
+      "webhookId": "e6fe0c8b-a480-4d7a-86d7-c2ed8064c809",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4032,
+        128
+      ],
+      "id": "a3ca0371-928f-46a2-b972-daba9499d1aa",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3168,
+        256
+      ],
+      "id": "8f377e28-87d5-49dc-aea3-37e741def167",
+      "name": "Wait3",
+      "webhookId": "658f1ab3-52e0-4529-8c8f-b7ae06af6aca"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3168,
+        0
+      ],
+      "id": "ef4bd617-0d2a-4b38-af07-0154b0d5920d",
+      "name": "Wait4",
+      "webhookId": "ed1f2efe-da95-4f02-8dc1-d0f38f377df6"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text status": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "text status",
+              "displayName": "text status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employee UID",
+              "displayName": "Employee UID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Full Name",
+              "displayName": "Employee Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Email",
+              "displayName": "Employee Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Phone (Mobile)",
+              "displayName": "Employee Phone (Mobile)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Full Name",
+              "displayName": "Client Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Scheduled Duration",
+              "displayName": "Visit Scheduled Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Date",
+              "displayName": "Visit Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time",
+              "displayName": "Visit Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time of Day",
+              "displayName": "Visit Start Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Date",
+              "displayName": "Visit End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time of Day",
+              "displayName": "Visit End Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time",
+              "displayName": "Visit End Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        128
+      ],
+      "id": "b11574f7-545e-4a01-8803-795fade2144b",
+      "name": "Update ERROR status2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "text status": "Processed - Pending SMS Confirmation"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "text status",
+              "displayName": "text status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Employee UID",
+              "displayName": "Employee UID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Full Name",
+              "displayName": "Employee Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Email",
+              "displayName": "Employee Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Phone (Mobile)",
+              "displayName": "Employee Phone (Mobile)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Full Name",
+              "displayName": "Client Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Scheduled Duration",
+              "displayName": "Visit Scheduled Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Date",
+              "displayName": "Visit Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time",
+              "displayName": "Visit Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time of Day",
+              "displayName": "Visit Start Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Date",
+              "displayName": "Visit End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time of Day",
+              "displayName": "Visit End Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time",
+              "displayName": "Visit End Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2640,
+        160
+      ],
+      "id": "cc48e61c-9428-453c-b818-d2e8d49aeb24",
+      "name": "Update status2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "text status": "={{ $('Call \\'Twillio status check sub workflow\\'').item.json.STATUS }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "text status",
+              "displayName": "text status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Employee UID",
+              "displayName": "Employee UID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Full Name",
+              "displayName": "Employee Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Email",
+              "displayName": "Employee Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Phone (Mobile)",
+              "displayName": "Employee Phone (Mobile)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Full Name",
+              "displayName": "Client Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Scheduled Duration",
+              "displayName": "Visit Scheduled Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Date",
+              "displayName": "Visit Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time",
+              "displayName": "Visit Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time of Day",
+              "displayName": "Visit Start Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Date",
+              "displayName": "Visit End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time of Day",
+              "displayName": "Visit End Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time",
+              "displayName": "Visit End Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3280,
+        464
+      ],
+      "id": "4a487339-709e-460f-bc86-ae3e693e6675",
+      "name": "Update status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3424,
+        256
+      ],
+      "id": "b1578c94-72aa-4122-9623-4716a0a7b8c5",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2848,
+        160
+      ],
+      "id": "2b4eebe8-bbff-47eb-b7b8-e5a55af4c8fa",
+      "name": "Wait2",
+      "webhookId": "a3c93f02-3150-46bf-944c-2514c858e89d"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2752,
+        464
+      ],
+      "id": "b6762f7d-ed70-4c3f-b183-208945cd7450",
+      "name": "Wait5",
+      "webhookId": "68921708-fb99-47bb-818f-ca65c35e4230"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n/** @type {{ [key: string]: any }} */\nconst merged = {};\n\nfor (const item of items) {\n  if (!item || !item.json || typeof item.json !== 'object') continue;\n  for (const [key, value] of Object.entries(item.json)) {\n    // only set if the key isn't already present, otherwise overwrite intentionally:\n    merged[key] = value;\n  }\n}\n\nreturn [\n  {\n    json: merged,\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4240,
+        128
+      ],
+      "id": "72e3bd21-2646-4d15-a291-c2fde7e5e114",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bd17a6b6-fc72-4386-8d2b-46777feefb41",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "SENT",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "132d917f-871d-454a-b2a7-c7f04fe34565",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "b74eb76d-e5e8-4a22-9435-091e37a847d9",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "FAILED",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "b132468a-bc03-4438-9b45-c20914e72d40",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "Processed - Pending SMS Confirmation",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "667a2989-7ac7-4ef3-b0ae-99ba071cdd40",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -912,
+        336
+      ],
+      "id": "5ffcf844-bc8d-4291-b388-6e6502357fae",
+      "name": "If",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ecf8f56-7b92-40e3-9d97-4d57e4bbe8e8",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        304
+      ],
+      "id": "bff3f560-8b4a-48d6-8088-3f4bbdb3884f",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca,taz@rahwinnipeg.ca",
+        "subject": "=URGENT - Shift Reminders Workflow NOT RUN",
+        "bodyContent": "=Due to lack of shifts in Shift Reminders Sheet for {{ $now.plus({ days: 1 }).toISODate() }}, the workflow was not able to proceed and no messages were sent to caregivers. Please correct this and rerun workflow as soon as possible.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        48
+      ],
+      "id": "b62d014a-11cb-440c-a973-d270d9aa8e7c",
+      "name": "Send a message2",
+      "webhookId": "e6fe0c8b-a480-4d7a-86d7-c2ed8064c809",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "options": {}
+      },
+      "id": "270a068a-6aab-4627-bd4e-daf9740a36e6",
+      "name": "Get shift and caregiver information from sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2512,
+        1728
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Get shift and caregiver information from sheet\n",
+        "height": 304,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2608,
+        1616
+      ],
+      "id": "1d8a3682-55d9-4eb7-a52c-af684ec41d1c",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Daily Trigger",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2928,
+        1616
+      ],
+      "id": "7885b979-c7ca-4c93-83bc-98c9d603fb3a",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 11,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "id": "1dc46366-7038-4a2d-a079-0c7011f08828",
+      "name": "Daily Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2864,
+        1728
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Filter only unprocessed shifts\n",
+        "height": 304,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2224,
+        1616
+      ],
+      "id": "c664705d-776e-45e6-ad57-bb119a4a600e",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Check that shift is assigned and phone number is available for caregiver\n\n",
+        "height": 304,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1680,
+        1616
+      ],
+      "id": "2952c488-4cb8-483b-b177-750f9b029c27",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Update ERROR status in sheet\n\n",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1248,
+        1392
+      ],
+      "id": "e832ae60-7052-4ae2-bab5-b818c775ffd3",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a802d85f-4d8c-442d-b23d-2b0087c3aacd",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "99227993-674f-46db-9b38-aceea8a89c8a",
+              "leftValue": "={{ $json['Employee Phone (Mobile)'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "53c404ac-b0a3-4939-8827-772a1bd7ac44",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "Virtual Scheduler",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5bd0b6f4-5db5-4511-a004-38f32f8b8e93",
+              "leftValue": "={{ $json['Employee Phone (Mobile)'] }}",
+              "rightValue": "#N/A ()",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4cb77b29-3dd9-408f-8efd-fe6563e9cb81",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "Office Admin",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "0191209c-7099-4d09-aa19-6c2a1132d769",
+              "leftValue": "={{ $json['Employee Full Name'] }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "8af7a998-8fc6-4507-be55-c7e0af2ba076",
+              "leftValue": "={{ $json['Employee UID'] }}",
+              "rightValue": "S2",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "21c2fec6-07a8-4278-90af-20f2c43ddc10",
+              "leftValue": "={{ $json['Employee UID'] }}",
+              "rightValue": "S9249",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "bb004ada-8e97-41e0-9973-ab0fed3c236e",
+              "leftValue": "={{ $json['Employee UID'] }}",
+              "rightValue": "S7677",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1552,
+        1728
+      ],
+      "id": "c04dc4f3-d88c-4774-900d-7f2c12eb8cbd",
+      "name": "Caregiver assignment and phone number check1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Get tomorrow's date in YYYY-MM-DD format\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\n\nconst tomorrowStr = `${yyyy}-${mm}-${dd}`; // NEW FORMAT\n\n// Filter items whose Visit Start Date matches tomorrow\nconst shiftsForTomorrow = allItems.filter(\n  item => item.json['Visit Start Date'] === tomorrowStr\n);\n\nreturn shiftsForTomorrow;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        1856
+      ],
+      "id": "e4c06715-df86-4045-9c92-82e6612a4249",
+      "name": "Filter tomorrow's shifts1"
+    },
+    {
+      "parameters": {
+        "content": "## Filter only tomorrow's shifts\n",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1248,
+        1728
+      ],
+      "id": "28a47913-30b6-4149-a970-fed03255c293",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Group shift info by caregiver",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        1728
+      ],
+      "id": "18511821-2383-4737-86e0-205e2ea68b38",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allShifts = $input.all();\nconst grouped = {};\n\nallShifts.forEach(item => {\n  const id = item.json['Employee UID'];\n\n  if (!grouped[id]) {\n    grouped[id] = {\n      name: item.json['Employee Full Name'],\n      id,\n      phone: item.json['Employee Phone (Mobile)'], // ✅ Add caregiver phone number\n      shifts: [],\n    };\n  }\n\n  grouped[id].shifts.push({\n    client: item.json['Client Full Name'],\n    start: item.json['Visit Start Time of Day'],\n    end: item.json['Visit End Time of Day'],\n  });\n});\n\n// Convert grouped object → n8n output array\nconst output = Object.values(grouped).map(entry => ({\n  json: {\n    name: entry.name,\n    id: entry.id,\n    phone: entry.phone, // ✅ Include phone in final output\n    shifts: entry.shifts,\n    shiftCount: entry.shifts.length,\n  }\n}));\n\nreturn output;"
+      },
+      "id": "5ef80f94-ec06-4e9d-85a2-589c41318f96",
+      "name": "Group by caregiver1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -912,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Generate message text",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        1728
+      ],
+      "id": "34c13082-e71d-49ba-84b5-888caed8ab16",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Format phone number",
+        "height": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        1728
+      ],
+      "id": "eb257ea7-3aa6-4ec7-97fd-797b95af8529",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Incoming fields from previous node\nconst name = $json.name;\nconst shiftCount = $json.shiftCount;\nconst shifts = $json.shifts;\n\n// Use tomorrow's date for reference\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Helper to pad times (if needed)\nconst padTime = t => {\n  if (!t) return '';\n  const [h, m] = t.split(':');\n  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;\n};\n\n// Collect client names and start times\nconst details = shifts.map(s => `${s.client} at ${padTime(s.start)}`);\n\n// Build message\nlet msg = `VISIT REMINDER: You have ${shiftCount} RAH Winnipeg visit${shiftCount > 1 ? 's' : ''} tomorrow with `;\n\nif (shiftCount === 1) {\n  msg += `${details[0]}. Check details in Alayacare App.`;\n} else if (shiftCount === 2) {\n  msg += `${details[0]}, and ${details[1]}. Check details in Alayacare App.`;\n} else {\n  const lastDetail = details.pop();\n  msg += `${details.join(', ')}, and ${lastDetail}. Check details in Alayacare App.`;\n}\n\n// Add \"do not reply\" on a new line\nmsg += `Kindly DO NOT reply to this number. For any queries, kindly call RAH After Hours @ (431) 887-2273.`;\n\n$json.message = msg;\nreturn $json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        1856
+      ],
+      "id": "e85ac592-41a7-4c45-9e32-98c2bfee1deb",
+      "name": "Generate message text1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the phone number from either field\nlet phoneNumber = $json['phone'];\n\nif (!phoneNumber) {\n  throw new Error('No phone number found');\n}\n\n// Convert to string in case it's a number\nphoneNumber = String(phoneNumber).trim();\n\n// STEP 1 — Remove ALL non-digit characters (fixes dashes, spaces, parentheses, etc.)\nphoneNumber = phoneNumber.replace(/\\D/g, '');\n\n// STEP 2 — Validate phone number length AFTER cleaning\nif (phoneNumber.length < 10) {\n  throw new Error(`Invalid phone number: ${phoneNumber} (too short)`);\n}\n\n// STEP 3 — Add country code if missing (assuming +1)\nif (phoneNumber.length === 10) {\n  phoneNumber = '1' + phoneNumber;\n}\n\n// STEP 4 — Add \"+\" prefix\nif (!phoneNumber.startsWith('+')) {\n  phoneNumber = '+' + phoneNumber;\n}\n\n// STEP 5 — Final validation\nif (!/^\\+1\\d{10}$/.test(phoneNumber)) {\n  console.warn(`Phone number may not be properly formatted: ${phoneNumber}`);\n}\n\n// Add formatted phone number to the data\n$json.formattedPhoneNumber = phoneNumber;\n$json.originalPhoneNumber = $json['Employee Phone (Mobile)'];\n\n// Ensure formatted field is a string\n$json.formattedPhoneNumber = String($json.formattedPhoneNumber).trim();\n\nreturn $json;"
+      },
+      "id": "5e2b83fe-bd69-4120-b165-70553ea9645b",
+      "name": "Format phone number1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        1856
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        16,
+        1856
+      ],
+      "id": "2c07f1f2-2268-4474-bd24-4c8c445e3ca7",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        1888
+      ],
+      "id": "99ff356c-c74a-49dd-babd-d000269d8c67",
+      "name": "Wait1",
+      "webhookId": "51c3f9d2-b735-4010-af42-61ac64b24f48"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "G3G0MTVQflx34SRs",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/G3G0MTVQflx34SRs",
+          "cachedResultName": "Twillio sub workflow copy"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        2016
+      ],
+      "id": "32dd76cf-af8a-4e34-b50f-69904aa66e61",
+      "name": "Call 'Twillio sub workflow copy'1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expecting exactly 2 items:\n// Item 0 → caregiver row\n// Item 1 → SID object\n\nconst items = $input.all();\n\nif (items.length < 2) {\n  throw new Error('Expected at least 2 input items');\n}\n\nconst row = items[0].json;\nconst sidObj = items[1].json;\n\n// Extract SID safely\nconst sid = sidObj.sid;\n\nif (!sid) {\n  throw new Error('SID not found in second input');\n}\n\n// Return ONE merged row\nreturn [\n  {\n    json: {\n      ...row,\n      sid: sid\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        1952
+      ],
+      "id": "0abc39f9-60a8-4d36-bbd5-848eb9c6a94d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        1952
+      ],
+      "id": "3206b69c-251d-443d-8c2c-276a32515279",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        960,
+        1520
+      ],
+      "id": "53b97190-c066-4936-b59b-30454672f035",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Employee UID",
+              "lookupValue": "={{ $json.id }}"
+            },
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $now.plus({ days: 1 }).toISODate() }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "={{\"\"}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1184,
+        1552
+      ],
+      "id": "10eee979-0ce6-44c7-885c-edb9441efc20",
+      "name": "Get row(s)1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WpzImojZ5OYmx58Q",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WpzImojZ5OYmx58Q",
+          "cachedResultName": "Twillio status check sub workflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1680,
+        1856
+      ],
+      "id": "0ff4e577-b3df-422c-8b3d-3ff28dde6f2e",
+      "name": "Call 'Twillio status check sub workflow'1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1216,
+        1792
+      ],
+      "id": "1a1b3865-4d3d-4815-9ffa-0d8a34c88326",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Employee UID",
+              "lookupValue": "={{ $('Loop Over Items5').item.json.id }}"
+            },
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $now.plus({ days: 1 }).toISODate() }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "Processed - Pending SMS Confirmation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        1856
+      ],
+      "id": "03c1a8f4-e261-4312-b693-0a21fb6122d0",
+      "name": "Get row(s)3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tjY9CyFMidUKBvpF",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/tjY9CyFMidUKBvpF",
+          "cachedResultName": "Caregiver shift reminders daily report sub workflow pt.2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2416,
+        1648
+      ],
+      "id": "986f79aa-3c5f-419a-9cf8-5849b5ee1ad1",
+      "name": "Call 'Caregiver shift reminders daily report sub workflow pt.2'1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "99hMsje0TZM5Qu0i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/99hMsje0TZM5Qu0i",
+          "cachedResultName": "Caregiver shift reminders daily report sub workflow pt.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2176,
+        1392
+      ],
+      "id": "45d0a0b2-c8b4-4862-930f-516c419a279d",
+      "name": "Call 'Caregiver shift reminders daily report sub workflow pt.1'1"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=Shift Reminders Workflow Summary {{ $json.tomorrow }}",
+        "bodyContent": "=Date: {{ $json.tomorrow }}\n{{ $json.message1 }}\n{{ $json.messagea }}\n{{ $json.message2 }}\n{{ $json.message3 }}\n{{ $json.message4 }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        1520
+      ],
+      "id": "97246868-974f-459e-87e1-f2b69bf6d93c",
+      "name": "Send a message",
+      "webhookId": "e6fe0c8b-a480-4d7a-86d7-c2ed8064c809",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2784,
+        1520
+      ],
+      "id": "df26c128-15b0-43ee-8d71-22625a80073d",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        1648
+      ],
+      "id": "7574c125-8d75-4652-890c-7b926bc18f04",
+      "name": "Wait6",
+      "webhookId": "658f1ab3-52e0-4529-8c8f-b7ae06af6aca"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        1392
+      ],
+      "id": "f28a2a38-c1bb-45e4-b45b-4ef9e5860817",
+      "name": "Wait7",
+      "webhookId": "ed1f2efe-da95-4f02-8dc1-d0f38f377df6"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text status": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "text status",
+              "displayName": "text status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employee UID",
+              "displayName": "Employee UID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Full Name",
+              "displayName": "Employee Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Email",
+              "displayName": "Employee Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Phone (Mobile)",
+              "displayName": "Employee Phone (Mobile)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Full Name",
+              "displayName": "Client Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Scheduled Duration",
+              "displayName": "Visit Scheduled Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Date",
+              "displayName": "Visit Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time",
+              "displayName": "Visit Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time of Day",
+              "displayName": "Visit Start Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Date",
+              "displayName": "Visit End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time of Day",
+              "displayName": "Visit End Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time",
+              "displayName": "Visit End Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1184,
+        1520
+      ],
+      "id": "2298a8dc-f44d-4027-bfb9-0d889d24f70b",
+      "name": "Update ERROR status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "text status": "Processed - Pending SMS Confirmation"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "text status",
+              "displayName": "text status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Employee UID",
+              "displayName": "Employee UID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Full Name",
+              "displayName": "Employee Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Email",
+              "displayName": "Employee Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Phone (Mobile)",
+              "displayName": "Employee Phone (Mobile)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Full Name",
+              "displayName": "Client Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Scheduled Duration",
+              "displayName": "Visit Scheduled Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Date",
+              "displayName": "Visit Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time",
+              "displayName": "Visit Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time of Day",
+              "displayName": "Visit Start Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Date",
+              "displayName": "Visit End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time of Day",
+              "displayName": "Visit End Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time",
+              "displayName": "Visit End Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1392,
+        1552
+      ],
+      "id": "0e5abffa-2a9b-4df4-a1e9-423a40ebb677",
+      "name": "Update status3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "text status": "={{ $('Call \\'Twillio status check sub workflow\\'').item.json.STATUS }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "text status",
+              "displayName": "text status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Employee UID",
+              "displayName": "Employee UID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Full Name",
+              "displayName": "Employee Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Email",
+              "displayName": "Employee Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Phone (Mobile)",
+              "displayName": "Employee Phone (Mobile)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Full Name",
+              "displayName": "Client Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client Address",
+              "displayName": "Client Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Scheduled Duration",
+              "displayName": "Visit Scheduled Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Date",
+              "displayName": "Visit Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time",
+              "displayName": "Visit Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit Start Time of Day",
+              "displayName": "Visit Start Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Date",
+              "displayName": "Visit End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time of Day",
+              "displayName": "Visit End Time of Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visit End Time",
+              "displayName": "Visit End Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2032,
+        1856
+      ],
+      "id": "7156853f-04a4-4f22-81c9-42f017004215",
+      "name": "Update status1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        1648
+      ],
+      "id": "ce832232-fff2-4316-a020-6b1dce7dc61b",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        1552
+      ],
+      "id": "4e137ed0-1806-4907-9d83-ae2ffa86eaef",
+      "name": "Wait8",
+      "webhookId": "a3c93f02-3150-46bf-944c-2514c858e89d"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        1856
+      ],
+      "id": "81263bda-5426-4e63-8617-f70c189f63c8",
+      "name": "Wait9",
+      "webhookId": "68921708-fb99-47bb-818f-ca65c35e4230"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n/** @type {{ [key: string]: any }} */\nconst merged = {};\n\nfor (const item of items) {\n  if (!item || !item.json || typeof item.json !== 'object') continue;\n  for (const [key, value] of Object.entries(item.json)) {\n    // only set if the key isn't already present, otherwise overwrite intentionally:\n    merged[key] = value;\n  }\n}\n\nreturn [\n  {\n    json: merged,\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2992,
+        1520
+      ],
+      "id": "7f9cb0d3-05d3-445c-a0df-25e7c74bbcfa",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bd17a6b6-fc72-4386-8d2b-46777feefb41",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "SENT",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "132d917f-871d-454a-b2a7-c7f04fe34565",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "b74eb76d-e5e8-4a22-9435-091e37a847d9",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "FAILED",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "b132468a-bc03-4438-9b45-c20914e72d40",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": "Processed - Pending SMS Confirmation",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "667a2989-7ac7-4ef3-b0ae-99ba071cdd40",
+              "leftValue": "={{ $json['text status'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2160,
+        1728
+      ],
+      "id": "4d3eb64d-5278-4626-a40c-93afa330734a",
+      "name": "If2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ecf8f56-7b92-40e3-9d97-4d57e4bbe8e8",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1936,
+        1696
+      ],
+      "id": "142d783b-faad-4770-a0b6-5907cde6ec35",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca,taz@rahwinnipeg.ca",
+        "subject": "=URGENT - Shift Reminders Workflow NOT RUN",
+        "bodyContent": "=Due to lack of shifts in Shift Reminders Sheet for {{ $now.plus({ days: 1 }).toISODate() }}, the workflow was not able to proceed and no messages were sent to caregivers. Please correct this and rerun workflow as soon as possible.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -1616,
+        1440
+      ],
+      "id": "17dc39fd-1da0-4e3a-839b-5e7e60e7f15d",
+      "name": "Send a message3",
+      "webhookId": "e6fe0c8b-a480-4d7a-86d7-c2ed8064c809",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        336
+      ],
+      "id": "224510b7-17ec-4588-81ba-808c6227901a",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Get shift and caregiver information from sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caregiver assignment and phone number check": {
+      "main": [
+        [
+          {
+            "node": "Update ERROR status2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter tomorrow's shifts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter tomorrow's shifts": {
+      "main": [
+        [
+          {
+            "node": "Group by caregiver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group by caregiver": {
+      "main": [
+        [
+          {
+            "node": "Generate message text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate message text": {
+      "main": [
+        [
+          {
+            "node": "Format phone number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format phone number": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call 'Twillio sub workflow copy'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Twillio sub workflow copy'": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Update status2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Twillio status check sub workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)2": {
+      "main": [
+        [
+          {
+            "node": "Update status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Caregiver shift reminders daily report sub workflow pt.2'": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call 'Caregiver shift reminders daily report sub workflow pt.1'": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Call 'Caregiver shift reminders daily report sub workflow pt.1'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update status2": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update status": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Call 'Caregiver shift reminders daily report sub workflow pt.2'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Call 'Twillio status check sub workflow'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Caregiver assignment and phone number check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get shift and caregiver information from sheet1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get shift and caregiver information from sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caregiver assignment and phone number check1": {
+      "main": [
+        [
+          {
+            "node": "Update ERROR status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter tomorrow's shifts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter tomorrow's shifts1": {
+      "main": [
+        [
+          {
+            "node": "Group by caregiver1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group by caregiver1": {
+      "main": [
+        [
+          {
+            "node": "Generate message text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate message text1": {
+      "main": [
+        [
+          {
+            "node": "Format phone number1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format phone number1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call 'Twillio sub workflow copy'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Twillio sub workflow copy'1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)1": {
+      "main": [
+        [
+          {
+            "node": "Update status3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Twillio status check sub workflow'1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)3": {
+      "main": [
+        [
+          {
+            "node": "Update status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Caregiver shift reminders daily report sub workflow pt.2'1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call 'Caregiver shift reminders daily report sub workflow pt.1'1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait7": {
+      "main": [
+        [
+          {
+            "node": "Call 'Caregiver shift reminders daily report sub workflow pt.1'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update status3": {
+      "main": [
+        [
+          {
+            "node": "Wait8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update status1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Call 'Caregiver shift reminders daily report sub workflow pt.2'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait8": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait9": {
+      "main": [
+        [
+          {
+            "node": "Call 'Twillio status check sub workflow'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Caregiver assignment and phone number check1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get shift and caregiver information from sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "34496a6f-f9fa-40d9-ad90-8a30b613a559",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-26T22:20:26.787Z",
+      "createdAt": "2026-03-26T22:20:26.787Z",
+      "role": "workflow:owner",
+      "workflowId": "b6FBBuhI4ffefhrf",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
