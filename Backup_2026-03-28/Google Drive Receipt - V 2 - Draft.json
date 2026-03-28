@@ -1,0 +1,799 @@
+{
+  "updatedAt": "2026-01-29T21:02:19.684Z",
+  "createdAt": "2026-01-22T04:19:22.733Z",
+  "id": "reDNuMzjOBJW133OderEx",
+  "name": "Google Drive Receipt - V 2 - Draft",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        -128
+      ],
+      "id": "1a3451ab-ac9b-4fed-bd2b-233d850629bd",
+      "name": "Anago Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        256
+      ],
+      "id": "dff4d68b-f737-4d1b-af70-4987194cb275",
+      "name": "RAH Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "list"
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1248,
+        -128
+      ],
+      "id": "ca8380d1-dde8-401c-9d96-84731e1ce36d",
+      "name": "Anago: List Files",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "list"
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1248,
+        256
+      ],
+      "id": "cb5e1887-cb51-44e1-9221-04df10f76e64",
+      "name": "RAH: List Files",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "anago-connection-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -128
+      ],
+      "id": "4f9bb9ab-b65b-4234-a4bd-378a6d053e11",
+      "name": "Anago: Connection OK?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "rah-connection-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        256
+      ],
+      "id": "13544e7e-a2e2-4318-9e3a-0b84b9a04988",
+      "name": "RAH: Connection OK?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        64
+      ],
+      "id": "eeef43be-bb7e-4a61-9cb8-414b97e7320c",
+      "name": "Anago: Filter New Files"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        256
+      ],
+      "id": "f66bc9e7-329e-435f-854a-7d493ba0e4a2",
+      "name": "RAH: Filter New Files"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare error notification for Anago connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = 'Anago';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        -128
+      ],
+      "id": "6bfefeef-87c8-4619-b2ed-49adef3f6272",
+      "name": "Anago: Connection Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare error notification for RAH connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = 'RAH';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        448
+      ],
+      "id": "c075162b-b3b0-4875-b91d-38cce0595318",
+      "name": "RAH: Connection Error"
+    },
+    {
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "🔴 CRITICAL: Google Drive Connection Failed - {{ $json.clientName }}",
+        "message": "=<h2 style=\"color: red;\">Google Drive Connection Failure</h2>\n<p><strong>Client:</strong> {{ $json.clientName }}</p>\n<p><strong>Error Type:</strong> {{ $json.errorType }}</p>\n<p><strong>Timestamp:</strong> {{ $json.errorTimestamp }}</p>\n<p><strong>Error Message:</strong></p>\n<pre style=\"background: #f4f4f4; padding: 10px; border-radius: 5px;\">{{ $json.errorMessage }}</pre>\n<hr>\n<h3>Action Required:</h3>\n<ul>\n  <li>Check if Google Drive credentials need to be re-authorized</li>\n  <li>Verify OAuth token hasn't expired</li>\n  <li>Check Google Drive API quotas and limits</li>\n  <li>Ensure the service account has proper permissions</li>\n</ul>\n<p><em>The workflow will continue attempting to connect on the next schedule cycle.</em></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        -128
+      ],
+      "id": "0f945038-808a-4035-8608-f56e56dd5ff2",
+      "name": "Send Connection Failure Alert",
+      "webhookId": "connection-failure-webhook",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = 'Anago';\n  item.json.recipientEmail = 'raflak@gmail.com';\n  item.json.processedFolderId = '1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX';\n  item.json.retryCount = item.json.retryCount || 0;\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        64
+      ],
+      "id": "d326424a-d7d3-4337-bf58-f96d40397d10",
+      "name": "Anago: Set Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = 'RAH';\n  item.json.recipientEmail = 'raflak@gmail.com';\n  item.json.processedFolderId = '1vpbxwHvnatfgCiUjJIcB8U5shECi75Be';\n  item.json.retryCount = item.json.retryCount || 0;\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        256
+      ],
+      "id": "d117a8e2-1db9-4611-b0f9-91fefd89ef7a",
+      "name": "RAH: Set Context"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2144,
+        160
+      ],
+      "id": "12011ae2-75da-4405-a12b-12de8e4ffe4b",
+      "name": "Download File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "download-success-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2368,
+        96
+      ],
+      "id": "182cce72-06c3-4c0b-bb6c-0f4d88e926b5",
+      "name": "Download Success?"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.recipientEmail }}",
+        "subject": "New Receipt: {{ $json.originalFileName }}",
+        "emailType": "text",
+        "message": "This file was added to your {{ $json.clientName }} google drive folder.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2592,
+        64
+      ],
+      "id": "ecfe59ef-17ce-46eb-8790-b35f3c6511c4",
+      "name": "Send Email",
+      "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "email-success-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        64
+      ],
+      "id": "13ff90ea-9048-4549-a217-eb019c733467",
+      "name": "Email Success?"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.processedFolderId }}/Processed",
+          "mode": "list"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3040,
+        64
+      ],
+      "id": "440a757c-3b4b-474b-8710-38918de03cb0",
+      "name": "Move to Processed",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze error to determine if retryable\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown error';\n  \n  // Check for retryable errors (network, timeout, rate limit)\n  const retryableErrors = [\n    'ETIMEDOUT',\n    'ECONNRESET',\n    'ENOTFOUND',\n    'ECONNREFUSED',\n    'timeout',\n    'network',\n    'rate limit',\n    'too many requests',\n    '429',\n    '503',\n    '504'\n  ];\n  \n  const isRetryable = retryableErrors.some(err => \n    errorMessage.toLowerCase().includes(err.toLowerCase())\n  );\n  \n  item.json.isRetryableError = isRetryable;\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        256
+      ],
+      "id": "9248ac38-5c99-4825-a15f-fa1258290e8f",
+      "name": "Analyze Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "retry-check",
+              "leftValue": "={{ $json.isRetryableError }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "retry-count-check",
+              "leftValue": "={{ $json.retryCount }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3264,
+        256
+      ],
+      "id": "35b92760-22c0-4a94-8eca-844c2d4977ac",
+      "name": "Should Retry?"
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3488,
+        192
+      ],
+      "id": "b25a246e-7e2b-4d65-9e9e-74cf51fa6cb7",
+      "name": "Wait 5 Minutes",
+      "webhookId": "retry-wait-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Increment retry counter\nfor (const item of $input.all()) {\n  item.json.retryCount = (item.json.retryCount || 0) + 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3712,
+        256
+      ],
+      "id": "9a96a966-6493-4a00-a2ef-9dab613c47e4",
+      "name": "Increment Retry Count"
+    },
+    {
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "❌ Receipt Processing Failed - {{ $json.clientName }}",
+        "message": "=<h2>Receipt Processing Failed</h2>\n<p><strong>Client:</strong> {{ $json.clientName }}</p>\n<p><strong>Filename:</strong> {{ $json.originalFileName }}</p>\n<p><strong>Timestamp:</strong> {{ $json.errorTimestamp }}</p>\n<p><strong>Error Message:</strong></p>\n<pre>{{ $json.errorMessage }}</pre>\n<p><strong>Retry Attempts:</strong> {{ $json.retryCount }}/2</p>\n<hr>\n<p><em>The file remains in the original folder for manual review.</em></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3488,
+        384
+      ],
+      "id": "017a1f99-5cf6-4ae3-9f25-625773bcea40",
+      "name": "Send Failure Notification",
+      "webhookId": "failure-notification-webhook",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Anago Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Anago: List Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RAH: List Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: List Files": {
+      "main": [
+        [
+          {
+            "node": "Anago: Connection OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: List Files": {
+      "main": [
+        [
+          {
+            "node": "RAH: Connection OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Connection OK?": {
+      "main": [
+        [
+          {
+            "node": "Anago: Filter New Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Anago: Connection Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Connection OK?": {
+      "main": [
+        [
+          {
+            "node": "RAH: Filter New Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RAH: Connection Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Filter New Files": {
+      "main": [
+        [
+          {
+            "node": "Anago: Set Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Filter New Files": {
+      "main": [
+        [
+          {
+            "node": "RAH: Set Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Connection Error": {
+      "main": [
+        [
+          {
+            "node": "Send Connection Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Connection Error": {
+      "main": [
+        [
+          {
+            "node": "Send Connection Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Set Context": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Set Context": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Download Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Success?": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Email Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Success?": {
+      "main": [
+        [
+          {
+            "node": "Move to Processed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Error": {
+      "main": [
+        [
+          {
+            "node": "Should Retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Retry?": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 Minutes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Failure Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Increment Retry Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Retry Count": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "8e66e9d4-8e8b-4eb4-a842-579ff87a431e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-22T04:19:22.739Z",
+      "createdAt": "2026-01-22T04:19:22.739Z",
+      "role": "workflow:owner",
+      "workflowId": "reDNuMzjOBJW133OderEx",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
