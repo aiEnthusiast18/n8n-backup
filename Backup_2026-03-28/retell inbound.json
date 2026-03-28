@@ -1,0 +1,47 @@
+{
+  "updatedAt": "2025-09-25T23:33:13.000Z",
+  "createdAt": "2025-09-13T23:05:29.788Z",
+  "id": "AEKZWpx6alj5RYr5",
+  "name": "retell inbound",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "3c55c707-7ac2-4a7e-80e9-9382aab48ea0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "01a2d035-d3b6-45bb-a655-5989089b1782",
+      "name": "Webhook",
+      "webhookId": "3c55c707-7ac2-4a7e-80e9-9382aab48ea0"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "9ff96eea-92c7-4518-99a5-0bcc61315dc8",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-13T23:05:29.797Z",
+      "createdAt": "2025-09-13T23:05:29.797Z",
+      "role": "workflow:owner",
+      "workflowId": "AEKZWpx6alj5RYr5",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
