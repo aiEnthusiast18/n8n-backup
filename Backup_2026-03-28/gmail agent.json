@@ -1,0 +1,179 @@
+{
+  "updatedAt": "2025-09-25T23:22:17.000Z",
+  "createdAt": "2025-08-17T23:17:45.362Z",
+  "id": "z2ra1YRWuu3r5679",
+  "name": "gmail agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b119e604-97ce-43fb-acaa-ac4a0dfdd967",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3hqtCAi1EGcgg76C",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=id:  {{ $json.id }}\n\nsubject: {{ $json.Subject }}\n\nsnippet: {{ $json.snippet }}",
+        "options": {
+          "systemMessage": "### Goal:\nTo manage incoming emails by filtering out unimportant ones and marking them as read.\n\n### Tasks:\n1. Check each email I receive.\n2. Determine if the email is important for me based on my Personal Context.\n3. If the email is important, do nothing. \n4. If the email is not important, mark it as read.\n\n\n### Irrelevant Content:\n- Everything related to promotions is unimportant\n- Any emails from companies and such can be disregarded also\n- But all emails from people, especially people saved in my contacts, those emails should be deemed important, no matter what the content is\n\n### Personal Context:\n- I am a teenage girl that uses her inbox for work, emails from family, co-workers, friends, etc\n- I also use my inbox for scholarship infos, newsletters, etc.\n- I also use this email to sign up for any websites or online stores or for any accounts or anything like that so there is often a lot of clutter in there and I end up missing important emails sometimes, which is definitely not the best case scenario\n- Sometimes I will also send emails to myself to have easy access to any presentations or files or such\n- I also use email for outreach, and to schedule meetings or send myself reminders"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "553aa731-7c5e-471f-9953-00d2151c5971",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        208
+      ],
+      "id": "066c5461-db57-450c-aa12-5f6d37eac51e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        208
+      ],
+      "id": "eb0b8ecd-926d-4370-b9ec-dbd892d9672d",
+      "name": "Mark a message as read in Gmail",
+      "webhookId": "ba0361f0-c688-48a1-a201-67d02503c761",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3hqtCAi1EGcgg76C",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## monitors gmail inbox and marks all useless emails as read so that only important emails are shown in unread folder",
+        "height": 112,
+        "width": 544
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -176
+      ],
+      "id": "ff5171c9-5b0e-4729-b944-562db05f6c93",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark a message as read in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Gmail Trigger": {
+      "Gmail Trigger": {
+        "lastTimeChecked": 1756224462,
+        "possibleDuplicates": [
+          "198e7229fdbe68e9",
+          "198e7202bfdfae46",
+          "198e6fde0da4f864"
+        ]
+      }
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "4c3e2bf5-7d86-4aa7-9e5b-48c7444ac37d",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-17T23:17:45.371Z",
+      "createdAt": "2025-08-17T23:17:45.371Z",
+      "role": "workflow:owner",
+      "workflowId": "z2ra1YRWuu3r5679",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
