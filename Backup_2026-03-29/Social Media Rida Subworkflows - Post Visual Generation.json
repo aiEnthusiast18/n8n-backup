@@ -1,0 +1,876 @@
+{
+  "updatedAt": "2026-03-08T17:09:50.896Z",
+  "createdAt": "2026-02-21T17:24:09.537Z",
+  "id": "vtMkaJDfb0PDiX0q",
+  "name": "Social Media Rida Subworkflows - Post Visual Generation",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        208
+      ],
+      "id": "68bf1199-5fdd-47da-a9b5-3eda1de5ea8a",
+      "name": "Wait6",
+      "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1232,
+        208
+      ],
+      "id": "bfca9549-767a-4228-ac0d-17d0743c0499",
+      "name": "Get Image6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      \"{{ $json.image1 }}\",\n      \"{{ $json.image2 }}\"\n    ]\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        208
+      ],
+      "id": "9bcd1771-5043-4160-a93c-16ba9a301e2d",
+      "name": "Edit Images2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+              "name": "image",
+              "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1616,
+        208
+      ],
+      "id": "e44b05c5-ab25-4cf5-a9a3-25e79c92d77e",
+      "name": "Result6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36031878-8176-430b-a310-b4616bc06a98",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "0b5c15ca-9d20-4788-adfa-41d5ae9af93a",
+              "name": "image1",
+              "value": "={{ $json['Image 1'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7dc2ffbc-fe0f-4809-80f9-d353d50f70cf",
+              "name": "image2",
+              "value": "={{ $json['Image 2'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        208
+      ],
+      "id": "68be50af-1c3f-4042-897d-7d1ad3465819",
+      "name": "Prompt/Images2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "generating",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generating"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1392,
+        192
+      ],
+      "id": "09123615-19ec-4196-8588-4abb6e2a7465",
+      "name": "Switch6"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        208
+      ],
+      "id": "be496e3b-ecad-4c1f-a8dc-8d2e9e1381af",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript)\n// Makes prompt safe to inject into a JSON string\n\nconst input = $input.first().json['Image Prompt'] ?? \"\";\n\nconst jsonSafePrompt = input\n  // escape backslashes FIRST\n  .replace(/\\\\/g, \"\\\\\\\\\")\n  \n  // escape double quotes\n  .replace(/\"/g, '\\\\\"')\n\n  // remove line breaks\n  .replace(/[\\r\\n]+/g, \" \")\n\n  // normalize smart quotes\n  .replace(/[“”]/g, '\\\\\"')\n  .replace(/[‘’]/g, \"'\")\n\n  // normalize long dashes\n  .replace(/[–—]/g, \"-\")\n\n  // collapse extra spaces\n  .replace(/\\s{2,}/g, \" \")\n\n  // trim\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      prompt: jsonSafePrompt\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        112
+      ],
+      "id": "090381d5-fbfe-41a8-8ce5-65ade47d435c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        192
+      ],
+      "id": "201bcad2-ad8d-481b-a5f2-5e7067cbb471",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node\n// Merges all incoming items into a single item\n\nconst merged = {};\n\nfor (const item of $input.all()) {\n  Object.assign(merged, item.json);\n}\n\nreturn [\n  {\n    json: merged\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        192
+      ],
+      "id": "66267a24-a0c8-4199-9ce7-53934d7b1915",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "Get Image6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image6": {
+      "main": [
+        [
+          {
+            "node": "Switch6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Images2": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt/Images2": {
+      "main": [
+        [
+          {
+            "node": "Edit Images2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch6": {
+      "main": [
+        [
+          {
+            "node": "Result6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Prompt/Images2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ed7d34e5-e35c-4d66-b53b-203ced28c2cb",
+  "activeVersionId": "ed7d34e5-e35c-4d66-b53b-203ced28c2cb",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-21T17:24:09.539Z",
+      "createdAt": "2026-02-21T17:24:09.539Z",
+      "role": "workflow:owner",
+      "workflowId": "vtMkaJDfb0PDiX0q",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-21T18:30:23.000Z",
+    "createdAt": "2026-02-21T18:30:13.444Z",
+    "versionId": "ed7d34e5-e35c-4d66-b53b-203ced28c2cb",
+    "workflowId": "vtMkaJDfb0PDiX0q",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          1072,
+          208
+        ],
+        "id": "68bf1199-5fdd-47da-a9b5-3eda1de5ea8a",
+        "name": "Wait6",
+        "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864"
+      },
+      {
+        "parameters": {
+          "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "taskId",
+                "value": "={{ $json.data.taskId }}"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          1232,
+          208
+        ],
+        "id": "bfca9549-767a-4228-ac0d-17d0743c0499",
+        "name": "Get Image6"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.kie.ai/api/v1/jobs/createTask",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      \"{{ $json.image1 }}\",\n      \"{{ $json.image2 }}\"\n    ]\n  }\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          912,
+          208
+        ],
+        "id": "9bcd1771-5043-4160-a93c-16ba9a301e2d",
+        "name": "Edit Images2"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+                "name": "image",
+                "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1616,
+          208
+        ],
+        "id": "e44b05c5-ab25-4cf5-a9a3-25e79c92d77e",
+        "name": "Result6"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "36031878-8176-430b-a310-b4616bc06a98",
+                "name": "prompt",
+                "value": "={{ $json.prompt }}",
+                "type": "string"
+              },
+              {
+                "id": "0b5c15ca-9d20-4788-adfa-41d5ae9af93a",
+                "name": "image1",
+                "value": "={{ $json['Image 1'] }}",
+                "type": "string"
+              },
+              {
+                "id": "7dc2ffbc-fe0f-4809-80f9-d353d50f70cf",
+                "name": "image2",
+                "value": "={{ $json['Image 2'] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          720,
+          208
+        ],
+        "id": "68be50af-1c3f-4042-897d-7d1ad3465819",
+        "name": "Prompt/Images2"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "success",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "success"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "generating",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "generating"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "fail",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "fail"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "waiting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          1392,
+          192
+        ],
+        "id": "09123615-19ec-4196-8588-4abb6e2a7465",
+        "name": "Switch6"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -176,
+          208
+        ],
+        "id": "be496e3b-ecad-4c1f-a8dc-8d2e9e1381af",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node (JavaScript)\n// Makes prompt safe to inject into a JSON string\n\nconst input = $input.first().json['Image Prompt'] ?? \"\";\n\nconst jsonSafePrompt = input\n  // escape backslashes FIRST\n  .replace(/\\\\/g, \"\\\\\\\\\")\n  \n  // escape double quotes\n  .replace(/\"/g, '\\\\\"')\n\n  // remove line breaks\n  .replace(/[\\r\\n]+/g, \" \")\n\n  // normalize smart quotes\n  .replace(/[“”]/g, '\\\\\"')\n  .replace(/[‘’]/g, \"'\")\n\n  // normalize long dashes\n  .replace(/[–—]/g, \"-\")\n\n  // collapse extra spaces\n  .replace(/\\s{2,}/g, \" \")\n\n  // trim\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      prompt: jsonSafePrompt\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          112,
+          112
+        ],
+        "id": "090381d5-fbfe-41a8-8ce5-65ade47d435c",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          320,
+          192
+        ],
+        "id": "201bcad2-ad8d-481b-a5f2-5e7067cbb471",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node\n// Merges all incoming items into a single item\n\nconst merged = {};\n\nfor (const item of $input.all()) {\n  Object.assign(merged, item.json);\n}\n\nreturn [\n  {\n    json: merged\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          512,
+          192
+        ],
+        "id": "66267a24-a0c8-4199-9ce7-53934d7b1915",
+        "name": "Code in JavaScript1"
+      }
+    ],
+    "connections": {
+      "Wait6": {
+        "main": [
+          [
+            {
+              "node": "Get Image6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Image6": {
+        "main": [
+          [
+            {
+              "node": "Switch6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Images2": {
+        "main": [
+          [
+            {
+              "node": "Wait6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prompt/Images2": {
+        "main": [
+          [
+            {
+              "node": "Edit Images2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch6": {
+        "main": [
+          [
+            {
+              "node": "Result6",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait6",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [],
+          [
+            {
+              "node": "Wait6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Prompt/Images2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version ed7d34e5",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
