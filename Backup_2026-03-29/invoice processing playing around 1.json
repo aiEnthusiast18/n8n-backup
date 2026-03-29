@@ -1,0 +1,1245 @@
+{
+  "updatedAt": "2025-09-26T00:43:57.000Z",
+  "createdAt": "2025-09-13T20:40:16.913Z",
+  "id": "asWxGM7LoWzQOIOm",
+  "name": "invoice processing playing around 1",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## PDF Text Extraction Workflow\n\n**Upload PDF via POST:**\n- Endpoint: `/webhook/pdf-upload`\n- Method: POST\n- Body: Include PDF file as base64 or binary\n- Field name: `pdfFile`\n\n**Process:**\n1. Receive PDF file\n2. Convert to text using OpenAI or Google Document AI\n3. Clean and format extracted text\n4. Return structured response",
+        "height": 300,
+        "width": 400
+      },
+      "id": "48000134-f850-4267-bb9a-f0243af3a1f9",
+      "name": "PDF Processing Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validate PDF input and prepare for processing\nconst items = [];\n\nfor (const item of $input.all()) {\n  try {\n    const input = item.json;\n    \n    // Check if PDF file is provided\n    if (!input.pdfFile && !input.file) {\n      throw new Error('No PDF file provided. Please include pdfFile or file in request body.');\n    }\n    \n    // Handle different input formats\n    let pdfData = input.pdfFile || input.file;\n    let filename = input.filename || 'document.pdf';\n    \n    // If it's base64 data, extract it\n    if (typeof pdfData === 'string' && pdfData.includes('base64,')) {\n      pdfData = pdfData.split('base64,')[1];\n    }\n    \n    items.push({\n      json: {\n        pdfData: pdfData,\n        filename: filename,\n        timestamp: new Date().toISOString(),\n        originalInput: input\n      }\n    });\n    \n  } catch (error) {\n    items.push({\n      json: {\n        error: true,\n        message: error.message,\n        timestamp: new Date().toISOString()\n      }\n    });\n  }\n}\n\nreturn items;"
+      },
+      "id": "3b0a8390-ff4b-4bad-97b8-a4e857181e1b",
+      "name": "Validate PDF Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -3056,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.error }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ac9558ed-02fe-45ec-a18a-a06dd93b96ea",
+      "name": "Check Validation Result",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -2864,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "model": "chatgpt-4o-latest",
+        "prompt": "=Extract all text content from this PDF file and return it in a structured JSON format. Include:\n1. All text content (preserve paragraphs and formatting where possible)\n2. Any headers or titles identified\n3. Page breaks or section dividers\n4. Metadata if available\n\nReturn the response in this JSON structure:\n{\n  \"success\": true,\n  \"extractedText\": \"[full text content]\",\n  \"sections\": [\n    {\n      \"type\": \"header|paragraph|list\",\n      \"content\": \"text content\",\n      \"page\": 1\n    }\n  ],\n  \"metadata\": {\n    \"totalPages\": 0,\n    \"totalCharacters\": 0,\n    \"language\": \"detected language\"\n  }\n}\n\nPDF Data: {{ $json.pdfData }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "b73e1eb6-a410-4a0b-9969-d16afcd091bc",
+      "name": "Extract Text with OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        -2656,
+        -656
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Process OpenAI response and clean extracted text\nconst items = [];\n\nfor (const item of $input.all()) {\n  try {\n    let extractedData;\n    \n    // Handle OpenAI response\n    if (item.json.choices && item.json.choices[0]) {\n      const content = item.json.choices[0].message.content;\n      extractedData = typeof content === 'string' ? JSON.parse(content) : content;\n    } else if (item.json.text) {\n      // Alternative response format\n      extractedData = JSON.parse(item.json.text);\n    } else {\n      throw new Error('Unexpected response format from OpenAI');\n    }\n    \n    // Validate and clean extracted data\n    const cleanedText = extractedData.extractedText || '';\n    const sections = extractedData.sections || [];\n    const metadata = extractedData.metadata || {};\n    \n    // Calculate additional metadata\n    const wordCount = cleanedText.split(/\\s+/).filter(word => word.length > 0).length;\n    const lineCount = cleanedText.split('\\n').length;\n    \n    items.push({\n      json: {\n        success: true,\n        extractedText: cleanedText,\n        sections: sections,\n        metadata: {\n          ...metadata,\n          wordCount: wordCount,\n          lineCount: lineCount,\n          characterCount: cleanedText.length,\n          extractionMethod: 'OpenAI GPT-4',\n          processedAt: new Date().toISOString()\n        },\n        originalFilename: $node['Validate PDF Input'].json.filename\n      }\n    });\n    \n  } catch (error) {\n    console.error('Error processing OpenAI response:', error);\n    \n    items.push({\n      json: {\n        success: false,\n        error: 'Failed to process PDF text extraction',\n        message: error.message,\n        rawResponse: item.json\n      }\n    });\n  }\n}\n\nreturn items;"
+      },
+      "id": "91379dbd-803f-438c-a362-1457314fec55",
+      "name": "Process OpenAI Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -2448,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format final response with extracted text and metadata\nconst items = [];\n\nfor (const item of $input.all()) {\n  try {\n    const data = item.json;\n    \n    if (data.success) {\n      // Create comprehensive response\n      const response = {\n        success: true,\n        message: 'PDF text extraction completed successfully',\n        data: {\n          filename: data.originalFilename,\n          extractedText: data.extractedText,\n          sections: data.sections,\n          metadata: data.metadata,\n          summary: {\n            totalWords: data.metadata.wordCount,\n            totalLines: data.metadata.lineCount,\n            totalCharacters: data.metadata.characterCount,\n            extractionMethod: data.metadata.extractionMethod,\n            processedAt: data.metadata.processedAt\n          }\n        }\n      };\n      \n      items.push({ json: response });\n      \n    } else {\n      // Error response\n      items.push({\n        json: {\n          success: false,\n          message: 'PDF text extraction failed',\n          error: data.error || data.message,\n          details: data.rawResponse\n        }\n      });\n    }\n    \n  } catch (error) {\n    items.push({\n      json: {\n        success: false,\n        message: 'Failed to format response',\n        error: error.message\n      }\n    });\n  }\n}\n\nreturn items;"
+      },
+      "id": "194f8c58-b5f3-4d43-870a-54c7ed7cb711",
+      "name": "Format Final Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -2256,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "9f9ff3ca-68b1-4f83-8d12-8e22616c0ec9",
+      "name": "Send Final Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -2048,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## How to Use This Workflow\n\n**1. Send PDF via POST request:**\n```bash\ncurl -X POST https://your-n8n-instance/webhook/pdf-upload \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"pdfFile\": \"base64-encoded-pdf-data\",\n    \"filename\": \"document.pdf\"\n  }'\n```\n\n**2. Response format:**\n- `success`: Boolean indicating success\n- `extractedText`: Full text content\n- `sections`: Array of structured sections\n- `metadata`: File statistics and info\n\n**3. Error handling:**\n- Validation errors return 400 status\n- Processing errors return detailed error info",
+        "height": 408,
+        "width": 496
+      },
+      "id": "88e93f28-1b98-4428-9671-d6015ca8345a",
+      "name": "Usage Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc",
+          "mode": "list",
+          "cachedResultName": "n8n invoice workflow",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        -1136
+      ],
+      "id": "72ea1555-cc9d-41f0-8a37-ba5d687a84de",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e355b70b-2d7e-4618-ae40-dcee7e8c97e1",
+              "leftValue": "={{ $json.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1296,
+        -1136
+      ],
+      "id": "b6831ca9-635c-46e8-b991-fb4685b141b4",
+      "name": "If",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc",
+          "mode": "list",
+          "cachedResultName": "n8n invoice workflow",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "baf3d7fb-af65-4798-8b5f-c606b19616a6",
+      "name": "Monitor Invoice Folder",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3760,
+        -608
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q78V8eBUVKK8J2at",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Invoice Processing Workflow\n\n**Purpose**: Automatically process PDF invoices from Google Drive\n\n**Process**:\n1. Monitor Google Drive folder for new PDF files\n2. Extract text content from PDF\n3. Use AI to extract structured invoice data\n4. Validate extracted data\n5. Add to Google Sheets or send alert\n\n**Error Handling**: Comprehensive validation and alert system",
+        "height": 332,
+        "width": 400
+      },
+      "id": "eeba0166-72b0-4245-ae71-405730a4d478",
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2272,
+        -1056
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract actual text from PDF file\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  try {\n    const fileId = item.json.id;\n    const fileName = item.json.name;\n    const downloadUrl = item.json.webContentLink;\n    \n    // Make HTTP request to download and extract PDF text\n    const response = await fetch(downloadUrl);\n    const arrayBuffer = await response.arrayBuffer();\n    const uint8Array = new Uint8Array(arrayBuffer);\n    \n    // Convert PDF to text (simplified approach)\n    // Note: This is basic extraction - for production use a proper PDF parser\n    const textDecoder = new TextDecoder();\n    let extractedText = textDecoder.decode(uint8Array);\n    \n    // Basic cleanup to extract readable text\n    extractedText = extractedText.replace(/[\\x00-\\x1F\\x7F-\\x9F]/g, ' ')\n                                .replace(/\\s+/g, ' ')\n                                .trim();\n    \n    results.push({\n      json: {\n        fileId: fileId,\n        fileName: fileName,\n        extractedText: extractedText,\n        processingStatus: 'text_extracted',\n        timestamp: new Date().toISOString()\n      }\n    });\n    \n  } catch (error) {\n    results.push({\n      json: {\n        error: 'PDF text extraction failed',\n        errorMessage: error.message,\n        fileName: item.json.name || 'unknown',\n        processingStatus: 'failed',\n        timestamp: new Date().toISOString()\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "ec3ca859-d574-4494-b96d-d7cf0e25b23a",
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        -880
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract structured data from this invoice text:\n\n{{ $json.extractedText }}\n\nExtract the invoice information from the above text content.",
+        "options": {
+          "systemMessage": "=You are an expert invoice processing AI. Your task is to extract structured data from invoice PDFs and return it in a specific JSON format.\n\nWhen given an invoice file, extract the following information:\n- Invoice Number  \n- Invoice Date (format: YYYY-MM-DD)\n- Vendor Name\n- Line Items (array with description, quantity, unit_price, amount)\n- Subtotal\n- Tax Amount  \n- Total Amount\n\nIMPORTANT: Look for ALL line items in the invoice. Line items may appear as:\n- Individual product/service rows with descriptions\n- Summary sections with service categories (like \"Parcels\", \"Shipments\", etc.)\n- Itemized charges or fees\n- Both positive and negative amounts (adjustments/credits)\n\nAlways extract each item/product/service category as a separate line item, even if quantities aren't specified (use 1 as default quantity).\n\nAlways respond with valid JSON in this exact format:\n{\n  \"invoice_number\": \"string\",\n  \"invoice_date\": \"YYYY-MM-DD\", \n  \"vendor_name\": \"string\",\n  \"line_items\": [\n    {\n      \"description\": \"string\",\n      \"quantity\": number,\n      \"unit_price\": number, \n      \"amount\": number\n    }\n  ],\n  \"subtotal\": number,\n  \"tax_amount\": number,\n  \"total_amount\": number,\n  \"extraction_confidence\": \"high|medium|low\",\n  \"missing_fields\": [\"array of any missing required fields\"]\n}\n\nExtract ALL service categories, charges, and adjustments as separate line items. If you cannot extract certain fields, set them to null and list them in missing_fields."
+        }
+      },
+      "id": "b3f0f2bf-e916-4084-8ac5-319dc4df361b",
+      "name": "AI Invoice Data Extractor",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1504,
+        -736
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validate the extracted invoice data\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  try {\n    let extractedData;\n    \n    // Parse AI output if it's a string\n    if (typeof item.json.output === 'string') {\n      extractedData = JSON.parse(item.json.output);\n    } else {\n      extractedData = item.json.output || item.json;\n    }\n    \n    // Required fields for validation\n    const requiredFields = ['invoice_number', 'invoice_date', 'vendor_name', 'total_amount'];\n    const missingFields = [];\n    \n    // Check for required fields\n    for (const field of requiredFields) {\n      if (!extractedData[field] || extractedData[field] === null) {\n        missingFields.push(field);\n      }\n    }\n    \n    // Validate date format\n    const dateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\n    if (extractedData.invoice_date && !dateRegex.test(extractedData.invoice_date)) {\n      missingFields.push('invalid_date_format');\n    }\n    \n    // Validate total amount is a number\n    if (extractedData.total_amount && isNaN(parseFloat(extractedData.total_amount))) {\n      missingFields.push('invalid_total_amount');\n    }\n    \n    // Determine validation status\n    const isValid = missingFields.length === 0;\n    const confidenceLevel = extractedData.extraction_confidence || 'unknown';\n    \n    results.push({\n      json: {\n        ...extractedData,\n        validation_status: isValid ? 'valid' : 'invalid',\n        validation_errors: missingFields,\n        confidence_level: confidenceLevel,\n        requires_manual_review: !isValid || confidenceLevel === 'low',\n        processed_at: new Date().toISOString(),\n        original_file: $node['Extract PDF Text'].json.fileName\n      }\n    });\n    \n  } catch (error) {\n    results.push({\n      json: {\n        validation_status: 'error',\n        error_message: error.message,\n        validation_errors: ['parsing_error'],\n        requires_manual_review: true,\n        processed_at: new Date().toISOString(),\n        original_file: $node['Extract PDF Text'].json.fileName || 'unknown'\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "19f135af-c7cb-4367-9d82-cd0201d7881d",
+      "name": "Validate Extracted Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        -736
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE",
+          "mode": "list",
+          "cachedResultName": "n8n invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $('If2').item.json.invoice_number }}",
+            "Invoice Date (YYYY-MM-DD)": "={{ $('If2').item.json.invoice_date }}",
+            "Vendor Name": "={{ $('If2').item.json.vendor_name }}",
+            "Subtotal": "={{ $('If2').item.json.subtotal }}",
+            "Tax Amount": "={{ $('If2').item.json.tax_amount }}",
+            "Total Amount": "={{ $('If2').item.json.total_amount }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Date (YYYY-MM-DD)",
+              "displayName": "Invoice Date (YYYY-MM-DD)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Name",
+              "displayName": "Vendor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subtotal",
+              "displayName": "Subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tax Amount",
+              "displayName": "Tax Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9c319e86-c4c5-41a4-aeb5-fb418548a2d9",
+      "name": "Add to Invoice Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        80,
+        -896
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\n\n**Validation Checks**:\n- Required fields present\n- Date format validation\n- Numeric amount validation\n- Confidence level assessment\n\n**Alert Conditions**:\n- Missing required fields\n- Low confidence extraction\n- PDF processing errors\n- Data validation failures\n\n**Manual Review Triggers**:\n- Validation status: invalid\n- Confidence level: low\n- Processing errors",
+        "height": 426,
+        "width": 300
+      },
+      "id": "60f9cf36-5b21-4b9b-b4ae-1ccdff033a4a",
+      "name": "Error Handling Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -640
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1520,
+        -560
+      ],
+      "id": "8f9f0535-8c95-4083-b0c0-256989644fa9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=Invoice Processed Successfully - {{ $json['Invoice Number'] }}",
+        "bodyContent": "=Details for {{ $json['Invoice Number'] }} from {{ $json['Vendor Name'] }} ({{ $json['Invoice Date (YYYY-MM-DD)'] }}) were successfully added to sheet.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -896
+      ],
+      "id": "802e42b6-bb49-4b5c-9e27-19eae5d8685b",
+      "name": "Send a message",
+      "webhookId": "c7eb9e59-8deb-4b2e-b593-e3a9f634e97d",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=Invoice Processing Error - {{ $json['Invoice Number'] }}",
+        "bodyContent": "There was an error adding details for {{ $json['Invoice Number'] }} from {{ $json['Vendor Name'] }} ({{ $json['Invoice Date (YYYY-MM-DD)'] }}) to sheet.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        -640
+      ],
+      "id": "e119e88e-b0f1-4fe4-8007-c9cee18ee20f",
+      "name": "Send a message1",
+      "webhookId": "c7eb9e59-8deb-4b2e-b593-e3a9f634e97d",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e355b70b-2d7e-4618-ae40-dcee7e8c97e1",
+              "leftValue": "={{ $json.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3536,
+        -608
+      ],
+      "id": "93bac142-2ff0-4cc1-80a6-32067828fc5a",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "46381a5f-db3d-4f25-ab54-0eba72dd42f9",
+              "leftValue": "={{ $json.validation_status }}",
+              "rightValue": "valid",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -720,
+        -736
+      ],
+      "id": "03a0d0c0-93ae-47b1-9f91-31a663d8e59e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=Invoice File Retrieval Error - {{ $('Monitor Invoice Folder').item.json.originalFilename }} (ID: {{ $('Monitor Invoice Folder').item.json.lastModifyingUser.permissionId }})",
+        "bodyContent": "=There was an error retrieving file for Invoice Processing workflow - n8n.\n{{ $('Monitor Invoice Folder').item.json.originalFilename }} (ID: {{ $('Monitor Invoice Folder').item.json.lastModifyingUser.permissionId }})",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -3312,
+        -464
+      ],
+      "id": "7d63a032-3dff-41d8-a40f-49cccb97e933",
+      "name": "Send a message2",
+      "webhookId": "c7eb9e59-8deb-4b2e-b593-e3a9f634e97d",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  const lineItems = item.json.line_items || [];\n  \n  if (lineItems.length === 0) {\n    item.json.line_item_description = null;\n    item.json.line_item_quantity = null;\n    item.json.line_item_unit_price = null;\n    item.json.line_item_amount = null;\n    item.json.line_item_number = null;\n    item.json.total_line_items = 0;\n  }\n}\n\nconst results = [];\nfor (const item of items) {\n  const lineItems = item.json.line_items || [];\n  \n  if (lineItems.length === 0) {\n    results.push(item);\n  } else {\n    for (let i = 0; i < lineItems.length; i++) {\n      const newItem = JSON.parse(JSON.stringify(item));\n      newItem.json.line_item_description = lineItems[i].description;\n      newItem.json.line_item_quantity = lineItems[i].quantity;\n      newItem.json.line_item_unit_price = lineItems[i].unit_price;\n      newItem.json.line_item_amount = lineItems[i].amount;\n      newItem.json.line_item_number = i + 1;\n      newItem.json.total_line_items = lineItems.length;\n      \n      // Only show vendor name and invoice number on first line item\n      if (i === 0) {\n        // Keep original values for first item\n        newItem.json.display_invoice_number = newItem.json.invoice_number;\n        newItem.json.display_vendor_name = newItem.json.vendor_name;\n      } else {\n        // Empty for subsequent items\n        newItem.json.display_invoice_number = \"\";\n        newItem.json.display_vendor_name = \"\";\n      }\n      \n      results.push(newItem);\n    }\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        -896
+      ],
+      "id": "96cb5f1d-7bcd-46aa-afe3-97124fcec8c7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE",
+          "mode": "list",
+          "cachedResultName": "n8n invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1632490364,
+          "mode": "list",
+          "cachedResultName": "line items",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit#gid=1632490364"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $json['Invoice Number'] }}",
+            "Vendor Name": "={{ $json['Vendor Name'] }}",
+            "Item Description": "=",
+            "Quantity": "=",
+            "Unit Price": "=",
+            "Total Amount": "="
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Name",
+              "displayName": "Vendor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item Description",
+              "displayName": "Item Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -144,
+        -1152
+      ],
+      "id": "a74072ac-a3b9-430e-a87c-0504cd93d19f",
+      "name": "Add Line Items to Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE",
+          "mode": "list",
+          "cachedResultName": "n8n invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1632490364,
+          "mode": "list",
+          "cachedResultName": "line items",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qnPGhIzIFDQdVxXRnZBhlfLdIMVcGAHFPZ-GkQNoSmE/edit#gid=1632490364"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $json.display_invoice_number }}",
+            "Vendor Name": "={{ $json.display_vendor_name }}",
+            "Item Description": "={{ $json.line_item_description }}",
+            "Quantity": "={{ $json.line_item_quantity }}",
+            "Unit Price": "={{ $json.line_item_unit_price }}",
+            "Total Amount": "={{ $json.line_item_amount }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Name",
+              "displayName": "Vendor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item Description",
+              "displayName": "Item Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        -896
+      ],
+      "id": "f51e00bb-bde4-4120-b267-33dabaf83965",
+      "name": "Add Line Items to Sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Just pass through the invoice data for the email\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -896
+      ],
+      "id": "37ca6ae2-6bb8-461a-aad4-bee54b0e26f0",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "content": "## If2 → Code in JavaScript → Add Line Items to Sheet1 → Add to Invoice Sheet → Code in JavaScript1 → Send a message\n",
+        "height": 128,
+        "width": 512
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -1168
+      ],
+      "id": "c6d1b59a-a19a-4081-b442-40e5d2e65dbf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "test",
+        "bodyContent": "={{ $('AI Invoice Data Extractor').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -736
+      ],
+      "id": "2adb05f4-a8ae-4c30-ab8e-fac620d6baa8",
+      "name": "Send a message3",
+      "webhookId": "972266e3-a847-45fb-a3a6-1b1d718226d1",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Validate PDF Input": {
+      "main": [
+        [
+          {
+            "node": "Check Validation Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Validation Result": {
+      "main": [
+        [
+          {
+            "node": "Extract Text with OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Extract Text with OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Process OpenAI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process OpenAI Response": {
+      "main": [
+        [
+          {
+            "node": "Format Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Response": {
+      "main": [
+        [
+          {
+            "node": "Send Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Invoice Folder": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        []
+      ]
+    },
+    "AI Invoice Data Extractor": {
+      "main": [
+        [
+          {
+            "node": "Validate Extracted Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Extracted Data": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Invoice Sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Invoice Data Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Validate PDF Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Add Line Items to Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Line Items to Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Add to Invoice Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message3": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Final Response": {
+      "main": [
+        [
+          {
+            "node": "AI Invoice Data Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Monitor Invoice Folder": [
+      {
+        "json": {
+          "parents": [
+            "1CyZ1FuLVkUtFuFHKDGjEimtsWAOnFlWc"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Rida Lakhani",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "08058990236564698466",
+            "emailAddress": "itsridalakhani@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocKIM9UZywEfTrmgZ89cl4IAW9TUQ_UJUngPSZN-XXtGg3hgbL0o=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Rida Lakhani",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "08058990236564698466",
+              "emailAddress": "itsridalakhani@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocKIM9UZywEfTrmgZ89cl4IAW9TUQ_UJUngPSZN-XXtGg3hgbL0o=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "08058990236564698466",
+              "type": "user",
+              "emailAddress": "itsridalakhani@gmail.com",
+              "role": "owner",
+              "displayName": "Rida Lakhani",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocKIM9UZywEfTrmgZ89cl4IAW9TUQ_UJUngPSZN-XXtGg3hgbL0o=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "08058990236564698466"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1JDdwy_xWaZkKboAotRFDeJDa2bRAy8a1",
+          "name": "sample-pdf-invoice.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "3",
+          "webContentLink": "https://drive.google.com/uc?id=1JDdwy_xWaZkKboAotRFDeJDa2bRAy8a1&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1JDdwy_xWaZkKboAotRFDeJDa2bRAy8a1/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBP4v9jxtwUqZYcK7ivRYIGyLCDU_wDkBQSQT-_3srVZE9amLfiLpvwKYJIZOxmhRzx_JqDtWt5Q6gsdylxlmPFORNjvep5n1eYyQ2gqg4N_EXs=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-09-13T20:14:48.524Z",
+          "createdTime": "2025-09-13T20:14:48.524Z",
+          "modifiedTime": "2025-09-13T20:14:34.000Z",
+          "modifiedByMeTime": "2025-09-13T20:14:34.000Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "sample-pdf-invoice.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "59c1b489d5a887037d93c3889e735086",
+          "sha1Checksum": "985b7de98f21059bb7199576ecd36a7202af0be5",
+          "sha256Checksum": "4dd6fbbe11077589923147e407076b661ec2a97b814db46e74ed92d89d7a0dc0",
+          "size": "1175949",
+          "quotaBytesUsed": "1175949",
+          "headRevisionId": "0BzBrMtTXulDnRXZlT0dVSzl2QldnZWVsc0xyVjcwOERTcWFRPQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "versionId": "10277871-76f2-4938-9668-cfa7af671fbd",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-13T20:40:16.919Z",
+      "createdAt": "2025-09-13T20:40:16.919Z",
+      "role": "workflow:owner",
+      "workflowId": "asWxGM7LoWzQOIOm",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
