@@ -1,0 +1,2375 @@
+{
+  "updatedAt": "2025-09-27T22:33:27.000Z",
+  "createdAt": "2025-09-26T01:59:08.615Z",
+  "id": "MmR2m1Xm27yVX1Xx",
+  "name": "Office Email Auto Responder Assistant v4",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "html": "={{ $json.body.content }}",
+        "options": {}
+      },
+      "id": "5a9f1870-7cc2-4b1d-bffb-a7c3caf47c6a",
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        496,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operationMode": "nodeInputBinary",
+        "options": {
+          "binaryDataKey": "={{ $json.data }}",
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following in max 100 words:\n\n\"{{ $json.data }}\"\n\nDo not enter the total number of words used.",
+              "prompt": "=Write a concise summary of the following in max 100 words:\n\n\"{{ $json.data }}\"\n\nDo not enter the total number of words used."
+            }
+          }
+        }
+      },
+      "id": "7e67026a-5634-4cbf-8995-49092944b1b7",
+      "name": "Email Summarization Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        784,
+        80
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "Chain that summarizes the received email",
+        "height": 240,
+        "width": 320
+      },
+      "id": "7277193a-b0fa-4e49-bc9e-ea56c426bbc4",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Agent that retrieves business information from a vector database and processes the response",
+        "height": 240,
+        "width": 340
+      },
+      "id": "9c53b98b-1ac3-493e-b54d-9a68d0ecd2cf",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1376,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Convert email to Markdown format for better understanding of LLM models",
+        "height": 240
+      },
+      "id": "4fd217fd-a089-4460-b35c-fab73b45e15a",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        -16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "If the feedback is OK send email",
+        "height": 180
+      },
+      "id": "f746877e-e228-4780-a250-3eff6a76c3bc",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2640,
+        -432
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "380cacd9-fc12-4429-9340-1c55a94a5e4c",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        752,
+        272
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35d7c303-42f4-4dd1-b41e-6eb087c23c3d",
+              "name": "aiGeneratedEmail",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "a8f9b2e1-3d4c-5e6f-7890-1234567890ab",
+              "name": "newSubject",
+              "type": "string",
+              "value": "=Re: {{ $('Markdown').item.json.subject }}"
+            },
+            {
+              "id": "b9g0c3f2-4e5d-6f70-8901-2345678901bc",
+              "name": "originalFrom",
+              "type": "string",
+              "value": "={{ $('Markdown').item.json.from.emailAddress.address }}"
+            },
+            {
+              "id": "317477a4-54f4-4fa8-842b-41fe28828fa5",
+              "name": "emailID",
+              "value": "={{ $('Markdown').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5882e9ee-d80b-4eb9-8798-4fae0af68196",
+              "name": "originalEmailText",
+              "value": "={{ $('Markdown').item.json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "60b9d92f-2f5a-4b09-949c-6260b3eea92e",
+              "name": "originalSubject",
+              "value": "={{ $('Markdown').item.json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fcaf7c18-c25d-4411-8e3f-88d586f54cc8",
+      "name": "Store Email Data",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1856,
+        80
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "Store generated email and original email info",
+        "height": 180
+      },
+      "id": "367dafe1-66c5-4f00-87f7-1be2f983df16",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1776,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "62e26bc5-1732-4699-a602-99490c7406fd",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "approved"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5e25dc23-81aa-40cb-a4c8-677b2ca680ce",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2848,
+        -368
+      ],
+      "typeVersion": 2.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "output": "fields",
+        "fields": [
+          "body",
+          "from",
+          "subject"
+        ],
+        "filters": {
+          "foldersToInclude": [
+            "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQAuAAAAAADAjei6kimUQKCVmDI9bNGcAQBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAAA="
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        80
+      ],
+      "id": "f9842c6f-5db5-4d2a-bf34-618363b2333c",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=[Approval Required] {{ $json.originalSubject }}",
+        "message": "=<h3>ORIGINAL EMAIL</h3>\nSubject: {{ $('Microsoft Outlook Trigger').item.json.subject }}\nFrom: {{ $('Microsoft Outlook Trigger').item.json.from.emailAddress.address }}\n{{ $('Markdown').item.json.data }}\n\n<h3>AI GENERATED RESPONSE</h3>\n{{ $json.aiGeneratedEmail }}\n\n<hr>\n<p><strong>Press Approve button to approve this message</strong></p>\n<ul>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        -368
+      ],
+      "id": "7495db17-112d-4236-9d3b-94326cde8d5f",
+      "name": "Send Approval Request",
+      "webhookId": "19322642-b1d0-46a2-8667-cf23b01b2049",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Store Email Data').item.json.originalFrom }}",
+        "subject": "=Re: {{ $('Store Email Data').item.json.originalSubject }}",
+        "bodyContent": "={{ $('Store Email Data').item.json.aiGeneratedEmail }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        -384
+      ],
+      "id": "05f9ed7f-7c78-43a4-8835-5577f0497728",
+      "name": "Send Final Email",
+      "webhookId": "f6082ae9-b5fb-4f10-9d14-6a9321bb7e2b",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Filter out approval emails and replies to prevent infinite loops",
+        "height": 180,
+        "width": 280
+      },
+      "id": "b263bd04-ddcf-4beb-876d-26061d1d9194",
+      "name": "Sticky Note Filter",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        32
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6c7cd993-9838-4499-9c57-83457eafc893",
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "[Approval Required]",
+              "operator": {
+                "type": "string",
+                "operation": "notStartsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        80
+      ],
+      "id": "71562dca-409e-4566-8b4a-be73a3cc2b98",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "content": "## Future features \n- learn from past run throughs",
+        "height": 144,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -240
+      ],
+      "id": "39494c35-919e-4d1d-9c8a-822f9fe08c68",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "="
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        336
+      ],
+      "id": "9e1ad1d0-c9ff-447e-bf32-0a141cd9bf10",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1936,
+        688
+      ],
+      "id": "ed873262-99a6-4ed0-bda4-0aa8a4d402a5",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        896
+      ],
+      "id": "01961859-17ac-49cf-9d43-09ff73d4bb92",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1648,
+        496
+      ],
+      "id": "8a9bd869-575c-4626-b3db-42a902b18809",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Markdown').item.json.data }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant for Anago Cleaning that drafts an email reply to each new email sent to the gmail account inbox. You use the Supabase Vector tool to see if there is any information you can provide about Anago Cleaning or its services. \n\nYou follow the standard format in writing an email starting with the salutation using their first name (example, Hello [first name], [first name] is replaced by the first word in {{ $('Microsoft Outlook Trigger').item.json.from.emailAddress.name }}) and then draft your reply. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        80
+      ],
+      "id": "2cea9954-e743-45fd-9bf6-764c1c492580",
+      "name": "AI Agent1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        288
+      ],
+      "id": "309424a4-5c82-4cb2-b15f-7c62096be73a",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool to look up information about Anago",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1584,
+        336
+      ],
+      "id": "db5e3dfc-e58d-42e3-bc8a-94bb7c49eb40",
+      "name": "Supabase Vector Store3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1xrYGb6Fykt3pKPlcLfR6JbGI85yeRO03",
+          "mode": "list",
+          "cachedResultName": "RAG Test File.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1xrYGb6Fykt3pKPlcLfR6JbGI85yeRO03/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1584,
+        688
+      ],
+      "id": "7834094d-5f6f-4195-9327-4d34614840a6",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yyOMN1bO2gFzSRaP",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Store Email Data').item.json.originalFrom }}",
+        "subject": "={{ $('Store Email Data').item.json.originalSubject }} - Reply awaiting review",
+        "bodyContent": "=Reply to {{ $('Store Email Data').item.json.originalSubject }} from {{ $('Store Email Data').item.json.originalFrom }} has been inputted into your google sheet and is awaiting approval.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2928,
+        384
+      ],
+      "id": "6b6fed6b-0814-4fcd-813e-45d0b93f33c6",
+      "name": "Send a message",
+      "webhookId": "1fe7c5c3-5130-4ab5-800a-b0f141efcf59",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email Text": "={{ $json.aiGeneratedEmail }}",
+            "Email To": "={{ $json.originalFrom }}",
+            "Email Subject": "={{ $json.newSubject }}",
+            "Email ID": "={{ $json.emailID }}",
+            "Email Status": "Drafted - Awaiting approval"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Subject",
+              "displayName": "Email Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Text",
+              "displayName": "Email Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email To",
+              "displayName": "Email To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2592,
+        80
+      ],
+      "id": "266f2728-1a08-4eb3-bc78-be9b829de499",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a060e07a-969d-4a54-a760-10fc4a11c5b8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        3168,
+        -128
+      ],
+      "id": "b6f156b0-788f-4f94-9df7-189b886f8751",
+      "name": "Webhook",
+      "webhookId": "a060e07a-969d-4a54-a760-10fc4a11c5b8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4d9ff8d1-0d76-4229-8049-054895547264",
+              "leftValue": "={{ $json.body.value }}",
+              "rightValue": "TRUE",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "98480780-732e-48ce-8cf0-13b08f1eb3fb",
+              "leftValue": "={{ $json.body.range.columnStart }}",
+              "rightValue": 4,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        3376,
+        -128
+      ],
+      "id": "ef4b536b-feba-4b89-9717-50d09f3ff2ce",
+      "name": "Filter1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.body.rowValues[0]['2'] }}",
+        "subject": "=Re: {{ $json.body.rowValues[0]['0'] }}",
+        "bodyContent": "={{ $json.body.rowValues[0]['1'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        -128
+      ],
+      "id": "e53c6a9b-8cb5-4577-b3fd-d710b63e11bc",
+      "name": "Send a message1",
+      "webhookId": "8fb03542-228e-4a96-87eb-15d6e44c276d",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=[Approval Required] {{ $('Store Email Data').item.json.newSubject }}",
+        "message": "=<h3>ORIGINAL EMAIL</h3>\nSubject: {{ $('Store Email Data').item.json.originalSubject }}<br>\nFrom: {{ $('Store Email Data').item.json.originalFrom }}\n<!-- Split original email into paragraphs and make bold -->\n{{ $('Store Email Data').item.json.originalEmailText\n    .split('\\n\\n')\n    .map(p => '<p><strong>' + p + '</strong></p>')\n    .join('') }}\n\n<h3>AI GENERATED RESPONSE</h3>\nSubject: {{ $('Store Email Data').item.json.newSubject }}<br>\nTo: {{ $('Store Email Data').item.json.originalFrom }}\n<!-- Split AI email into paragraphs and make bold -->\n{{ $('Store Email Data').item.json.aiGeneratedEmail\n    .split('\\n\\n')\n    .map(p => '<p><strong>' + p + '</strong></p>')\n    .join('') }}\n\n<hr>\n<p><strong>Next Steps:</strong></p>\n<ul>\n  <li>To <strong>edit</strong> the AI-generated email, please go to this sheet: \n      <a href=\"https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=sharing\">Client Info Sheet</a>\n  </li>\n  <li>Make any modifications you’d like directly in the sheet</li>\n  <li>Once you’re satisfied, come back here and press the <strong>Approve</strong> button to finalize</li>\n</ul>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2896,
+        80
+      ],
+      "id": "e263c41e-5b67-4715-aad1-38a4e9723f4c",
+      "name": "Send message and wait for response",
+      "webhookId": "907343a0-6d60-4ac4-a6b4-64fd42be3f8d",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ID": "={{ $('Store Email Data').item.json.emailID }}",
+            "Email Status": "Approved - Sent"
+          },
+          "matchingColumns": [
+            "Email ID"
+          ],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Subject",
+              "displayName": "Email Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Text",
+              "displayName": "Email Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email To",
+              "displayName": "Email To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3664,
+        80
+      ],
+      "id": "73bf59a5-7fbe-4898-87b5-ba02cf5b40fb",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Input will be provided as JSON with these keys (all required):\n\n{\n \"email_to\": \"<recipient email address as string>\",\n \"email_subject\": \"<email subject as string>\",\n \"email_text\": \"<email body text as string>\"\n}\n\n\nAction for the agent:\n\nAppend a new row in the specified sheet with columns mapped exactly:\n\n\"Email Subject\" <- {{ $json.originalSubject }}\n\n\"Email Text\" <- {{ $json.aiGeneratedEmail }}\n\n\"Email To\" <- {{ $json.originalFrom }}\n\nQuery the sheet using get_rows_tool with filters for the same three columns (Email Text, Email Subject, Email To) using the exact values provided.\n\nReturn only the sheet row number (integer) as described in the System prompt rules.",
+        "options": {
+          "systemMessage": "You are an automated agent with access to two tools:\n\nappend_row_tool — appends a single row to a Google Sheet. Input: { \"columns\": { \"Email Subject\": string, \"Email Text\": string, \"Email To\": string } }. Returns a success object but not the sheet row index.\n\nget_rows_tool — queries rows and returns matching rows and their sheet row numbers. Input: { \"filters\": [ { \"lookupColumn\": string, \"lookupValue\": string }, ... ] }. Returns an array of matching rows, where each result includes its sheet row number (field name may be rowNumber, rowIndex, or equivalent).\n\nFollow these rules exactly:\n\nStep 1 — call append_row_tool once with the provided values to append a row with columns exactly mapped: Email Subject, Email Text, Email To. Push the data in the first available row from the top.\n\nStep 2 — immediately call get_rows_tool once with three filters that exactly match the same values appended:\nfilter Email Text → appended Email Text\nfilter Email Subject → appended Email Subject\nfilter Email To → appended Email To\n\nFrom the response of get_rows_tool, determine the sheet row to return:\n\nIf multiple matching rows are returned, pick the match with the largest sheet row number (i.e., the most-recently appended row).\n\nIf a single match is returned, use that row number.\n\n\nOutput requirement (must be obeyed exactly): output only the row number as an integer, and nothing else — no text, no JSON, no punctuation, no explanation, no whitespace before/after the digits. Examples of valid outputs: 12 or 1. Do not use code fences or newlines. Do not print logs or diagnostics.\n\nError handling:\n\nDo not attempt retries, delays, or asynchronous waiting beyond the single append followed by the single get_rows_tool call described above.\n\nMatching must be exact (case-sensitive) on the three filter fields unless the tool forces case-insensitive matching; use whatever exact-match mechanism the tools provide.\n\nAlways obey the output requirement. No additional commentary, metadata, or tokens."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2160,
+        -144
+      ],
+      "id": "ab02e993-699b-4aef-84aa-d94799708f14",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email ID",
+              "lookupValue": "={{ $('Store Email Data').item.json.emailID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3168,
+        80
+      ],
+      "id": "9cc778a1-6150-4502-baf8-3d3155e012c5",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json['Email To'] }}",
+        "subject": "={{ $json['Email Subject'] }}",
+        "bodyContent": "={{ $json['Email Text'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        80
+      ],
+      "id": "4834357b-2fe2-4ee2-b4ae-9e83ad807d1d",
+      "name": "Send a message2",
+      "webhookId": "9cd26fbf-aa73-4db0-b163-f0adeb15aa21",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Add a new row in this Google Sheet with the email ID: {{ $json.emailID }}. Leave all other columns empty. ",
+        "options": {
+          "systemMessage": "You are an AI agent with access to a Google Sheets tool. Your task is to create a new row in a specified sheet. Only add the provided email ID in the designated column. Do not modify any other columns."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2128,
+        272
+      ],
+      "id": "3fe82ffc-029d-4710-a14f-8f782a0055ac",
+      "name": "AI Agent2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_ID__using_to_match_', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Email ID"
+          ],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Subject",
+              "displayName": "Email Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Text",
+              "displayName": "Email Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email To",
+              "displayName": "Email To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Header_Row', `Push the data in the next available row from the top`, 'number') }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2624,
+        560
+      ],
+      "id": "f8f217de-ead7-467e-bbd1-566761ae0d8a",
+      "name": "Append or update row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2496,
+        576
+      ],
+      "id": "22f9fef0-6a33-4f60-89b6-5d0c72944a11",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Supabase learning\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -464
+      ],
+      "id": "0788b0c3-4442-4cf1-90f2-c4d6b5560a81",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f329341a-d55b-4735-b74e-c7a1af0d6b05",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        336,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e5eb28e8-bbd4-4991-af70-bcdb890cc0d9",
+      "name": "Convert Email to Text",
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        592,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e3a40b94-9e62-46d9-b9f2-9713dbe2bdd2",
+      "name": "Extract Email Metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        848,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "54394b03-4aa8-46c6-a651-31fa650f19b5",
+      "name": "Summarize Email Content",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f8f5f493-bcdb-4363-8af8-fbbc497f9a1a",
+      "name": "Generate Email Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        1568
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "tableName": "email_replies_embeddings",
+        "prompt": "={{ $json.text }}",
+        "topK": 5,
+        "options": {}
+      },
+      "id": "a302b451-e079-4ef2-9417-5e29d338a500",
+      "name": "Search Similar Past Replies",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        1344
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate similarity scores and prepare data\nconst searchResults = $input.all();\nlet similarities = [];\nlet maxSimilarity = 0;\n\nif (searchResults && searchResults[0] && searchResults[0].json.documents) {\n  const docs = searchResults[0].json.documents;\n  \n  similarities = docs.map(doc => ({\n    content: doc.content || '',\n    similarity_score: doc.score || 0\n  })).filter(doc => doc.similarity_score >= 0.75)\n    .sort((a, b) => b.similarity_score - a.similarity_score);\n  \n  maxSimilarity = similarities.length > 0 ? similarities[0].similarity_score : 0;\n}\n\nconst emailData = $node['Extract Email Metadata'].json;\n\nreturn {\n  json: {\n    ...emailData,\n    similar_replies: similarities,\n    max_similarity_score: maxSimilarity,\n    similarity_count: similarities.length\n  }\n};"
+      },
+      "id": "c9cb33d5-cf02-44d5-a490-eff8ebe7d013",
+      "name": "Calculate Similarity Scores",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "f6bb8c82-4c5d-4e3f-8a7b-9c8d7e6f5g4h",
+              "leftValue": "={{ $json.max_similarity_score }}",
+              "rightValue": 0.88,
+              "operator": {
+                "type": "number",
+                "operation": "gte",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3d7e51c-13a4-4e25-bffa-60962b6e4fc5",
+      "name": "High Similarity Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.original_body_text }}",
+        "options": {
+          "systemMessage": "You are an expert email assistant. Generate a professional email response based on the original email.\n\nOriginal email: {{ $json.original_body_text }}\nSender: {{ $json.sender_name }}\nSubject: {{ $json.original_subject }}\n\nInstructions:\n1. Write a complete, professional email response\n2. Address all points raised in the original email\n3. Maintain appropriate tone and formality\n4. Include proper greeting and closing\n5. Be helpful, clear, and concise"
+        }
+      },
+      "id": "de669686-1be8-4685-97c5-9dd39e59e4cc",
+      "name": "Generate AI Reply",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "823a5a05-e320-4ac0-837f-56417b8e098a",
+      "name": "Prepare for Human Review",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        2592,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "reviewer@company.com",
+        "subject": "=Email Review Required: {{ $json.draft_type }} - {{ $json.original_subject }}",
+        "message": "=**Email Review Required**\n\n**Draft Type:** {{ $json.draft_type }}\n**Confidence:** {{ $json.confidence_level }}\n**Similarity Score:** {{ Math.round($json.max_similarity_score * 100) }}%\n\n**Original Email:**\nFrom: {{ $json.sender_name }} <{{ $json.sender_email }}>\nSubject: {{ $json.original_subject }}\n\n{{ $json.original_body_text }}\n\n---\n\n**AI Generated Response:**\n{{ $json.ai_draft_reply }}\n\n---\n\n**Instructions:**\n- Reply APPROVE to send as-is\n- Reply EDIT: [your changes] to modify\n- Reply REJECT to cancel\n\n**Similar Past Replies:** {{ $json.similarity_count }}",
+        "options": {}
+      },
+      "id": "3ece5684-3efe-433d-9b7e-5332670265a4",
+      "name": "Send for Human Review",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        1344
+      ],
+      "webhookId": "f60922bd-da94-436e-9044-f28dc31d5bca"
+    },
+    {
+      "parameters": {
+        "tableId": "email_conversations",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "email_id",
+              "fieldValue": "={{ $json.email_id }}"
+            },
+            {
+              "fieldId": "original_subject",
+              "fieldValue": "={{ $json.original_subject }}"
+            },
+            {
+              "fieldId": "original_body",
+              "fieldValue": "={{ $json.original_body_text }}"
+            },
+            {
+              "fieldId": "sender_email",
+              "fieldValue": "={{ $json.sender_email }}"
+            },
+            {
+              "fieldId": "sender_name",
+              "fieldValue": "={{ $json.sender_name }}"
+            },
+            {
+              "fieldId": "received_timestamp",
+              "fieldValue": "={{ $json.received_timestamp }}"
+            },
+            {
+              "fieldId": "ai_draft_reply",
+              "fieldValue": "={{ $json.ai_draft_reply }}"
+            },
+            {
+              "fieldId": "draft_type",
+              "fieldValue": "={{ $json.draft_type }}"
+            },
+            {
+              "fieldId": "confidence_level",
+              "fieldValue": "={{ $json.confidence_level }}"
+            },
+            {
+              "fieldId": "max_similarity_score",
+              "fieldValue": "={{ $json.max_similarity_score }}"
+            },
+            {
+              "fieldId": "workflow_version",
+              "fieldValue": "={{ $json.workflow_version }}"
+            }
+          ]
+        }
+      },
+      "id": "5614f115-fe24-47d3-a193-0e184b426b45",
+      "name": "Store Email Data1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3088,
+        1344
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 208,
+        "width": 3008,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        1312
+      ],
+      "id": "ece50baa-643b-42cf-852f-05453fd89084",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 459782174,
+          "mode": "list",
+          "cachedResultName": "Learning",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=459782174"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Input Email": "={{ $('Store Email Data').item.json.originalEmailText }}",
+            "Input Subject": "={{ $('Store Email Data').item.json.originalSubject }}",
+            "Output Subject": "={{ $('Get row(s) in sheet').item.json['Email Subject'] }}",
+            "Output Email": "={{ $('Get row(s) in sheet').item.json['Email Text'] }}",
+            "Date": "={{ $now.format('dd/LL/yyyy') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Input Subject",
+              "displayName": "Input Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Input Email",
+              "displayName": "Input Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Output Subject",
+              "displayName": "Output Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Output Email",
+              "displayName": "Output Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3872,
+        80
+      ],
+      "id": "0a5dc533-a9bb-42f1-8d95-d1a95e7e2bb1",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        3616,
+        480
+      ],
+      "id": "cb4941fd-b1d4-4d43-9ffe-ab32f75ac006",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "text": "=Take the following inputted date and rewrite it in this format {{ $now.format('dd/LL/yyyy') }}\nFor example, output 2025-09-26T15:01:45.105-05:00 as 26/09/2025\nOutput only the date as dd/LL/yyyy, no test before or after. In NO CIRCUMSTANCE should any other text be outputted but the date\n\nDate to re-format: {{ $json.newDate }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "dateToExtract",
+              "description": "date rewritten in this format dd/LL/yyyy"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        4032,
+        480
+      ],
+      "id": "013a04e1-f05d-4fda-af17-ecff1b59c6a7",
+      "name": "Information Extractor",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $json.timestamp }}",
+        "duration": 1,
+        "options": {
+          "includeInputFields": false
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        3824,
+        480
+      ],
+      "id": "6ce56dcf-dd1d-4ebb-8b31-a981a1a29c34",
+      "name": "Date & Time",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3968,
+        688
+      ],
+      "id": "4e3dc99f-ea41-4bb8-988b-522a0f8b3228",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 459782174,
+          "mode": "list",
+          "cachedResultName": "Learning",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=459782174"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $json.output.dateToExtract }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4384,
+        480
+      ],
+      "id": "3f81aded-76da-4d6f-8c02-9f8e64f8896b",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4704,
+        304
+      ],
+      "id": "ecebf5d1-7217-4a52-8e90-d702a3e48a80",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ab5eb75f-d94f-49fb-b079-64140f30c40d",
+      "name": "Bridge Data for Embeddings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        1664,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "467ce33c-7e55-4b26-9116-9de2fab52f18",
+      "name": "Summarize Email Content1",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "32b3e9c7-6ffc-41c5-a356-007bc0edba72",
+      "name": "Generate Email Embeddings1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        1776
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "tableName": "email_replies_embeddings",
+        "prompt": "={{ $json.combined_content }}",
+        "topK": 5,
+        "options": {}
+      },
+      "id": "06b031dd-b2dd-4459-b87f-5db17bb17e4e",
+      "name": "Search Similar Past Replies1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        1776
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Email Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Email Data": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Send Final Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Store Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        []
+      ]
+    },
+    "Append or update row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Convert Email to Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Email to Text": {
+      "main": [
+        [
+          {
+            "node": "Extract Email Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Email Metadata": {
+      "main": [
+        [
+          {
+            "node": "Summarize Email Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Similar Past Replies": {
+      "main": [
+        [
+          {
+            "node": "Calculate Similarity Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Similarity Scores": {
+      "main": [
+        [
+          {
+            "node": "High Similarity Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Similarity Check": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate AI Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Reply": {
+      "main": [
+        [
+          {
+            "node": "Prepare for Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Human Review": {
+      "main": [
+        [
+          {
+            "node": "Send for Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send for Human Review": {
+      "main": [
+        [
+          {
+            "node": "Store Email Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        []
+      ]
+    },
+    "Summarize Email Content1": {
+      "main": [
+        [
+          {
+            "node": "Bridge Data for Embeddings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bridge Data for Embeddings": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Microsoft Outlook Trigger": {
+      "lastTimeChecked": "2025-09-13T16:33:06.005-05:00"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Microsoft Outlook Trigger": [
+      {
+        "json": {
+          "@odata.etag": "W/\"CQAAABYAAABaJg3pK7X6RI2dXaBL9HRRAAATfVv0\"",
+          "id": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "subject": "Request for Janitorial Services Quote",
+          "body": {
+            "contentType": "html",
+            "content": "<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><div dir=\"ltr\"><p>Hello Anago Cleaning Team,</p><p>I’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.</p><p>Could you provide a quote and let us know your availability to begin services?</p><p>Thank you,<br>Michael Rivera<br><a class=\"gmail-decorated-link gmail-cursor-pointer\" rel=\"noopener\">michael.rivera@example.com<span aria-hidden=\"true\" class=\"gmail-ms-0.5 gmail-inline-block gmail-align-middle gmail-leading-none\"></span></a><br>ABC Solutions</p></div></body></html>"
+          },
+          "from": {
+            "emailAddress": {
+              "name": "Rida Lakhani",
+              "address": "itsridalakhani@gmail.com"
+            }
+          }
+        }
+      }
+    ],
+    "Markdown": [
+      {
+        "json": {
+          "@odata.etag": "W/\"CQAAABYAAABaJg3pK7X6RI2dXaBL9HRRAAATfVv0\"",
+          "id": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "subject": "Request for Janitorial Services Quote",
+          "body": {
+            "contentType": "html",
+            "content": "<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><div dir=\"ltr\"><p>Hello Anago Cleaning Team,</p><p>I’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.</p><p>Could you provide a quote and let us know your availability to begin services?</p><p>Thank you,<br>Michael Rivera<br><a class=\"gmail-decorated-link gmail-cursor-pointer\" rel=\"noopener\">michael.rivera@example.com<span aria-hidden=\"true\" class=\"gmail-ms-0.5 gmail-inline-block gmail-align-middle gmail-leading-none\"></span></a><br>ABC Solutions</p></div></body></html>"
+          },
+          "from": {
+            "emailAddress": {
+              "name": "Rida Lakhani",
+              "address": "itsridalakhani@gmail.com"
+            }
+          },
+          "data": "Hello Anago Cleaning Team,\n\nI’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.\n\nCould you provide a quote and let us know your availability to begin services?\n\nThank you,  \nMichael Rivera  \nmichael.rivera@example.com  \nABC Solutions"
+        }
+      }
+    ],
+    "Email Summarization Chain": [
+      {
+        "json": {
+          "response": {
+            "text": "Michael Rivera from ABC Solutions is seeking janitorial services for a 3,000 sq. ft. office. He requests a quote for a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation. He also inquires about the team's availability to start the services."
+          }
+        }
+      }
+    ],
+    "Store Email Data": [
+      {
+        "json": {
+          "aiGeneratedEmail": "Hello Michael,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services tailored to your needs, including twice-weekly cleaning schedules. Our services encompass dusting, vacuuming, trash removal, and restroom sanitation, among other tasks. We are flexible in scheduling and can accommodate your office space of approximately 3,000 sq. ft.\n\nTo provide you with an accurate quote and confirm our availability, could you please share some additional information such as your location and preferred start date? \n\nWe look forward to the opportunity to serve ABC Solutions.\n\nBest regards,  \nAnago Cleaning Team",
+          "newSubject": "Re: Request for Janitorial Services Quote",
+          "originalFrom": "itsridalakhani@gmail.com",
+          "emailID": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "originalEmailText": "Hello Anago Cleaning Team,\n\nI’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.\n\nCould you provide a quote and let us know your availability to begin services?\n\nThank you,  \nMichael Rivera  \nmichael.rivera@example.com  \nABC Solutions",
+          "originalSubject": "Request for Janitorial Services Quote"
+        }
+      }
+    ],
+    "Filter": [
+      {
+        "json": {
+          "@odata.etag": "W/\"CQAAABYAAABaJg3pK7X6RI2dXaBL9HRRAAATfVv0\"",
+          "id": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "subject": "Request for Janitorial Services Quote",
+          "body": {
+            "contentType": "html",
+            "content": "<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><div dir=\"ltr\"><p>Hello Anago Cleaning Team,</p><p>I’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.</p><p>Could you provide a quote and let us know your availability to begin services?</p><p>Thank you,<br>Michael Rivera<br><a class=\"gmail-decorated-link gmail-cursor-pointer\" rel=\"noopener\">michael.rivera@example.com<span aria-hidden=\"true\" class=\"gmail-ms-0.5 gmail-inline-block gmail-align-middle gmail-leading-none\"></span></a><br>ABC Solutions</p></div></body></html>"
+          },
+          "from": {
+            "emailAddress": {
+              "name": "Rida Lakhani",
+              "address": "itsridalakhani@gmail.com"
+            }
+          }
+        }
+      }
+    ],
+    "AI Agent1": [
+      {
+        "json": {
+          "output": "Hello Michael,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services tailored to your needs, including twice-weekly cleaning schedules. Our services encompass dusting, vacuuming, trash removal, and restroom sanitation, among other tasks. We are flexible in scheduling and can accommodate your office space of approximately 3,000 sq. ft.\n\nTo provide you with an accurate quote and confirm our availability, could you please share some additional information such as your location and preferred start date? \n\nWe look forward to the opportunity to serve ABC Solutions.\n\nBest regards,  \nAnago Cleaning Team"
+        }
+      }
+    ],
+    "Append row in sheet": [
+      {
+        "json": {
+          "Email Text": "Hello Michael,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services tailored to your needs, including twice-weekly cleaning schedules. Our services encompass dusting, vacuuming, trash removal, and restroom sanitation, among other tasks. We are flexible in scheduling and can accommodate your office space of approximately 3,000 sq. ft.\n\nTo provide you with an accurate quote and confirm our availability, could you please share some additional information such as your location and preferred start date? \n\nWe look forward to the opportunity to serve ABC Solutions.\n\nBest regards,  \nAnago Cleaning Team",
+          "Email To": "itsridalakhani@gmail.com",
+          "Email Subject": "Re: Request for Janitorial Services Quote",
+          "Email ID": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "Email Status": "Drafted - Awaiting approval"
+        }
+      }
+    ],
+    "Send message and wait for response": [
+      {
+        "json": {
+          "data": {
+            "approved": true
+          }
+        }
+      }
+    ],
+    "Get row(s) in sheet": [
+      {
+        "json": {
+          "row_number": 7,
+          "Email ID": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "Email Subject": "Re: Request for Janitorial Services Quote",
+          "Email Text": "Hello George,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services including dusting, vacuuming, trash removal, and restroom sanitation with flexible scheduling options such as twice-weekly cleanings. Our cleaning plans are customized to meet your specific needs, and we service office spaces like yours.\n\nTo provide an accurate quote for your 3,000 sq. ft. office, could you please confirm the number of restrooms and any additional specific requirements you may have? Once we have those details, we can offer a competitive pricing estimate and discuss our availability to begin services.\n\nWe look forward to assisting ABC Solutions with your cleaning needs.\n\nBest regards,  \nThe Anago Cleaning Team",
+          "Email To": "itsridalakhani@gmail.com",
+          "Email Status": "Approved - Sent"
+        }
+      },
+      {
+        "json": {
+          "row_number": 9,
+          "Email ID": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "Email Subject": "Re: Request for Janitorial Services Quote",
+          "Email Text": "Hello Michael,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services tailored to your needs, including twice-weekly cleaning schedules. Our services encompass dusting, vacuuming, trash removal, and restroom sanitation, among other tasks. We are flexible in scheduling and can accommodate your office space of approximately 3,000 sq. ft.\n\nTo provide you with an accurate quote and confirm our availability, could you please share some additional information such as your location and preferred start date? \n\nWe look forward to the opportunity to serve ABC Solutions.\n\nBest regards,  \nAnago Cleaning Team",
+          "Email To": "itsridalakhani@gmail.com",
+          "Email Status": "Drafted - Awaiting approval"
+        }
+      }
+    ],
+    "Update row in sheet": [
+      {
+        "json": {
+          "Email ID": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "Email Status": "Approved - Sent"
+        }
+      },
+      {
+        "json": {
+          "Email ID": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "Email Status": "Approved - Sent"
+        }
+      }
+    ],
+    "Send a message2": [
+      {
+        "json": {
+          "success": true
+        }
+      },
+      {
+        "json": {
+          "success": true
+        }
+      }
+    ],
+    "Append row in sheet1": [
+      {
+        "json": {
+          "Input Email": "Hello Anago Cleaning Team,\n\nI’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.\n\nCould you provide a quote and let us know your availability to begin services?\n\nThank you,  \nMichael Rivera  \nmichael.rivera@example.com  \nABC Solutions",
+          "Input Subject": "Request for Janitorial Services Quote",
+          "Output Subject": "Re: Request for Janitorial Services Quote",
+          "Output Email": "Hello George,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services including dusting, vacuuming, trash removal, and restroom sanitation with flexible scheduling options such as twice-weekly cleanings. Our cleaning plans are customized to meet your specific needs, and we service office spaces like yours.\n\nTo provide an accurate quote for your 3,000 sq. ft. office, could you please confirm the number of restrooms and any additional specific requirements you may have? Once we have those details, we can offer a competitive pricing estimate and discuss our availability to begin services.\n\nWe look forward to assisting ABC Solutions with your cleaning needs.\n\nBest regards,  \nThe Anago Cleaning Team",
+          "Date": "27/09/2025"
+        }
+      },
+      {
+        "json": {
+          "Input Email": "Hello Anago Cleaning Team,\n\nI’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.\n\nCould you provide a quote and let us know your availability to begin services?\n\nThank you,  \nMichael Rivera  \nmichael.rivera@example.com  \nABC Solutions",
+          "Input Subject": "Request for Janitorial Services Quote",
+          "Output Subject": "Re: Request for Janitorial Services Quote",
+          "Output Email": "Hello Michael,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services tailored to your needs, including twice-weekly cleaning schedules. Our services encompass dusting, vacuuming, trash removal, and restroom sanitation, among other tasks. We are flexible in scheduling and can accommodate your office space of approximately 3,000 sq. ft.\n\nTo provide you with an accurate quote and confirm our availability, could you please share some additional information such as your location and preferred start date? \n\nWe look forward to the opportunity to serve ABC Solutions.\n\nBest regards,  \nAnago Cleaning Team",
+          "Date": "27/09/2025"
+        }
+      }
+    ],
+    "Get row(s) in sheet1": [
+      {
+        "json": {
+          "row_number": 2,
+          "Input Subject": "Request for Janitorial Services Quote",
+          "Input Email": "Hello Anago Cleaning Team,\n\nI’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.\n\nCould you provide a quote and let us know your availability to begin services?\n\nThank you,  \nMichael Rivera  \nmichael.rivera@example.com  \nABC Solutions",
+          "Output Subject": "Re: Request for Janitorial Services Quote",
+          "Output Email": "Hello George,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services including dusting, vacuuming, trash removal, and restroom sanitation with flexible scheduling options such as twice-weekly cleanings. Our cleaning plans are customized to meet your specific needs, and we service office spaces like yours.\n\nTo provide an accurate quote for your 3,000 sq. ft. office, could you please confirm the number of restrooms and any additional specific requirements you may have? Once we have those details, we can offer a competitive pricing estimate and discuss our availability to begin services.\n\nWe look forward to assisting ABC Solutions with your cleaning needs.\n\nBest regards,  \nThe Anago Cleaning Team",
+          "Date": "27/09/2025"
+        }
+      },
+      {
+        "json": {
+          "row_number": 3,
+          "Input Subject": "Request for Janitorial Services Quote",
+          "Input Email": "Hello Anago Cleaning Team,\n\nI’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.\n\nCould you provide a quote and let us know your availability to begin services?\n\nThank you,  \nMichael Rivera  \nmichael.rivera@example.com  \nABC Solutions",
+          "Output Subject": "Re: Request for Janitorial Services Quote",
+          "Output Email": "Hello Michael,\n\nThank you for reaching out to Anago Cleaning.\n\nWe offer janitorial services tailored to your needs, including twice-weekly cleaning schedules. Our services encompass dusting, vacuuming, trash removal, and restroom sanitation, among other tasks. We are flexible in scheduling and can accommodate your office space of approximately 3,000 sq. ft.\n\nTo provide you with an accurate quote and confirm our availability, could you please share some additional information such as your location and preferred start date? \n\nWe look forward to the opportunity to serve ABC Solutions.\n\nBest regards,  \nAnago Cleaning Team",
+          "Date": "27/09/2025"
+        }
+      }
+    ]
+  },
+  "versionId": "d8cfe957-c14a-4458-ad1e-8a554967d5e3",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-26T01:59:08.621Z",
+      "createdAt": "2025-09-26T01:59:08.621Z",
+      "role": "workflow:owner",
+      "workflowId": "MmR2m1Xm27yVX1Xx",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
