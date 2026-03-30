@@ -1,0 +1,381 @@
+{
+  "updatedAt": "2025-10-22T02:03:55.597Z",
+  "createdAt": "2025-10-22T02:03:55.597Z",
+  "id": "sBN8jVvOdbuzTQDW",
+  "name": "Apollo Lead Scraper Workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "lead-request",
+        "responseMode": "lastNode",
+        "options": {
+          "responseContentType": "application/json"
+        }
+      },
+      "id": "6e465be6-4fb1-4e01-82c2-638c2b0ba424",
+      "name": "Webhook - Receive Lead Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        -784,
+        -192
+      ],
+      "webhookId": "apollo-lead-scraper-001"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "combinator": "and"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f25c7266-a991-45cb-8dc6-d042acf8a399",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "8ce0c89d-d32c-433e-950f-272d46383c33",
+      "name": "Set Search Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        -384,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apollo.io/v1/mixed_people/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "1f307712-ddc8-4c93-bde5-8ae2582c200a",
+      "name": "Apollo API - Search People/Companies",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -176,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process Apollo API results and format leads\nconst results = $input.all();\nconst processedLeads = [];\n\ntry {\n  // Get the raw data from Apollo API\n  const apiResponse = results[0]?.json;\n  \n  // Check if we have valid response data\n  if (!apiResponse || !apiResponse.people) {\n    return [{\n      json: {\n        success: false,\n        message: 'No results found from Apollo API',\n        query: results[0]?.json?.searchQuery || 'unknown',\n        timestamp: new Date().toISOString()\n      }\n    }];\n  }\n  \n  // Process each person/lead from the results\n  const people = apiResponse.people || [];\n  \n  for (const person of people) {\n    const lead = {\n      // Personal Information\n      id: person.id || null,\n      fullName: person.name || 'N/A',\n      firstName: person.first_name || null,\n      lastName: person.last_name || null,\n      title: person.title || 'N/A',\n      seniority: person.seniority || null,\n      \n      // Contact Information\n      email: person.email || null,\n      emailStatus: person.email_status || 'unknown',\n      phone: person.phone_number || null,\n      linkedinUrl: person.linkedin_url || null,\n      \n      // Company Information\n      companyName: person.organization?.name || 'N/A',\n      companyDomain: person.organization?.primary_domain || null,\n      companyIndustry: person.organization?.industry || null,\n      companySize: person.organization?.estimated_num_employees || null,\n      companyLocation: {\n        city: person.organization?.city || null,\n        state: person.organization?.state || null,\n        country: person.organization?.country || null,\n        fullAddress: person.organization?.street_address || null\n      },\n      companyPhone: person.organization?.phone || null,\n      companyLinkedIn: person.organization?.linkedin_url || null,\n      companyFacebook: person.organization?.facebook_url || null,\n      companyTwitter: person.organization?.twitter_url || null,\n      \n      // Additional Metadata\n      departments: person.departments || [],\n      keywords: person.organization?.keywords || [],\n      technologies: person.organization?.technologies || [],\n      \n      // Scoring and Quality\n      emailConfidence: person.email_confidence || 0,\n      phoneNumberStatus: person.phone_number_status || null,\n      \n      // Timestamps\n      lastUpdated: person.updated_at || null,\n      addedToList: new Date().toISOString()\n    };\n    \n    processedLeads.push(lead);\n  }\n  \n  // Return formatted results\n  return [{\n    json: {\n      success: true,\n      message: `Successfully retrieved ${processedLeads.length} leads`,\n      query: results[0]?.json?.searchQuery || 'unknown',\n      location: results[0]?.json?.location || 'unknown',\n      totalLeads: processedLeads.length,\n      leads: processedLeads,\n      timestamp: new Date().toISOString(),\n      apiCredits: apiResponse.credits_used || null\n    }\n  }];\n  \n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: `Error processing results: ${error.message}`,\n      query: results[0]?.json?.searchQuery || 'unknown',\n      timestamp: new Date().toISOString()\n    }\n  }];\n}"
+      },
+      "id": "8918103f-325c-4ce0-be6b-ca3975f0fda9",
+      "name": "Process Apollo Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "splitIntoItems"
+      },
+      "id": "19207475-4903-4ec7-9183-2f406a2afa82",
+      "name": "Split Into Individual Leads",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        224,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1f4f234d-75dc-4dd7-b34d-572c50c58d5e",
+      "name": "Enrich Lead Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "combinator": "and"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.hasValidContact }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            },
+            {
+              "leftValue": "={{ $json.leadScore }}",
+              "rightValue": 40,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9f2a3c07-5a4c-4c33-93d7-36145a7c0518",
+      "name": "Filter High Quality Leads",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "aggregateItems"
+      },
+      "id": "4ff3ea5e-5c5a-4ef4-a6fe-4309657eeea9",
+      "name": "Aggregate Final Results",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        832,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format the final response with summary statistics\nconst results = $input.all();\nconst leads = results[0]?.json?.qualifiedLeads || [];\n\n// Calculate statistics\nconst stats = {\n  totalQualifiedLeads: leads.length,\n  byQuality: {\n    high: leads.filter(l => l.leadQuality === 'High').length,\n    medium: leads.filter(l => l.leadQuality === 'Medium').length,\n    low: leads.filter(l => l.leadQuality === 'Low').length\n  },\n  byContactType: {\n    withEmail: leads.filter(l => l.email !== null).length,\n    withPhone: leads.filter(l => l.phone !== null).length,\n    withLinkedIn: leads.filter(l => l.linkedinUrl !== null).length\n  },\n  averageLeadScore: leads.length > 0 \n    ? Math.round(leads.reduce((sum, l) => sum + (l.leadScore || 0), 0) / leads.length)\n    : 0\n};\n\n// Group leads by company\nconst companiesMap = {};\nleads.forEach(lead => {\n  const companyName = lead.companyName || 'Unknown';\n  if (!companiesMap[companyName]) {\n    companiesMap[companyName] = {\n      companyName: companyName,\n      domain: lead.companyDomain,\n      location: lead.companyLocation,\n      industry: lead.companyIndustry,\n      contacts: []\n    };\n  }\n  companiesMap[companyName].contacts.push({\n    name: lead.fullName,\n    title: lead.title,\n    email: lead.email,\n    phone: lead.phone,\n    linkedIn: lead.linkedinUrl,\n    leadScore: lead.leadScore\n  });\n});\n\nconst companiesList = Object.values(companiesMap)\n  .sort((a, b) => b.contacts.length - a.contacts.length);\n\nreturn [{\n  json: {\n    success: true,\n    summary: {\n      message: `Successfully processed lead generation request`,\n      timestamp: new Date().toISOString(),\n      statistics: stats,\n      topCompanies: companiesList.slice(0, 5).map(c => ({\n        name: c.companyName,\n        contactCount: c.contacts.length,\n        domain: c.domain\n      }))\n    },\n    companies: companiesList,\n    allLeads: leads,\n    exportReady: {\n      csv: leads.map(l => ({\n        'Full Name': l.fullName,\n        'Title': l.title,\n        'Company': l.companyName,\n        'Email': l.email || '',\n        'Phone': l.phone || '',\n        'LinkedIn': l.linkedinUrl || '',\n        'Lead Score': l.leadScore,\n        'Lead Quality': l.leadQuality\n      }))\n    }\n  }\n}];"
+      },
+      "id": "f2eb7e21-b8dc-4730-814a-1671f98672a2",
+      "name": "Format Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c179abaf-1839-444c-b279-b8a50adf50c8",
+      "name": "Store Leads (Optional)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3a0080d3-4ed2-4e42-bbc3-6f24a2469059",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        -384,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Apollo API Configuration\n\nYou need to:\n1. Get Apollo API key from apollo.io\n2. Add HTTP Header Auth credential\n3. Set header name: 'X-Api-Key'\n4. Set header value: Your API key\n\nNote: Apollo has rate limits and credit usage",
+        "height": 228,
+        "width": 360,
+        "color": 3
+      },
+      "id": "a57a0e11-1750-4540-a7f5-210a1ae22173",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -464
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Receive Lead Request": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Set Search Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Search Parameters": {
+      "main": [
+        [
+          {
+            "node": "Apollo API - Search People/Companies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo API - Search People/Companies": {
+      "main": [
+        [
+          {
+            "node": "Process Apollo Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Apollo Results": {
+      "main": [
+        [
+          {
+            "node": "Split Into Individual Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Individual Leads": {
+      "main": [
+        [
+          {
+            "node": "Enrich Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Filter High Quality Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter High Quality Leads": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Final Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Final Results": {
+      "main": [
+        [
+          {
+            "node": "Format Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Response": {
+      "main": [
+        [
+          {
+            "node": "Store Leads (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a1c8b327-5775-4c26-abad-0c972fe11394",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-22T02:03:55.600Z",
+      "createdAt": "2025-10-22T02:03:55.600Z",
+      "role": "workflow:owner",
+      "workflowId": "sBN8jVvOdbuzTQDW",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
