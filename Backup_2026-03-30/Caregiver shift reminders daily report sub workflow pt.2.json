@@ -1,0 +1,687 @@
+{
+  "updatedAt": "2026-01-28T18:28:17.718Z",
+  "createdAt": "2025-12-27T23:01:28.149Z",
+  "id": "tjY9CyFMidUKBvpF",
+  "name": "Caregiver shift reminders daily report sub workflow pt.2",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        256
+      ],
+      "id": "24c66b74-588a-4077-8595-d14c13de5557",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "SENT"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        160
+      ],
+      "id": "5aad58dd-4a63-4a6f-a35f-8df143d45fd4",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        160
+      ],
+      "id": "04ea732b-b90f-4d87-80e0-be7a771be38a",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message3",
+              "value": "={{ $json.message3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        160
+      ],
+      "id": "c664ba0b-e3e8-49e8-b34f-aa5c1221e85b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        640,
+        256
+      ],
+      "id": "4c0c3a4e-e301-4d2e-beb8-b95d1dc3df19",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        256
+      ],
+      "id": "ea031582-038b-4a0d-9528-ad52a1e4ac5a",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        864,
+        256
+      ],
+      "id": "1009cca3-77f6-4051-8677-31df158ee0e0",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "FAILED"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        352
+      ],
+      "id": "e9cb64d1-9c0e-48d7-82c6-7b67dcfafdf6",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        352
+      ],
+      "id": "c627837a-8146-4358-8b4f-c51015c6f853",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message4",
+              "value": "={{ $json.message4 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        352
+      ],
+      "id": "091e2b3d-3271-41eb-8146-085c49f4426f",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "74663166-bd25-421d-8443-c5411c203ce4",
+  "activeVersionId": "74663166-bd25-421d-8443-c5411c203ce4",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-27T23:01:28.154Z",
+      "createdAt": "2025-12-27T23:01:28.154Z",
+      "role": "workflow:owner",
+      "workflowId": "tjY9CyFMidUKBvpF",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-02T18:40:34.000Z",
+    "createdAt": "2026-01-02T18:40:14.322Z",
+    "versionId": "74663166-bd25-421d-8443-c5411c203ce4",
+    "workflowId": "tjY9CyFMidUKBvpF",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -256,
+          256
+        ],
+        "id": "24c66b74-588a-4077-8595-d14c13de5557",
+        "name": "Code in JavaScript3"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 991995639,
+            "mode": "list",
+            "cachedResultName": "new",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "SENT"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -32,
+          160
+        ],
+        "id": "5aad58dd-4a63-4a6f-a35f-8df143d45fd4",
+        "name": "Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          192,
+          160
+        ],
+        "id": "04ea732b-b90f-4d87-80e0-be7a771be38a",
+        "name": "Code in JavaScript5"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message3",
+                "value": "={{ $json.message3 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          416,
+          160
+        ],
+        "id": "c664ba0b-e3e8-49e8-b34f-aa5c1221e85b",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          640,
+          256
+        ],
+        "id": "4c0c3a4e-e301-4d2e-beb8-b95d1dc3df19",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -480,
+          256
+        ],
+        "id": "ea031582-038b-4a0d-9528-ad52a1e4ac5a",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          864,
+          256
+        ],
+        "id": "1009cca3-77f6-4051-8677-31df158ee0e0",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 991995639,
+            "mode": "list",
+            "cachedResultName": "new",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "FAILED"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -32,
+          352
+        ],
+        "id": "e9cb64d1-9c0e-48d7-82c6-7b67dcfafdf6",
+        "name": "Get row(s) in sheet",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          192,
+          352
+        ],
+        "id": "c627837a-8146-4358-8b4f-c51015c6f853",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message4",
+                "value": "={{ $json.message4 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          416,
+          352
+        ],
+        "id": "091e2b3d-3271-41eb-8146-085c49f4426f",
+        "name": "Edit Fields"
+      }
+    ],
+    "connections": {
+      "Code in JavaScript3": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript5": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 74663166",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
