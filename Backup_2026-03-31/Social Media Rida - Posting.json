@@ -1,0 +1,31 @@
+{
+  "updatedAt": "2026-01-02T22:19:34.041Z",
+  "createdAt": "2026-01-02T22:19:34.041Z",
+  "id": "8TQv2dbh6FuUcE6k",
+  "name": "Social Media Rida - Posting",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "8acd3e70-fdf2-4f25-8700-e807f45a9618",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-02T22:19:34.045Z",
+      "createdAt": "2026-01-02T22:19:34.045Z",
+      "role": "workflow:owner",
+      "workflowId": "8TQv2dbh6FuUcE6k",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
