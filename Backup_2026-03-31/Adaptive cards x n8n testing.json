@@ -1,0 +1,79 @@
+{
+  "updatedAt": "2025-09-26T00:08:54.000Z",
+  "createdAt": "2025-09-24T04:21:37.533Z",
+  "id": "vRFF9k8B5aW631eS",
+  "name": "Adaptive cards x n8n testing",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5e0706ff-5af5-4efb-9343-2ae13100e00b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "adaptive cards test",
+        "bodyContent": "=<p class =\"editor-paragraph\">\n,script type =\"application/adaptivecard+json\">\n{\n    \"type\": \"AdaptiveCard\",\n    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n    \"version\": \"1.6\",\n    \"body\": [\n        {\n            \"type\": \"TextBlock\",\n            \"text\": \"Lead Gen Workflow n8n - Email Approval\",\n            \"wrap\": true,\n            \"horizontalAlignment\": \"Center\"\n        },\n        {\n            \"type\": \"Image\",\n            \"url\": \"https://mma.prnewswire.com/media/1430662/Anago_Logo.jpg?w=200\",\n            \"id\": \"anagologo\",\n            \"horizontalAlignment\": \"Center\"\n        },\n        {\n            \"type\": \"ColumnSet\",\n            \"columns\": [\n                {\n                    \"type\": \"Column\",\n                    \"width\": \"stretch\",\n                    \"items\": [\n                        {\n                            \"type\": \"TextBlock\",\n                            \"text\": \"OPTION 1\",\n                            \"wrap\": true,\n                            \"horizontalAlignment\": \"Center\",\n                            \"size\": \"Large\",\n                            \"fontType\": \"Monospace\",\n                            \"color\": \"Default\"\n                        }\n                    ],\n                    \"style\": \"warning\"\n                },\n                {\n                    \"type\": \"Column\",\n                    \"width\": \"stretch\",\n                    \"items\": [\n                        {\n                            \"type\": \"TextBlock\",\n                            \"text\": \"OPTION 2\",\n                            \"wrap\": true,\n                            \"horizontalAlignment\": \"Center\",\n                            \"fontType\": \"Monospace\",\n                            \"size\": \"Large\"\n                        }\n                    ],\n                    \"style\": \"attention\"\n                }\n            ]\n        },\n        {\n            \"type\": \"TextBlock\",\n            \"text\": \"Please select one of the options above\",\n            \"wrap\": true,\n            \"size\": \"Small\",\n            \"horizontalAlignment\": \"Center\",\n            \"color\": \"Warning\"\n        }\n    ]\n}\n</script?\n</p>",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "13f19c65-7099-4031-961a-7f6b16a26604",
+      "name": "Send a message",
+      "webhookId": "8d4d5a78-3f2d-4508-a20e-dcb510fe96cf",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f11c1cdc-2911-415c-b428-6556de5caae3",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-24T04:21:37.540Z",
+      "createdAt": "2025-09-24T04:21:37.540Z",
+      "role": "workflow:owner",
+      "workflowId": "vRFF9k8B5aW631eS",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
