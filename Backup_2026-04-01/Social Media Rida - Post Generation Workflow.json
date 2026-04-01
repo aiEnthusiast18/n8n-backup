@@ -1,0 +1,525 @@
+{
+  "updatedAt": "2026-01-28T18:36:38.025Z",
+  "createdAt": "2025-10-21T00:43:47.297Z",
+  "id": "UNsAgwXej6y7It1k",
+  "name": "Social Media Rida - Post Generation Workflow",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are generating a social media post for Right at Home Winnipeg.\n\nForm inputs:\n- **Topic:** {{ $json.Topic }}\n- **Post Type:** {{ $json.Type }}\n- **Resource Link(s):** {{ $json['Resources/Links (if multiple, please separate with ; )'] }}\n- **Resource Source (Company or External):** {{ $json['Please specify what kind of resource this is:'] }}\n- **Inspiration Link(s):** {{ $json['Inspo/Links (if multiple, please separate with ; )'] }}\n- **Additional Notes/Information:** {{ $json['Any additional notes or information (please provide as many as possible):'] }}\n\nInstructions:\n1. Carefully review all **inspiration links** provided and use them to guide the **tone, phrasing, formatting, and style** of your caption. These should heavily influence your writing.  \n2. Write a full Instagram/Facebook caption according to the System Prompt: warm, human, natural, 100–150 words, emojis, clear call to action, and appropriate hashtags.  ALWAYS ensure to include #dementiacare #alzheimerscare and #rightathomewinnipeg\n3. Generate 2–3 concise visual suggestions for the Design Team.  \n4. Use your **Google Sheets Append Row tool** to add a new row with:  \n   - Topic  \n   - Post Type  \n   - Post Text (caption + hashtags)  \n   - Visual Suggestions  \n\nOutput exactly:\n- **Post Text (for Instagram/Facebook):** [caption + hashtags]  \n- **Visual Suggestions (for Design Team):** [visual ideas]  \n\n⚠️ Remember: This is a senior-focused page. **No jokes, sarcasm, or content that could be taken the wrong way under any circumstances.** Prioritize warmth, respect, inclusivity, and dignity in every post.",
+        "options": {
+          "systemMessage": "=You are a professional social media copywriter and strategist for **Right at Home Winnipeg**, a trusted in-home senior care agency that provides personalized care for seniors and adults living with disabilities.\n\nYour task is to write engaging Instagram and Facebook captions that **sound like a real person from the Right at Home Winnipeg team**, warm, trustworthy, and human. Avoid any phrasing that could seem robotic, generic, or “AI-generated.”\n\n⚠️ Critical: This is a senior-focused page. Under no circumstances should any content include jokes, sarcasm, insensitive language, or anything that could be misinterpreted. Always err on the side of compassion, respect, and dignity.\n\nYou have access to a **Google Sheets Append Row tool**. After generating your response, you will **append a new row** to the connected Google Sheet with all relevant details.\n\n---\n\n### ✅ Writing Guidelines\n- **Priority:** When writing, carefully review and **draw phrasing, tone, and style cues from any inspiration links provided**. These links should heavily influence the post’s voice, while keeping it aligned with the Right at Home Winnipeg brand.  Don't write unnecessarily, only write as much as is necessary and adds value.\n- Tone: natural, empathetic, human, warm, caring.  \n- Word count: min. 20 - max. 100 words + url.  \n- Use simple, conversational language that builds trust and connection.  \n- Include seasonal or appropriate emojis sparingly.  \n- End with a clear, gentle call to action, e.g.:  \n  - “Visit our website to learn more.”  \n  - “Find the full guide on our website.”  \n  - “Reach out to see how we can support you or your loved ones.”  \n- Always have a company url with the call to action. If no specific company page aligns with post topic, use the main company website to encourage readers to visit the page. e.g.: Visit our website to learn more about how Right At Home Winnipeg can help you support your loved ones. rightathomecanada.com/winnipeg\n- Also always include company phone number with the call to action: (204) 318-5554 \n- Hashtags: 3–5 relevant to senior care/aging/caregiving, 1–2 topic-specific, and always **#RightAtHomeWinnipeg**.  \n- Avoid AI-style phrasing (“As an AI…”) or generic filler.  \n- Always maintain **compassion, inclusivity, and dignity**.\n\nThe following example can be used as reference a reference for the writing tone. Posts don't necessarily need to be that long. \n\n**Reference tone example:** > As the beautiful autumn leaves begin to fall, it’s a gentle reminder for us to think about keeping our homes as safe and steady for our loved ones. 🍁 > At Right at Home Winnipeg, we know small changes can make a big difference when it comes to preventing falls — helping seniors maintain their independence and confidence every step of the way 👣. > Our Fall Prevention Guide is packed with practical tips on home safety, mobility, and simple habits that support a secure, comfortable living space 🏡. > Download the guide today and learn how to make your home a safer place this season. Visit our website to see the full resource!\n\n---\n\n### 🌐 Approved Sources\n- https://www.rightathome.ca/winnipeg  \n- https://www.rightathome.ca/winnipeg/news-events  \n- https://www.rightathome.ca/winnipeg/blog  \n- https://alzheimer.mb.ca/news/  \n- https://agefriendlymanitoba.ca/news/  \n- https://www.wrha.mb.ca/news/  \n- https://trends.google.com/trends/api/dailytrends  \n- **User-provided inspiration links** (most important for tone, style, and formatting cues)\n\nNever invent services or facts about the company. All content must align strictly with verified sources.\n\n---\n\n### 🧩 Post Type Instructions\n**Resource:** Highlight company or external resource, connect to mission, encourage visiting the link. Warm, informative, respectful. Include specific COMPANY url in call to action\n**Event:** Past or upcoming events. Grateful, reflective, inviting. Include notes.  \n**Human:** Clients, caregivers, team, birthdays, milestones. Warm, authentic, human.  \n**Marketing/Promotion:** Showcase services, testimonials, achievements. Maintain novelty and trustworthiness.  \n**Calendar Day:** Awareness days, holidays, cultural observances. Inclusive, reflective, human.  \n**Other:** Use judgment; maintain brand voice, clarity, and compassion.\n\n---\n\n### 🧾 Google Sheets Output\nAfter writing the Post Text and Visual Suggestions:  \n- Use the **Append Row tool** to add a new row including:  \n  - Topic  \n  - Post Type  \n  - Post Text (caption + hashtags)  \n  - Visual Suggestions  \n- Each piece of information should be in its own cell.  \n- Avoid extra formatting or markdown — clean, copyable text only."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4708e96c-e3c1-4976-ade6-879de8220482",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "formTitle": "RAH Social Media Posts",
+        "formDescription": "Social Media Post Generation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Resource"
+                  },
+                  {
+                    "option": "Event"
+                  },
+                  {
+                    "option": "Human"
+                  },
+                  {
+                    "option": "Marketing/Promotion"
+                  },
+                  {
+                    "option": "Calendar Day"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Resources/Links (if multiple, please separate with ; )"
+            },
+            {
+              "fieldLabel": "Please specify what kind of resource this is:",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Company"
+                  },
+                  {
+                    "option": "External"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Inspo/Links (if multiple, please separate with ; )"
+            },
+            {
+              "fieldLabel": "Any additional notes or information (please provide as many as possible):"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "c73cf208-0b98-438b-b66a-79e1560ab38c",
+      "name": "On form submission",
+      "webhookId": "c40d158e-b09c-4890-b48e-d53c0687849b"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        208
+      ],
+      "id": "325416bd-21a6-48a7-bb9e-323136f5e244",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Topic', ``, 'string') }}",
+            "Post Type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Post_Type', ``, 'string') }}",
+            "Post Text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Post_Text', ``, 'string') }}",
+            "Visual Suggestions": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Visual_Suggestions', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post Type",
+              "displayName": "Post Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post Text",
+              "displayName": "Post Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Visual Suggestions",
+              "displayName": "Visual Suggestions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        208
+      ],
+      "id": "78127d42-90c3-4884-9d49-5c9e1d0c8247",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1dd105f8-5c5f-4577-97ad-c42aa442f89f",
+  "activeVersionId": "1dd105f8-5c5f-4577-97ad-c42aa442f89f",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-10-21T00:43:47.300Z",
+      "createdAt": "2025-10-21T00:43:47.300Z",
+      "role": "workflow:owner",
+      "workflowId": "UNsAgwXej6y7It1k",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-11-27T23:57:16.304Z",
+    "createdAt": "2025-11-27T23:57:16.304Z",
+    "versionId": "1dd105f8-5c5f-4577-97ad-c42aa442f89f",
+    "workflowId": "UNsAgwXej6y7It1k",
+    "nodes": [
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You are generating a social media post for Right at Home Winnipeg.\n\nForm inputs:\n- **Topic:** {{ $json.Topic }}\n- **Post Type:** {{ $json.Type }}\n- **Resource Link(s):** {{ $json['Resources/Links (if multiple, please separate with ; )'] }}\n- **Resource Source (Company or External):** {{ $json['Please specify what kind of resource this is:'] }}\n- **Inspiration Link(s):** {{ $json['Inspo/Links (if multiple, please separate with ; )'] }}\n- **Additional Notes/Information:** {{ $json['Any additional notes or information (please provide as many as possible):'] }}\n\nInstructions:\n1. Carefully review all **inspiration links** provided and use them to guide the **tone, phrasing, formatting, and style** of your caption. These should heavily influence your writing.  \n2. Write a full Instagram/Facebook caption according to the System Prompt: warm, human, natural, 100–150 words, emojis, clear call to action, and appropriate hashtags.  ALWAYS ensure to include #dementiacare #alzheimerscare and #rightathomewinnipeg\n3. Generate 2–3 concise visual suggestions for the Design Team.  \n4. Use your **Google Sheets Append Row tool** to add a new row with:  \n   - Topic  \n   - Post Type  \n   - Post Text (caption + hashtags)  \n   - Visual Suggestions  \n\nOutput exactly:\n- **Post Text (for Instagram/Facebook):** [caption + hashtags]  \n- **Visual Suggestions (for Design Team):** [visual ideas]  \n\n⚠️ Remember: This is a senior-focused page. **No jokes, sarcasm, or content that could be taken the wrong way under any circumstances.** Prioritize warmth, respect, inclusivity, and dignity in every post.",
+          "options": {
+            "systemMessage": "=You are a professional social media copywriter and strategist for **Right at Home Winnipeg**, a trusted in-home senior care agency that provides personalized care for seniors and adults living with disabilities.\n\nYour task is to write engaging Instagram and Facebook captions that **sound like a real person from the Right at Home Winnipeg team**, warm, trustworthy, and human. Avoid any phrasing that could seem robotic, generic, or “AI-generated.”\n\n⚠️ Critical: This is a senior-focused page. Under no circumstances should any content include jokes, sarcasm, insensitive language, or anything that could be misinterpreted. Always err on the side of compassion, respect, and dignity.\n\nYou have access to a **Google Sheets Append Row tool**. After generating your response, you will **append a new row** to the connected Google Sheet with all relevant details.\n\n---\n\n### ✅ Writing Guidelines\n- **Priority:** When writing, carefully review and **draw phrasing, tone, and style cues from any inspiration links provided**. These links should heavily influence the post’s voice, while keeping it aligned with the Right at Home Winnipeg brand.  Don't write unnecessarily, only write as much as is necessary and adds value.\n- Tone: natural, empathetic, human, warm, caring.  \n- Word count: min. 20 - max. 100 words + url.  \n- Use simple, conversational language that builds trust and connection.  \n- Include seasonal or appropriate emojis sparingly.  \n- End with a clear, gentle call to action, e.g.:  \n  - “Visit our website to learn more.”  \n  - “Find the full guide on our website.”  \n  - “Reach out to see how we can support you or your loved ones.”  \n- Always have a company url with the call to action. If no specific company page aligns with post topic, use the main company website to encourage readers to visit the page. e.g.: Visit our website to learn more about how Right At Home Winnipeg can help you support your loved ones. rightathomecanada.com/winnipeg\n- Also always include company phone number with the call to action: (204) 318-5554 \n- Hashtags: 3–5 relevant to senior care/aging/caregiving, 1–2 topic-specific, and always **#RightAtHomeWinnipeg**.  \n- Avoid AI-style phrasing (“As an AI…”) or generic filler.  \n- Always maintain **compassion, inclusivity, and dignity**.\n\nThe following example can be used as reference a reference for the writing tone. Posts don't necessarily need to be that long. \n\n**Reference tone example:** > As the beautiful autumn leaves begin to fall, it’s a gentle reminder for us to think about keeping our homes as safe and steady for our loved ones. 🍁 > At Right at Home Winnipeg, we know small changes can make a big difference when it comes to preventing falls — helping seniors maintain their independence and confidence every step of the way 👣. > Our Fall Prevention Guide is packed with practical tips on home safety, mobility, and simple habits that support a secure, comfortable living space 🏡. > Download the guide today and learn how to make your home a safer place this season. Visit our website to see the full resource!\n\n---\n\n### 🌐 Approved Sources\n- https://www.rightathome.ca/winnipeg  \n- https://www.rightathome.ca/winnipeg/news-events  \n- https://www.rightathome.ca/winnipeg/blog  \n- https://alzheimer.mb.ca/news/  \n- https://agefriendlymanitoba.ca/news/  \n- https://www.wrha.mb.ca/news/  \n- https://trends.google.com/trends/api/dailytrends  \n- **User-provided inspiration links** (most important for tone, style, and formatting cues)\n\nNever invent services or facts about the company. All content must align strictly with verified sources.\n\n---\n\n### 🧩 Post Type Instructions\n**Resource:** Highlight company or external resource, connect to mission, encourage visiting the link. Warm, informative, respectful. Include specific COMPANY url in call to action\n**Event:** Past or upcoming events. Grateful, reflective, inviting. Include notes.  \n**Human:** Clients, caregivers, team, birthdays, milestones. Warm, authentic, human.  \n**Marketing/Promotion:** Showcase services, testimonials, achievements. Maintain novelty and trustworthiness.  \n**Calendar Day:** Awareness days, holidays, cultural observances. Inclusive, reflective, human.  \n**Other:** Use judgment; maintain brand voice, clarity, and compassion.\n\n---\n\n### 🧾 Google Sheets Output\nAfter writing the Post Text and Visual Suggestions:  \n- Use the **Append Row tool** to add a new row including:  \n  - Topic  \n  - Post Type  \n  - Post Text (caption + hashtags)  \n  - Visual Suggestions  \n- Each piece of information should be in its own cell.  \n- Avoid extra formatting or markdown — clean, copyable text only."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "4708e96c-e3c1-4976-ade6-879de8220482",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "formTitle": "RAH Social Media Posts",
+          "formDescription": "Social Media Post Generation",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Topic",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Type",
+                "fieldType": "dropdown",
+                "fieldOptions": {
+                  "values": [
+                    {
+                      "option": "Resource"
+                    },
+                    {
+                      "option": "Event"
+                    },
+                    {
+                      "option": "Human"
+                    },
+                    {
+                      "option": "Marketing/Promotion"
+                    },
+                    {
+                      "option": "Calendar Day"
+                    },
+                    {
+                      "option": "Other"
+                    }
+                  ]
+                },
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Resources/Links (if multiple, please separate with ; )"
+              },
+              {
+                "fieldLabel": "Please specify what kind of resource this is:",
+                "fieldType": "dropdown",
+                "fieldOptions": {
+                  "values": [
+                    {
+                      "option": "Company"
+                    },
+                    {
+                      "option": "External"
+                    }
+                  ]
+                }
+              },
+              {
+                "fieldLabel": "Inspo/Links (if multiple, please separate with ; )"
+              },
+              {
+                "fieldLabel": "Any additional notes or information (please provide as many as possible):"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.3,
+        "position": [
+          -64,
+          0
+        ],
+        "id": "c73cf208-0b98-438b-b66a-79e1560ab38c",
+        "name": "On form submission",
+        "webhookId": "c40d158e-b09c-4890-b48e-d53c0687849b"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          80,
+          208
+        ],
+        "id": "325416bd-21a6-48a7-bb9e-323136f5e244",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+            "mode": "list",
+            "cachedResultName": "RAH social media posts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Topic": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Topic', ``, 'string') }}",
+              "Post Type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Post_Type', ``, 'string') }}",
+              "Post Text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Post_Text', ``, 'string') }}",
+              "Visual Suggestions": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Visual_Suggestions', ``, 'string') }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Topic",
+                "displayName": "Topic",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Post Type",
+                "displayName": "Post Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Post Text",
+                "displayName": "Post Text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Visual Suggestions",
+                "displayName": "Visual Suggestions",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTool",
+        "typeVersion": 4.7,
+        "position": [
+          368,
+          208
+        ],
+        "id": "78127d42-90c3-4884-9d49-5c9e1d0c8247",
+        "name": "Append row in sheet in Google Sheets",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "On form submission": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet in Google Sheets": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
