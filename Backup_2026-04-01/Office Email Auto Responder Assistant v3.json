@@ -1,0 +1,1438 @@
+{
+  "updatedAt": "2025-09-26T00:59:30.000Z",
+  "createdAt": "2025-09-15T17:49:19.462Z",
+  "id": "HeYmZcOQ9VIzOmvY",
+  "name": "Office Email Auto Responder Assistant v3",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "html": "={{ $json.body.content }}",
+        "options": {}
+      },
+      "id": "7f141090-bf86-4cae-b106-26fa4047822c",
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        496,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operationMode": "nodeInputBinary",
+        "options": {
+          "binaryDataKey": "={{ $json.data }}",
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following in max 100 words:\n\n\"{{ $json.data }}\"\n\nDo not enter the total number of words used.",
+              "prompt": "=Write a concise summary of the following in max 100 words:\n\n\"{{ $json.data }}\"\n\nDo not enter the total number of words used."
+            }
+          }
+        }
+      },
+      "id": "c64b8086-af0d-405d-8655-fea2acb21bed",
+      "name": "Email Summarization Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        784,
+        80
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "Chain that summarizes the received email",
+        "height": 240,
+        "width": 320
+      },
+      "id": "3e285ba7-2128-4d4a-ba00-c17552543a36",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Agent that retrieves business information from a vector database and processes the response",
+        "height": 240,
+        "width": 340
+      },
+      "id": "12ebe4cc-c513-40f4-b50e-7b9a29176991",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1376,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Convert email to Markdown format for better understanding of LLM models",
+        "height": 240
+      },
+      "id": "46b56798-fd9d-436b-8c90-b6e534923caa",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        -16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "If the feedback is OK send email",
+        "height": 180
+      },
+      "id": "7897c3ce-3409-4805-b753-22708805450a",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2640,
+        -432
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "af1dfe66-7287-428d-887f-475d6bed1cdf",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        752,
+        272
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35d7c303-42f4-4dd1-b41e-6eb087c23c3d",
+              "name": "aiGeneratedEmail",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "a8f9b2e1-3d4c-5e6f-7890-1234567890ab",
+              "name": "newSubject",
+              "type": "string",
+              "value": "=Re: {{ $('Markdown').item.json.subject }}"
+            },
+            {
+              "id": "b9g0c3f2-4e5d-6f70-8901-2345678901bc",
+              "name": "originalFrom",
+              "type": "string",
+              "value": "={{ $('Markdown').item.json.from.emailAddress.address }}"
+            },
+            {
+              "id": "317477a4-54f4-4fa8-842b-41fe28828fa5",
+              "name": "emailID",
+              "value": "={{ $('Markdown').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5882e9ee-d80b-4eb9-8798-4fae0af68196",
+              "name": "originalEmailText",
+              "value": "={{ $('Markdown').item.json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "60b9d92f-2f5a-4b09-949c-6260b3eea92e",
+              "name": "originalSubject",
+              "value": "={{ $('Markdown').item.json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "101ff4dd-2d2e-46c6-83cb-84adebdd61be",
+      "name": "Store Email Data",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1856,
+        80
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "Store generated email and original email info",
+        "height": 180
+      },
+      "id": "6c88f226-b809-46f7-8f69-874641e504fb",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1776,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "62e26bc5-1732-4699-a602-99490c7406fd",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "approved"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a68d1b90-fa0e-451a-8190-984fd4dc1f14",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2848,
+        -368
+      ],
+      "typeVersion": 2.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "output": "fields",
+        "fields": [
+          "body",
+          "from",
+          "subject"
+        ],
+        "filters": {
+          "foldersToInclude": [
+            "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQAuAAAAAADAjei6kimUQKCVmDI9bNGcAQBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAAA="
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        80
+      ],
+      "id": "2fbf8598-c799-454f-8969-533b461806b0",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=[Approval Required] {{ $json.originalSubject }}",
+        "message": "=<h3>ORIGINAL EMAIL</h3>\nSubject: {{ $('Microsoft Outlook Trigger').item.json.subject }}\nFrom: {{ $('Microsoft Outlook Trigger').item.json.from.emailAddress.address }}\n{{ $('Markdown').item.json.data }}\n\n<h3>AI GENERATED RESPONSE</h3>\n{{ $json.aiGeneratedEmail }}\n\n<hr>\n<p><strong>Press Approve button to approve this message</strong></p>\n<ul>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        -368
+      ],
+      "id": "14570b27-b8b4-4c7e-bae6-6913466595b9",
+      "name": "Send Approval Request",
+      "webhookId": "fa904388-a577-4c2f-9ce5-0532481acff2",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Store Email Data').item.json.originalFrom }}",
+        "subject": "=Re: {{ $('Store Email Data').item.json.originalSubject }}",
+        "bodyContent": "={{ $('Store Email Data').item.json.aiGeneratedEmail }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        -384
+      ],
+      "id": "e9739bc9-0c24-4405-8c93-d84d436abba8",
+      "name": "Send Final Email",
+      "webhookId": "eac2bdcf-cc08-4837-8d4a-1d991180f989",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Filter out approval emails and replies to prevent infinite loops",
+        "height": 180,
+        "width": 280
+      },
+      "id": "608a0142-ed95-4bfb-aad0-9a704b05d403",
+      "name": "Sticky Note Filter",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        32
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6c7cd993-9838-4499-9c57-83457eafc893",
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "[Approval Required]",
+              "operator": {
+                "type": "string",
+                "operation": "notStartsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        80
+      ],
+      "id": "a6c805ad-99d3-488a-a664-519ea43845e0",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "content": "## Future features \n- learn from past run throughs",
+        "height": 144,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -240
+      ],
+      "id": "c9b5d749-1ac2-4ae0-aaa3-e6828b99b87a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "="
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        336
+      ],
+      "id": "27724dfc-1551-48a8-b911-44bce2c5dd06",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1936,
+        688
+      ],
+      "id": "fdbf641e-114d-40c9-90da-271b78112e02",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        896
+      ],
+      "id": "8ab9d4bc-fc3e-4a3a-9b28-754e90c8e426",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1648,
+        496
+      ],
+      "id": "bc5e067e-e198-4be8-bd34-e3683910c17b",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Markdown').item.json.data }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant for Anago Cleaning that drafts an email reply to each new email sent to the gmail account inbox. You use the Supabase Vector tool to see if there is any information you can provide about Anago Cleaning or its services. \n\nYou follow the standard format in writing an email starting with the salutation using their first name (example, Hello [first name], [first name] is replaced by the first word in {{ $('Microsoft Outlook Trigger').item.json.from.emailAddress.name }}) and then draft your reply. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        80
+      ],
+      "id": "e12e81f1-7123-40fb-9b2a-d7796fc3de68",
+      "name": "AI Agent1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        288
+      ],
+      "id": "b5d76be6-1cb0-4c4c-a096-b1e900c44d36",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool to look up information about Anago",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1584,
+        336
+      ],
+      "id": "2bd60d10-85a3-402e-a4cb-5feb94ab6534",
+      "name": "Supabase Vector Store3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1xrYGb6Fykt3pKPlcLfR6JbGI85yeRO03",
+          "mode": "list",
+          "cachedResultName": "RAG Test File.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1xrYGb6Fykt3pKPlcLfR6JbGI85yeRO03/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1584,
+        688
+      ],
+      "id": "28dce4e5-9fdd-4e6d-b9d2-9f41cd18f0ff",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yyOMN1bO2gFzSRaP",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Store Email Data').item.json.originalFrom }}",
+        "subject": "={{ $('Store Email Data').item.json.originalSubject }} - Reply awaiting review",
+        "bodyContent": "=Reply to {{ $('Store Email Data').item.json.originalSubject }} from {{ $('Store Email Data').item.json.originalFrom }} has been inputted into your google sheet and is awaiting approval.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2928,
+        384
+      ],
+      "id": "b810a7fc-a4c6-40d5-b38f-032996b0c739",
+      "name": "Send a message",
+      "webhookId": "d6b54b23-3bc7-45aa-8b22-b53874f21cb4",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email Text": "={{ $json.aiGeneratedEmail }}",
+            "Email To": "={{ $json.originalFrom }}",
+            "Email Subject": "={{ $json.newSubject }}",
+            "Email ID": "={{ $json.emailID }}",
+            "Email Status": "Drafted - Awaiting approval"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Subject",
+              "displayName": "Email Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Text",
+              "displayName": "Email Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email To",
+              "displayName": "Email To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2592,
+        80
+      ],
+      "id": "1bc002b5-534a-42b4-8610-41027069cd31",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "208eb98a-3ad9-4614-9db6-49d17fad2a13",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        3168,
+        -128
+      ],
+      "id": "45d61942-842a-4a68-b0e4-3dfacc24e1bb",
+      "name": "Webhook",
+      "webhookId": "208eb98a-3ad9-4614-9db6-49d17fad2a13",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4d9ff8d1-0d76-4229-8049-054895547264",
+              "leftValue": "={{ $json.body.value }}",
+              "rightValue": "TRUE",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "98480780-732e-48ce-8cf0-13b08f1eb3fb",
+              "leftValue": "={{ $json.body.range.columnStart }}",
+              "rightValue": 4,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        3376,
+        -128
+      ],
+      "id": "cb2b86ab-5abb-4717-a2be-6d67c07984fe",
+      "name": "Filter1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.body.rowValues[0]['2'] }}",
+        "subject": "=Re: {{ $json.body.rowValues[0]['0'] }}",
+        "bodyContent": "={{ $json.body.rowValues[0]['1'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        -128
+      ],
+      "id": "a694fe0a-5667-428d-977f-2d8b28dec96a",
+      "name": "Send a message1",
+      "webhookId": "64c864b8-97d2-4ef6-9c87-7e843dae01df",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "=[Approval Required] {{ $('Store Email Data').item.json.newSubject }}",
+        "message": "=<h3>ORIGINAL EMAIL</h3>\nSubject: {{ $('Store Email Data').item.json.originalSubject }}<br>\nFrom: {{ $('Store Email Data').item.json.originalFrom }}\n<!-- Split original email into paragraphs and make bold -->\n{{ $('Store Email Data').item.json.originalEmailText\n    .split('\\n\\n')\n    .map(p => '<p><strong>' + p + '</strong></p>')\n    .join('') }}\n\n<h3>AI GENERATED RESPONSE</h3>\nSubject: {{ $('Store Email Data').item.json.newSubject }}<br>\nTo: {{ $('Store Email Data').item.json.originalFrom }}\n<!-- Split AI email into paragraphs and make bold -->\n{{ $('Store Email Data').item.json.aiGeneratedEmail\n    .split('\\n\\n')\n    .map(p => '<p><strong>' + p + '</strong></p>')\n    .join('') }}\n\n<hr>\n<p><strong>Next Steps:</strong></p>\n<ul>\n  <li>To <strong>edit</strong> the AI-generated email, please go to this sheet: \n      <a href=\"https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=sharing\">Client Info Sheet</a>\n  </li>\n  <li>Make any modifications you’d like directly in the sheet</li>\n  <li>Once you’re satisfied, come back here and press the <strong>Approve</strong> button to finalize</li>\n</ul>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2896,
+        80
+      ],
+      "id": "54adfbfb-3e40-477f-86e5-04ba22cc6d34",
+      "name": "Send message and wait for response",
+      "webhookId": "8caa65d7-6bcc-4f47-a1e6-9c0a931b0df4",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ID": "={{ $('Store Email Data').item.json.emailID }}",
+            "Email Status": "Approved - Sent"
+          },
+          "matchingColumns": [
+            "Email ID"
+          ],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Subject",
+              "displayName": "Email Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Text",
+              "displayName": "Email Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email To",
+              "displayName": "Email To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3664,
+        80
+      ],
+      "id": "874fa6d9-0615-4508-859a-8c612a573544",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Input will be provided as JSON with these keys (all required):\n\n{\n \"email_to\": \"<recipient email address as string>\",\n \"email_subject\": \"<email subject as string>\",\n \"email_text\": \"<email body text as string>\"\n}\n\n\nAction for the agent:\n\nAppend a new row in the specified sheet with columns mapped exactly:\n\n\"Email Subject\" <- {{ $json.originalSubject }}\n\n\"Email Text\" <- {{ $json.aiGeneratedEmail }}\n\n\"Email To\" <- {{ $json.originalFrom }}\n\nQuery the sheet using get_rows_tool with filters for the same three columns (Email Text, Email Subject, Email To) using the exact values provided.\n\nReturn only the sheet row number (integer) as described in the System prompt rules.",
+        "options": {
+          "systemMessage": "You are an automated agent with access to two tools:\n\nappend_row_tool — appends a single row to a Google Sheet. Input: { \"columns\": { \"Email Subject\": string, \"Email Text\": string, \"Email To\": string } }. Returns a success object but not the sheet row index.\n\nget_rows_tool — queries rows and returns matching rows and their sheet row numbers. Input: { \"filters\": [ { \"lookupColumn\": string, \"lookupValue\": string }, ... ] }. Returns an array of matching rows, where each result includes its sheet row number (field name may be rowNumber, rowIndex, or equivalent).\n\nFollow these rules exactly:\n\nStep 1 — call append_row_tool once with the provided values to append a row with columns exactly mapped: Email Subject, Email Text, Email To. Push the data in the first available row from the top.\n\nStep 2 — immediately call get_rows_tool once with three filters that exactly match the same values appended:\nfilter Email Text → appended Email Text\nfilter Email Subject → appended Email Subject\nfilter Email To → appended Email To\n\nFrom the response of get_rows_tool, determine the sheet row to return:\n\nIf multiple matching rows are returned, pick the match with the largest sheet row number (i.e., the most-recently appended row).\n\nIf a single match is returned, use that row number.\n\n\nOutput requirement (must be obeyed exactly): output only the row number as an integer, and nothing else — no text, no JSON, no punctuation, no explanation, no whitespace before/after the digits. Examples of valid outputs: 12 or 1. Do not use code fences or newlines. Do not print logs or diagnostics.\n\nError handling:\n\nDo not attempt retries, delays, or asynchronous waiting beyond the single append followed by the single get_rows_tool call described above.\n\nMatching must be exact (case-sensitive) on the three filter fields unless the tool forces case-insensitive matching; use whatever exact-match mechanism the tools provide.\n\nAlways obey the output requirement. No additional commentary, metadata, or tokens."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2160,
+        -144
+      ],
+      "id": "0d9adb43-4ba8-4c32-a9f9-4b80aec3aef8",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email ID",
+              "lookupValue": "={{ $('Store Email Data').item.json.emailID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3168,
+        80
+      ],
+      "id": "c5d59512-1f62-4918-9260-8f01faf80713",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json['Email To'] }}",
+        "subject": "={{ $json['Email Subject'] }}",
+        "bodyContent": "={{ $json['Email Text'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        80
+      ],
+      "id": "96e1bf7c-f444-422c-940a-3590dfe4105c",
+      "name": "Send a message2",
+      "webhookId": "d50f0e37-23d6-4af2-b845-487a59fa35fc",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Add a new row in this Google Sheet with the email ID: {{ $json.emailID }}. Leave all other columns empty. ",
+        "options": {
+          "systemMessage": "You are an AI agent with access to a Google Sheets tool. Your task is to create a new row in a specified sheet. Only add the provided email ID in the designated column. Do not modify any other columns."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2208,
+        352
+      ],
+      "id": "c39f7641-007f-486c-9dbc-afc02e4096a6",
+      "name": "AI Agent2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g",
+          "mode": "list",
+          "cachedResultName": "Office Email Response Generation  - Approval",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NZ4XMBUlyobhTAyZM2wrZKcS9ZvtkpXtFa5s9s82W6g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_ID__using_to_match_', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Email ID"
+          ],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Subject",
+              "displayName": "Email Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Text",
+              "displayName": "Email Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email To",
+              "displayName": "Email To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Header_Row', `Push the data in the next available row from the top`, 'number') }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2624,
+        560
+      ],
+      "id": "5f1652bd-f1b9-4b66-ba1c-f43a03296fb3",
+      "name": "Append or update row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2496,
+        576
+      ],
+      "id": "fe9d78bb-3270-48fc-a995-f64dc243c422",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## allows for modifications to be made at approval stage"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -464
+      ],
+      "id": "18d9ff39-9170-4392-a37d-cb4fa9b1c3c3",
+      "name": "Sticky Note4"
+    }
+  ],
+  "connections": {
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Email Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Email Data": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Send Final Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Store Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        []
+      ]
+    },
+    "Append or update row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Microsoft Outlook Trigger": {
+      "lastTimeChecked": "2025-09-13T16:33:06.005-05:00"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Microsoft Outlook Trigger": [
+      {
+        "json": {
+          "@odata.etag": "W/\"CQAAABYAAABaJg3pK7X6RI2dXaBL9HRRAAATfVv0\"",
+          "id": "AAMkADZmYWRiNTZhLTRhMzgtNDk5MS04ODY0LWI0NDM4MDhlNzM3MQBGAAAAAADAjei6kimUQKCVmDI9bNGcBwBaJg3pK7X6RI2dXaBL9HRRAAAAAAEMAABaJg3pK7X6RI2dXaBL9HRRAAATiWavAAA=",
+          "subject": "Request for Janitorial Services Quote",
+          "body": {
+            "contentType": "html",
+            "content": "<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><div dir=\"ltr\"><p>Hello Anago Cleaning Team,</p><p>I’m looking for janitorial services for our office, which is approximately 3,000 sq. ft. We would like a twice-weekly cleaning schedule that includes dusting, vacuuming, trash removal, and restroom sanitation.</p><p>Could you provide a quote and let us know your availability to begin services?</p><p>Thank you,<br>Michael Rivera<br><a class=\"gmail-decorated-link gmail-cursor-pointer\" rel=\"noopener\">michael.rivera@example.com<span aria-hidden=\"true\" class=\"gmail-ms-0.5 gmail-inline-block gmail-align-middle gmail-leading-none\"></span></a><br>ABC Solutions</p></div></body></html>"
+          },
+          "from": {
+            "emailAddress": {
+              "name": "Rida Lakhani",
+              "address": "itsridalakhani@gmail.com"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "3a701865-185e-422b-9c53-16dfc0db9325",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-15T17:49:19.479Z",
+      "createdAt": "2025-09-15T17:49:19.479Z",
+      "role": "workflow:owner",
+      "workflowId": "HeYmZcOQ9VIzOmvY",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
