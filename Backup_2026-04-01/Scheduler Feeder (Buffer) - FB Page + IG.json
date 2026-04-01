@@ -1,0 +1,630 @@
+{
+  "updatedAt": "2025-11-30T20:47:54.000Z",
+  "createdAt": "2025-11-26T00:03:50.325Z",
+  "id": "PQ8N8cFYOVJ0AF9g",
+  "name": "Scheduler Feeder (Buffer) - FB Page + IG",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "cfc8bc7a-b03d-4f32-a49f-6dc3f064a2f6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        208
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "550b65de-19b7-46a6-b4d9-02c91b35e149",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 876787574,
+          "mode": "list",
+          "cachedResultName": "automated topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+        },
+        "options": {}
+      },
+      "id": "e3b7738c-4e64-4379-9db4-c66b90c23d04",
+      "name": "Read Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "draft",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a84e746e-ece0-46ca-8143-6fcedbe2a977",
+      "name": "Filter Draft Posts",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Buffer API Configuration\nconst BUFFER_ACCESS_TOKEN = 'YOUR_BUFFER_ACCESS_TOKEN';\nconst BUFFER_CLIENT_ID = 'YOUR_BUFFER_CLIENT_ID';\n\n// Get the current item data\nconst item = $input.item.json;\n\n// Parse platforms from the sheet (comma-separated)\nconst platforms = item.Platforms ? item.Platforms.split(',').map(p => p.trim()) : [];\n\n// Format content for each platform\nconst formatContent = (platform, content, link, hashtags) => {\n  let formattedContent = content;\n  \n  // Platform-specific formatting\n  switch(platform.toLowerCase()) {\n    case 'twitter':\n    case 'x':\n      // Twitter has 280 character limit\n      if (link) {\n        const maxContentLength = 250 - (hashtags ? hashtags.length : 0);\n        formattedContent = content.substring(0, maxContentLength) + '...';\n      }\n      formattedContent = `${formattedContent}${hashtags ? ' ' + hashtags : ''}${link ? ' ' + link : ''}`;\n      return formattedContent.substring(0, 280);\n      \n    case 'facebook':\n    case 'linkedin':\n      formattedContent = content;\n      if (hashtags) formattedContent += '\\n\\n' + hashtags;\n      if (link) formattedContent += '\\n\\n' + link;\n      return formattedContent;\n      \n    case 'instagram':\n      // Instagram doesn't support clickable links in posts\n      formattedContent = content;\n      if (hashtags) formattedContent += '\\n\\n' + hashtags;\n      return formattedContent;\n      \n    default:\n      return content;\n  }\n};\n\n// Create an array of posts for each platform\nconst posts = platforms.map(platform => ({\n  platform: platform,\n  content: formatContent(platform, item.Content, item.Link, item.Hashtags),\n  mediaUrl: item.MediaURL || null,\n  scheduledTime: item.ScheduledTime || null,\n  rowId: $position + 2, // +2 for header row and 0-based index\n  originalData: item\n}));\n\nreturn posts;"
+      },
+      "id": "fae1bb87-5b22-4476-9b81-3c3797cfa06e",
+      "name": "Format Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=posts",
+        "options": {}
+      },
+      "id": "c36c4c7e-ff46-4277-a137-c311ad160de4",
+      "name": "Split Posts",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3.1,
+      "position": [
+        1056,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.bufferapp.com/1/profiles.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_BUFFER_ACCESS_TOKEN"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "b4e83eb0-03cf-450f-be0f-9c4e1fe01cfd",
+      "name": "Get Buffer Profiles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1264,
+        208
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ra8456lpAoIBK5sL",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the Buffer profiles from the previous node\nconst profiles = $('Get Buffer Profiles').first().json;\nconst post = $input.item.json;\n\n// Map platform names to Buffer profile IDs\nconst platformMapping = {\n  'twitter': 'twitter',\n  'x': 'twitter',\n  'facebook': 'facebook',\n  'linkedin': 'linkedin',\n  'instagram': 'instagram'\n};\n\n// Find the matching Buffer profile\nconst platformKey = platformMapping[post.platform.toLowerCase()];\nconst profile = profiles.find(p => p.service === platformKey);\n\nif (!profile) {\n  throw new Error(`No Buffer profile found for platform: ${post.platform}`);\n}\n\n// Return the post with the profile ID\nreturn {\n  ...post,\n  profileId: profile.id,\n  profileService: profile.service\n};"
+      },
+      "id": "ff18f388-29d2-444c-86c5-bbe8ba8f4e35",
+      "name": "Map Profile IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bufferapp.com/1/updates/create.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_BUFFER_ACCESS_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "1a892079-95ed-4f43-95f2-4bce72ee8d45",
+      "name": "Create Buffer Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1664,
+        304
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "value": "BufferPosts",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "c1abb8d5-2fb6-452c-b174-234898e52194",
+      "name": "Update Sheet Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Buffer Social Media Scheduler Setup\n\n### Required Setup:\n1. **Buffer Account**: Get your access token from https://buffer.com/developers/apps\n2. **Google Sheets**: Create a sheet with these columns:\n   - A: Content (post text)\n   - B: Platforms (comma-separated: twitter, facebook, linkedin, instagram)\n   - C: Link (optional URL)\n   - D: MediaURL (optional image/video URL)\n   - E: Hashtags (optional)\n   - F: ScheduledTime (optional, format: 2024-12-20 14:30)\n   - G: Status (draft/scheduled/published)\n   - H: BufferID (auto-filled by workflow)\n\n### Configuration Steps:\n1. Replace YOUR_BUFFER_ACCESS_TOKEN in HTTP nodes\n2. Replace YOUR_GOOGLE_SHEET_ID in Google Sheets nodes\n3. Connect your Google Sheets credentials\n4. Test with Manual Trigger first\n5. Activate Schedule Trigger for automation",
+        "height": 624,
+        "width": 400
+      },
+      "id": "7ecb1b74-de54-4e55-aa86-4cc9b7be9841",
+      "name": "Setup Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## How This Works\n\n1. **Trigger**: Runs every 4 hours or manually\n2. **Read Sheet**: Gets all posts from Google Sheets\n3. **Filter**: Only processes posts with status=\"draft\"\n4. **Format**: Adapts content for each platform (character limits, hashtags)\n5. **Split**: Creates separate items for each platform\n6. **Get Profiles**: Fetches your Buffer profile IDs\n7. **Map**: Matches platforms to Buffer profiles\n8. **Create Post**: Sends to Buffer API\n9. **Update Sheet**: Marks as \"scheduled\" with Buffer ID",
+        "height": 300,
+        "width": 400
+      },
+      "id": "5ce3935c-22af-47ee-94a4-371f795ccb28",
+      "name": "Workflow Explanation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        }
+      },
+      "id": "e35725a8-aa78-469f-a9cb-f719cf978e4f",
+      "name": "Cron (hourly)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        592,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 353862305,
+          "mode": "list",
+          "cachedResultName": "buffer automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=353862305"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "Approved"
+            }
+          ]
+        },
+        "options": {
+          "returnAllMatches": "returnAllMatches"
+        }
+      },
+      "id": "e0299d1e-e9f1-4ab3-b740-1fd511a2b6ef",
+      "name": "Google Sheets - Read Approved",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        832,
+        1568
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const now = new Date();\nconst in48h = new Date(Date.now() + 48 * 60 * 60 * 1000);\n\n// Map rows: assuming range columns:\n// A: row_id, B: status, C: scheduled_time, D: caption, E: image_url, F: video_url\nconst out = [];\nfor (const item of items) {\n  const [row_id, status, scheduled_time, caption, image_url, video_url] = item.json;\n  if (!row_id) continue; // must have row id for update\n  if (String(status).toLowerCase() !== 'approved') continue;\n  const dt = new Date(scheduled_time);\n  if (isNaN(dt.getTime())) continue; // invalid date\n  if (dt <= in48h && dt >= now) {\n    // Build Buffer payload for both profiles from env vars\n    const fbId = $env.68febc7e669affb4c9897505;\n    const igId = $env.68febc4e669affb4c98974cd;\n    const profile_ids = [fbId, igId].filter(Boolean);\n    if (profile_ids.length < 2) {\n      throw new Error('Missing Buffer profile IDs. Set FB_PAGE_PROFILE_ID and IG_PROFILE_PROFILE_ID environment variables.');\n    }\n\n    const media = {};\n    if (image_url) media.photo = image_url;\n    if (video_url) media.video = video_url;\n\n    const payload = {\n      text: caption || '',\n      scheduled_at: dt.toISOString(),\n      profile_ids,\n      // Buffer expects media only if provided\n      ...(Object.keys(media).length ? { media } : {})\n    };\n\n    out.push({\n      json: {\n        row_id,\n        status,\n        scheduled_time: dt.toISOString(),\n        caption,\n        image_url,\n        video_url,\n        buffer_payload: payload\n      }\n    });\n  }\n}\nreturn out;"
+      },
+      "id": "e5ae8952-05bd-4368-ab28-4780b72e2428",
+      "name": "Prepare Buffer Payload",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        1424
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.bufferapp.com/1/updates/create.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "allowUnauthorizedCerts": false
+        }
+      },
+      "id": "9eb6d6c1-c185-4ef5-b26f-d07c404b7e25",
+      "name": "Buffer - Create Scheduled Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1632,
+        1328
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hUwpDh27MflTkpZP",
+          "name": "Azure API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "f0ba5b58-dc41-49b5-8fef-49a190605037",
+      "name": "Google Sheets - Set Status: Queued in Buffer",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2288,
+        1264
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{`Post queued in Buffer for ${$json.scheduled_time} (Row: ${$json.row_id})`}}",
+        "otherOptions": {}
+      },
+      "id": "8f5a249d-7797-4ea0-850e-1d305a0438e4",
+      "name": "Slack - Confirmation",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        1312
+      ],
+      "webhookId": "f788ff8f-9db6-4976-92a8-7f576a08ccd1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [],
+          "boolean": [],
+          "string": [
+            {
+              "value1": "={{$json.statusCode}}",
+              "operation": "notEqual",
+              "value2": "200"
+            }
+          ]
+        }
+      },
+      "id": "11e8961e-380f-4a03-a711-f7fd2a4f1c69",
+      "name": "IF Buffer Error",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{`❌ Buffer error for Row ${$json.row_id}. Status: ${$json.statusCode}. Check payload and credentials.`}}",
+        "otherOptions": {}
+      },
+      "id": "2c3df462-04a7-4c16-a98c-458c26f6042f",
+      "name": "Slack - Error Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        1808
+      ],
+      "webhookId": "9c5b0682-dd14-4518-955b-8a1dd7e399f4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Hardcode your Buffer profile IDs (strings)\nconst FB_PAGE_PROFILE_ID = '68febc7e669affb4c9897505';\nconst IG_PROFILE_PROFILE_ID = '68febc4e669affb4c98974cd';\n\n// Read fields from the current item\nconst row_id         = $json.row_id;\nconst status         = ($json.status || '').toLowerCase();\nconst scheduled_time = $json.scheduled_time;\nconst caption        = $json.caption || '';\nconst image_url      = $json.image_url || '';\nconst video_url      = $json.video_url || '';\n\n// Only proceed for approved items; you can also filter earlier in the sheet query\nif (status !== 'approved') {\n  // Pass through unchanged (or return null to drop)\n  return { ...$json, skipped: true, reason: 'not approved' };\n}\n\n// Validate date and convert to ISO\nconst dt = new Date(scheduled_time);\nif (isNaN(dt.getTime())) {\n  throw new Error(`Invalid scheduled_time for row ${row_id}: ${scheduled_time}`);\n}\n\n// Build media only when present\nconst media = {};\nif (image_url) media.photo = image_url;\nif (video_url) media.video = video_url;\n\nconst buffer_payload = {\n  text: caption,\n  scheduled_at: dt.toISOString(),\n  // ALWAYS post to both platforms\n  profile_ids: [FB_PAGE_PROFILE_ID, IG_PROFILE_PROFILE_ID],\n  ...(Object.keys(media).length ? { media } : {})\n};\n\n// Return augmented item; the next node will read buffer_payload\nreturn { ...$json, buffer_payload };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        1568
+      ],
+      "id": "4bca6ee1-55a5-40e9-9847-3797fda22700",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter Draft Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Draft Posts": {
+      "main": [
+        [
+          {
+            "node": "Format Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Posts": {
+      "main": [
+        [
+          {
+            "node": "Split Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Posts": {
+      "main": [
+        [
+          {
+            "node": "Get Buffer Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Buffer Profiles": {
+      "main": [
+        [
+          {
+            "node": "Map Profile IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Profile IDs": {
+      "main": [
+        [
+          {
+            "node": "Create Buffer Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Buffer Post": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron (hourly)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read Approved": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Buffer Payload": {
+      "main": [
+        []
+      ]
+    },
+    "Buffer - Create Scheduled Update": {
+      "main": [
+        []
+      ]
+    },
+    "IF Buffer Error": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Set Status: Queued in Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Cron (hourly)": [
+      {
+        "json": {}
+      }
+    ]
+  },
+  "versionId": "90a2f14b-23fa-415d-aca0-b552412873d5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-26T00:03:50.329Z",
+      "createdAt": "2025-11-26T00:03:50.329Z",
+      "role": "workflow:owner",
+      "workflowId": "PQ8N8cFYOVJ0AF9g",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
