@@ -1,0 +1,74 @@
+{
+  "updatedAt": "2026-03-22T22:37:42.166Z",
+  "createdAt": "2026-03-22T22:03:22.238Z",
+  "id": "6w9Yhp4RhMMWyONE",
+  "name": "register click",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "register-click-42a4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2522c98b-67dd-44f1-97df-04e4ff659c62",
+      "name": "Webhook",
+      "webhookId": "fd3e38d4-e234-42a4-986f-44ccb0e94be1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "990c5c4a-10d9-4013-9cae-62f3b7a82f3d",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "820c9700-fae6-4b7b-aff0-684e1fa0b9b8",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T22:03:22.241Z",
+      "createdAt": "2026-03-22T22:03:22.241Z",
+      "role": "workflow:owner",
+      "workflowId": "6w9Yhp4RhMMWyONE",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
