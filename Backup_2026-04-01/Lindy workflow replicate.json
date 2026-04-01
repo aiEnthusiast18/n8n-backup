@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2025-09-25T23:13:44.000Z",
+  "createdAt": "2025-08-21T04:59:20.704Z",
+  "id": "n8F2cVzZ6OXFjkvb",
+  "name": "Lindy workflow replicate",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ba5a90b2-928a-4301-97d6-d2cd32155bca",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-08-21T04:59:20.711Z",
+      "createdAt": "2025-08-21T04:59:20.711Z",
+      "role": "workflow:owner",
+      "workflowId": "n8F2cVzZ6OXFjkvb",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
