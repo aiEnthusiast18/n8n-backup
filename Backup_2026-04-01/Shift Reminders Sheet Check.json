@@ -1,0 +1,519 @@
+{
+  "updatedAt": "2026-03-05T03:07:30.651Z",
+  "createdAt": "2025-12-03T00:02:02.376Z",
+  "id": "nWDyItboxWyh6gIR",
+  "name": "Shift Reminders Sheet Check",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "91039259-fdad-4b68-930c-84d49bc5b875",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 991995639,
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        0
+      ],
+      "id": "b8056e9d-5d85-4189-b6ee-d743b8b1bd68",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Use n8n execution start time explicitly\nconst execTime = new Date($execution.startedAt);\n\n// Force local midnight of execution day\nconst baseDate = new Date(\n  execTime.getFullYear(),\n  execTime.getMonth(),\n  execTime.getDate()\n);\n\n// Add 1 day = TOMORROW\nbaseDate.setDate(baseDate.getDate() + 1);\n\n// Format YYYY-MM-DD\nconst year = baseDate.getFullYear();\nconst month = String(baseDate.getMonth() + 1).padStart(2, '0');\nconst day = String(baseDate.getDate()).padStart(2, '0');\n\nreturn [{ targetDate: `${year}-${month}-${day}` }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        416
+      ],
+      "id": "28beb22b-bf9e-4a21-b220-5a38e4a53dcd",
+      "name": "Code in JavaScript",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1c59d46-2479-4983-ac30-f058ef78cf77",
+              "leftValue": "={{ $('Code in JavaScript1').item.json.lastDate }}",
+              "rightValue": "={{ new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('en-CA') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "afterOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "b5a52884-d71b-4a74-9558-65bfa70f4e78",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -112
+      ],
+      "id": "69aae47c-ef73-454a-9f52-d75557231c9f",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "toRecipients": "=rida@anagomb.ca, rlakhani@anagomb.ca",
+        "subject": "Add Shifts in Sheet - RAH Shift Reminders Workflow",
+        "bodyContent": "=There are no scheduled shifts in the shift reminders google sheet starting {{ new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('en-CA') }}.\nPlease review the schedule, and add shifts to the following sheet accordingly before tomorrow at 11 AM.\nhttps://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=sharing\nThank you.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        912,
+        96
+      ],
+      "id": "0efa22a4-9063-4046-a05d-b571dadf24b0",
+      "name": "Send a message",
+      "webhookId": "147285db-4461-472e-bbf1-9d06c65a44ea",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node code\n// Input: items (each item.json is a row from Google Sheets / other source)\n// Output: single item: { json: { lastDate: \"YYYY-MM-DD\" } }\n\nconst rows = items; // n8n provides 'items' automatically\n\nfunction excelSerialToDate(serial) {\n  // Excel/Google serial => JS Date (UTC)\n  // Excel incorrectly treats 1900 as leap year; most simple conversion:\n  const epoch = Date.UTC(1899, 11, 30); // 1899-12-30\n  return new Date(epoch + Math.round(serial) * 86400000);\n}\n\nfunction tryParseDate(v) {\n  if (v === null || v === undefined || v === '') return null;\n\n  // if it's already a Date\n  if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)) return v;\n\n  // if it's a number (possible Excel serial)\n  if (typeof v === 'number' && isFinite(v)) {\n    return excelSerialToDate(v);\n  }\n\n  // strings: normalize\n  let s = String(v).trim();\n\n  // remove surrounding quotes/commas\n  s = s.replace(/^[\"']|[\"']$/g, '');\n\n  // common patterns:\n  // 1) ISO-ish \"YYYY-MM-DD\" or \"YYYY-MM-DDTHH:MM:SS\" or \"YYYY-MM-DD HH:MM\"\n  // 2) \"YYYY/MM/DD\"\n  // 3) \"DD/MM/YYYY\" (try as fallback if the first parses invalid)\n  // 4) \"MM/DD/YYYY\"\n  // Try to extract numeric tokens\n  // First try YYYY-MM-DD or YYYY/MM/DD\n  const isoMatch = s.match(/^(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})/);\n  if (isoMatch) {\n    const yyyy = parseInt(isoMatch[1], 10);\n    const mm = parseInt(isoMatch[2], 10);\n    const dd = parseInt(isoMatch[3], 10);\n    // construct as UTC date to avoid local timezone shift\n    return new Date(Date.UTC(yyyy, mm - 1, dd));\n  }\n\n  // Try numbers separated by non-digits (could be DD/MM/YYYY or MM/DD/YYYY)\n  const tokens = s.split(/\\D+/).filter(Boolean);\n  if (tokens.length >= 3) {\n    // guess: if first token has 4 digits -> it's year-first already handled, else try dd/mm/yyyy\n    if (tokens[0].length === 4) {\n      const y = parseInt(tokens[0], 10);\n      const m = parseInt(tokens[1], 10);\n      const d = parseInt(tokens[2], 10);\n      return new Date(Date.UTC(y, m - 1, d));\n    } else {\n      // try both interpretations: prefer day-first (DD/MM/YYYY) unless month > 12\n      const a = parseInt(tokens[0], 10);\n      const b = parseInt(tokens[1], 10);\n      const c = parseInt(tokens[2], 10);\n      // if b > 12 then it's definitely day-first (a=day)\n      if (b > 12) {\n        return new Date(Date.UTC(c, a - 1, b)); // but this is unusual; still try\n      }\n      // assume DD/MM/YYYY\n      if (c > 31) {\n        // maybe MM/DD/YY etc. fallback to JS Date.parse\n        const parsed = Date.parse(s);\n        if (!isNaN(parsed)) return new Date(parsed);\n        return null;\n      }\n      // assume dd/mm/yyyy\n      return new Date(Date.UTC(c, b - 1, a));\n    }\n  }\n\n  // As final fallback, try Date.parse (may handle \"Dec 1 2025\" etc.)\n  const parsed = Date.parse(s);\n  if (!isNaN(parsed)) return new Date(parsed);\n\n  return null;\n}\n\n// Find the column key that contains visit start date (case-insensitive)\nfunction findDateKey(jsonRow) {\n  const keys = Object.keys(jsonRow || {});\n  // first, exact-ish match:\n  for (const k of keys) {\n    if (/^\\s*visit\\s*start\\s*date\\s*$/i.test(k)) return k;\n  }\n  // second, fuzzy match\n  for (const k of keys) {\n    if (/visit.*start.*date/i.test(k)) return k;\n  }\n  // third, any header that contains \"date\" (fallback)\n  for (const k of keys) {\n    if (/date/i.test(k) && /visit|start|begin/i.test(k)) return k;\n  }\n  // last fallback: any key containing just \"date\"\n  for (const k of keys) {\n    if (/date/i.test(k)) return k;\n  }\n  return null;\n}\n\nlet maxTs = -Infinity;\nlet maxDate = null;\nlet detectedKey = null;\n\n// If there are many rows, it's fine — iterate\nfor (const row of rows) {\n  const json = row.json || {};\n  // on first iteration, detect the key\n  if (!detectedKey) detectedKey = findDateKey(json);\n\n  if (!detectedKey) continue; // can't find a date column in this row\n\n  const raw = json[detectedKey];\n  const d = tryParseDate(raw);\n\n  if (d && !isNaN(d.getTime())) {\n    const ts = d.getTime();\n    if (ts > maxTs) {\n      maxTs = ts;\n      maxDate = d;\n    }\n  }\n}\n\n// Prepare output\nif (!maxDate) {\n  // no valid date found\n  return [{ json: { lastDate: null, message: 'No valid dates found in column.' } }];\n}\n\n// output ISO date string YYYY-MM-DD\nconst outIsoDate = maxDate.toISOString().slice(0, 10);\n\nreturn [{ json: { lastDate: outIsoDate } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "030c6ba8-57af-4823-8d44-3950867b280d",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36fbfa10-1dba-492a-845f-8f0c24aca048",
+              "name": "",
+              "value": "={{$(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0,10); })()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        416
+      ],
+      "id": "f53440c2-6c84-403b-855a-3ae9eca28143",
+      "name": "Edit Fields",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9980520c-c63f-4d0e-8a1d-310bf5f95432",
+  "activeVersionId": "18c3d011-8410-4485-9cda-54a02e51f8d1",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-03T00:02:02.382Z",
+      "createdAt": "2025-12-03T00:02:02.382Z",
+      "role": "workflow:owner",
+      "workflowId": "nWDyItboxWyh6gIR",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-19T00:48:22.000Z",
+    "createdAt": "2026-02-19T00:48:15.247Z",
+    "versionId": "18c3d011-8410-4485-9cda-54a02e51f8d1",
+    "workflowId": "nWDyItboxWyh6gIR",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -64,
+          0
+        ],
+        "id": "91039259-fdad-4b68-930c-84d49bc5b875",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 991995639,
+            "mode": "list",
+            "cachedResultName": "new",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=991995639"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          160,
+          0
+        ],
+        "id": "b8056e9d-5d85-4189-b6ee-d743b8b1bd68",
+        "name": "Get row(s) in sheet",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Use n8n execution start time explicitly\nconst execTime = new Date($execution.startedAt);\n\n// Force local midnight of execution day\nconst baseDate = new Date(\n  execTime.getFullYear(),\n  execTime.getMonth(),\n  execTime.getDate()\n);\n\n// Add 1 day = TOMORROW\nbaseDate.setDate(baseDate.getDate() + 1);\n\n// Format YYYY-MM-DD\nconst year = baseDate.getFullYear();\nconst month = String(baseDate.getMonth() + 1).padStart(2, '0');\nconst day = String(baseDate.getDate()).padStart(2, '0');\n\nreturn [{ targetDate: `${year}-${month}-${day}` }];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          480,
+          240
+        ],
+        "id": "28beb22b-bf9e-4a21-b220-5a38e4a53dcd",
+        "name": "Code in JavaScript",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "a1c59d46-2479-4983-ac30-f058ef78cf77",
+                "leftValue": "={{ $('Code in JavaScript1').item.json.lastDate }}",
+                "rightValue": "={{ new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('en-CA') }}",
+                "operator": {
+                  "type": "dateTime",
+                  "operation": "afterOrEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          624,
+          0
+        ],
+        "id": "b5a52884-d71b-4a74-9558-65bfa70f4e78",
+        "name": "If"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          912,
+          -112
+        ],
+        "id": "69aae47c-ef73-454a-9f52-d75557231c9f",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "toRecipients": "=rida@anagomb.ca, rlakhani@anagomb.ca",
+          "subject": "Add Shifts in Sheet - RAH Shift Reminders Workflow",
+          "bodyContent": "=There are no scheduled shifts in the shift reminders google sheet starting {{ new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('en-CA') }}.\nPlease review the schedule, and add shifts to the following sheet accordingly before tomorrow at 11 AM.\nhttps://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=sharing\nThank you.",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          912,
+          96
+        ],
+        "id": "0efa22a4-9063-4046-a05d-b571dadf24b0",
+        "name": "Send a message",
+        "webhookId": "147285db-4461-472e-bbf1-9d06c65a44ea",
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "4BDt5SAYt7JiWG5R",
+            "name": "Microsoft Outlook account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Function node code\n// Input: items (each item.json is a row from Google Sheets / other source)\n// Output: single item: { json: { lastDate: \"YYYY-MM-DD\" } }\n\nconst rows = items; // n8n provides 'items' automatically\n\nfunction excelSerialToDate(serial) {\n  // Excel/Google serial => JS Date (UTC)\n  // Excel incorrectly treats 1900 as leap year; most simple conversion:\n  const epoch = Date.UTC(1899, 11, 30); // 1899-12-30\n  return new Date(epoch + Math.round(serial) * 86400000);\n}\n\nfunction tryParseDate(v) {\n  if (v === null || v === undefined || v === '') return null;\n\n  // if it's already a Date\n  if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)) return v;\n\n  // if it's a number (possible Excel serial)\n  if (typeof v === 'number' && isFinite(v)) {\n    return excelSerialToDate(v);\n  }\n\n  // strings: normalize\n  let s = String(v).trim();\n\n  // remove surrounding quotes/commas\n  s = s.replace(/^[\"']|[\"']$/g, '');\n\n  // common patterns:\n  // 1) ISO-ish \"YYYY-MM-DD\" or \"YYYY-MM-DDTHH:MM:SS\" or \"YYYY-MM-DD HH:MM\"\n  // 2) \"YYYY/MM/DD\"\n  // 3) \"DD/MM/YYYY\" (try as fallback if the first parses invalid)\n  // 4) \"MM/DD/YYYY\"\n  // Try to extract numeric tokens\n  // First try YYYY-MM-DD or YYYY/MM/DD\n  const isoMatch = s.match(/^(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})/);\n  if (isoMatch) {\n    const yyyy = parseInt(isoMatch[1], 10);\n    const mm = parseInt(isoMatch[2], 10);\n    const dd = parseInt(isoMatch[3], 10);\n    // construct as UTC date to avoid local timezone shift\n    return new Date(Date.UTC(yyyy, mm - 1, dd));\n  }\n\n  // Try numbers separated by non-digits (could be DD/MM/YYYY or MM/DD/YYYY)\n  const tokens = s.split(/\\D+/).filter(Boolean);\n  if (tokens.length >= 3) {\n    // guess: if first token has 4 digits -> it's year-first already handled, else try dd/mm/yyyy\n    if (tokens[0].length === 4) {\n      const y = parseInt(tokens[0], 10);\n      const m = parseInt(tokens[1], 10);\n      const d = parseInt(tokens[2], 10);\n      return new Date(Date.UTC(y, m - 1, d));\n    } else {\n      // try both interpretations: prefer day-first (DD/MM/YYYY) unless month > 12\n      const a = parseInt(tokens[0], 10);\n      const b = parseInt(tokens[1], 10);\n      const c = parseInt(tokens[2], 10);\n      // if b > 12 then it's definitely day-first (a=day)\n      if (b > 12) {\n        return new Date(Date.UTC(c, a - 1, b)); // but this is unusual; still try\n      }\n      // assume DD/MM/YYYY\n      if (c > 31) {\n        // maybe MM/DD/YY etc. fallback to JS Date.parse\n        const parsed = Date.parse(s);\n        if (!isNaN(parsed)) return new Date(parsed);\n        return null;\n      }\n      // assume dd/mm/yyyy\n      return new Date(Date.UTC(c, b - 1, a));\n    }\n  }\n\n  // As final fallback, try Date.parse (may handle \"Dec 1 2025\" etc.)\n  const parsed = Date.parse(s);\n  if (!isNaN(parsed)) return new Date(parsed);\n\n  return null;\n}\n\n// Find the column key that contains visit start date (case-insensitive)\nfunction findDateKey(jsonRow) {\n  const keys = Object.keys(jsonRow || {});\n  // first, exact-ish match:\n  for (const k of keys) {\n    if (/^\\s*visit\\s*start\\s*date\\s*$/i.test(k)) return k;\n  }\n  // second, fuzzy match\n  for (const k of keys) {\n    if (/visit.*start.*date/i.test(k)) return k;\n  }\n  // third, any header that contains \"date\" (fallback)\n  for (const k of keys) {\n    if (/date/i.test(k) && /visit|start|begin/i.test(k)) return k;\n  }\n  // last fallback: any key containing just \"date\"\n  for (const k of keys) {\n    if (/date/i.test(k)) return k;\n  }\n  return null;\n}\n\nlet maxTs = -Infinity;\nlet maxDate = null;\nlet detectedKey = null;\n\n// If there are many rows, it's fine — iterate\nfor (const row of rows) {\n  const json = row.json || {};\n  // on first iteration, detect the key\n  if (!detectedKey) detectedKey = findDateKey(json);\n\n  if (!detectedKey) continue; // can't find a date column in this row\n\n  const raw = json[detectedKey];\n  const d = tryParseDate(raw);\n\n  if (d && !isNaN(d.getTime())) {\n    const ts = d.getTime();\n    if (ts > maxTs) {\n      maxTs = ts;\n      maxDate = d;\n    }\n  }\n}\n\n// Prepare output\nif (!maxDate) {\n  // no valid date found\n  return [{ json: { lastDate: null, message: 'No valid dates found in column.' } }];\n}\n\n// output ISO date string YYYY-MM-DD\nconst outIsoDate = maxDate.toISOString().slice(0, 10);\n\nreturn [{ json: { lastDate: outIsoDate } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          0
+        ],
+        "id": "030c6ba8-57af-4823-8d44-3950867b280d",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "36fbfa10-1dba-492a-845f-8f0c24aca048",
+                "name": "",
+                "value": "={{$(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0,10); })()}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          256,
+          240
+        ],
+        "id": "f53440c2-6c84-403b-855a-3ae9eca28143",
+        "name": "Edit Fields",
+        "disabled": true
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          []
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 18c3d011",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
