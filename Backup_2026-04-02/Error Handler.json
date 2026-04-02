@@ -1,0 +1,140 @@
+{
+  "updatedAt": "2026-03-05T02:10:37.496Z",
+  "createdAt": "2026-01-28T18:16:21.353Z",
+  "id": "heO-R-Fdix8eEk6h6FI2v",
+  "name": "Error Handler",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "b581c516-eed3-47ec-bd9b-66acabb98a4c",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=Error - {{ $json.workflow.name }}",
+        "bodyContent": "=Execution ID:  {{ $json.execution.id }}\nURL: {{ $json.execution.url }}\nError Message: {{ $json.execution.error.message }}\nLast Node Executed: {{ $json.execution.lastNodeExecuted }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "cbe67372-a0d9-4f00-aa31-72a5d245b754",
+      "name": "Send a message",
+      "webhookId": "7a3b82e9-d33b-4e74-a366-3647454b0dc8",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "4BDt5SAYt7JiWG5R",
+          "name": "ITsupport Microsoft Outlook account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a92db890-bbb9-4cd1-8d3e-1e36fd7e9ace",
+  "activeVersionId": "a92db890-bbb9-4cd1-8d3e-1e36fd7e9ace",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T18:16:21.355Z",
+      "createdAt": "2026-01-28T18:16:21.355Z",
+      "role": "workflow:owner",
+      "workflowId": "heO-R-Fdix8eEk6h6FI2v",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-05T02:10:39.000Z",
+    "createdAt": "2026-03-05T02:10:16.985Z",
+    "versionId": "a92db890-bbb9-4cd1-8d3e-1e36fd7e9ace",
+    "workflowId": "heO-R-Fdix8eEk6h6FI2v",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          16,
+          0
+        ],
+        "id": "b581c516-eed3-47ec-bd9b-66acabb98a4c",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "=Error - {{ $json.workflow.name }}",
+          "bodyContent": "=Execution ID:  {{ $json.execution.id }}\nURL: {{ $json.execution.url }}\nError Message: {{ $json.execution.error.message }}\nLast Node Executed: {{ $json.execution.lastNodeExecuted }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "cbe67372-a0d9-4f00-aa31-72a5d245b754",
+        "name": "Send a message",
+        "webhookId": "7a3b82e9-d33b-4e74-a366-3647454b0dc8",
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "4BDt5SAYt7JiWG5R",
+            "name": "ITsupport Microsoft Outlook account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version a92db890",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
