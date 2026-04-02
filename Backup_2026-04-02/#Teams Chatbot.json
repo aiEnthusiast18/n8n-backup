@@ -1,0 +1,971 @@
+{
+  "updatedAt": "2026-01-28T18:40:52.771Z",
+  "createdAt": "2025-08-11T14:05:03.526Z",
+  "id": "befc7TjLf7t8jqBN",
+  "name": "#Teams Chatbot",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Webhook data is coming from Azure Bot Configuration using production URL (not test) https://portal.azure.com/#@NETORG10246608.onmicrosoft.com/resource/subscriptions/1ecadd04-fd29-4dc8-acc7-caac526ccf3f/resourceGroups/teams/providers/Microsoft.BotService/botServices/anagoteamschatbot/config.",
+        "height": 304,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        160
+      ],
+      "id": "99771745-4412-4cc5-b832-16a1ae143ac2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65b19840-a001-4290-85cd-47e00d4cda5f",
+              "name": "user_aad_id",
+              "value": "={{ $json.body.from.aadObjectId }}",
+              "type": "string"
+            },
+            {
+              "id": "29028395-cc8e-4246-8723-7dd9cb221400",
+              "name": "conversation_id",
+              "value": "={{ $json.headers['x-ms-conversation-id'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d51152b9-4b29-484e-a3da-8d85bb9c0cba",
+              "name": "user_message",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "4c2771ae-55b2-4808-9f44-1f0a4f668f7f",
+              "name": "service_url",
+              "value": "={{ $json.body.serviceUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        128
+      ],
+      "id": "514340b4-bfd8-4ea9-8948-c65f5f85b0f6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5cfd5d78-64a0-4547-a994-451d212285c7",
+              "name": "=text",
+              "value": "={{ $json.output.replace(/\\n/g, '\\\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        480
+      ],
+      "id": "e47e5bc0-1357-4a2f-91db-3ca01bada5fa",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        816,
+        304
+      ],
+      "id": "07c35b1a-d24e-464a-a70e-2653dd41ad87",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "## This workflow is based on the video\n**There are some changes made so the reply comes from the Bot and not from the user\n\nhttps://www.youtube.com/watch?v=Q7iZWSXpXU8",
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d08fed78-3c8a-46fa-aa39-7d366a8b20d2",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        704
+      ],
+      "id": "dcba9355-b6bd-46c0-afdb-72f64d4fe125",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.headers['x-ms-conversation-id'] }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        704
+      ],
+      "id": "a9795d8e-2610-4c90-b717-0d670c14c1d9",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "8j3kx3xVrJ5s0dwo",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool to look up information about Anago to answer the questions in the chat and provide information about the services provided by Anago",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        704
+      ],
+      "id": "91f7cbc9-ed7f-4231-ac70-1126cca697d0",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uWuWv6TXvVhMjwX1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        912
+      ],
+      "id": "d33824ce-a717-4abf-b561-07c8d3e1dfbf",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://smba.trafficmanager.net/ca/v3/conversations/{{ $json.conversation_id }}/activities/{{ $('Webhook1').item.json.body.id }}\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"message\", \n  \"text\": \"{{ $json.text }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        304
+      ],
+      "id": "c831efa6-8a1b-4346-a8d2-86ce060e131d",
+      "name": "HTTP Request1",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hUwpDh27MflTkpZP",
+          "name": "Azure API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "394c5b60-f896-4ccb-88d5-7c1220744c3f",
+              "leftValue": "={{ $json.body.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        480
+      ],
+      "id": "5f93f465-deee-4e5b-a147-e7e514473308",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "teamschatbot",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        304
+      ],
+      "id": "e2827e7d-e22f-4656-a7c9-7fdfaa46ccf8",
+      "name": "Webhook1",
+      "webhookId": "6858d9f2-3f92-4086-ba9c-cc219cfce95e"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.text }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant for Anago Cleaning. You help direct customers to Anago and match what they are looking for to services that Anago provides based on the Supabase vector tool provided. The output should be formatted in a way that will be be safe to pass as a text that will be included in the api push. Add line breaks in \\n if needed."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        16,
+        480
+      ],
+      "id": "db9c2ad1-3396-499a-a5e8-c17489753655",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "content": "- workflow triggered by slack message\n- filter ensures message is not blank\n- ai agent intakes user message and using analog document folder via supabase matches user needs to Anago services\n- all variables mapped into nodes to effectively respond to user message in slack",
+        "height": 192,
+        "width": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        944
+      ],
+      "id": "2e160303-ddbe-4bf7-8dd0-849218009aeb",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.204it.ca",
+            "user-agent": "Microsoft-SkypeBotApi (Microsoft-BotFramework/3.0)",
+            "content-length": "1147",
+            "authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkR6M2kzdmZfX0ljcnBaMG1EamhVVWNoODVFRSIsIng1dCI6IkR6M2kzdmZfX0ljcnBaMG1EamhVVWNoODVFRSIsInR5cCI6IkpXVCJ9.ew0KICAic2VydmljZXVybCI6ICJodHRwczovL3NtYmEudHJhZmZpY21hbmFnZXIubmV0L2NhLzc5ZTY3ZDBhLTRiYmYtNDA0MS1hNGZmLTQ1MTM3NjUzMDM2ZS8iLA0KICAibmJmIjogMTc1NDkyNDcwNCwNCiAgImV4cCI6IDE3NTQ5MjgzMDQsDQogICJpc3MiOiAiaHR0cHM6Ly9hcGkuYm90ZnJhbWV3b3JrLmNvbSIsDQogICJhdWQiOiAiZTM3NDVjYzMtNjg0NC00ZTk4LTg5YjctYzUwY2Y5NDBhODM0Ig0KfQ.SwLAu0A73IuEaUE4lEf7u2KAL08d6OfFhabNBBm0wxNpx1Tmk3Fenp96T7OvstVtw0HWmXBBHI8cpT35LuzHqSqxXO32yO81DN_Ue1ZbGtK9ECb2-l0ynZrKsBddBKVgeqKCnkglAF2U80Xb1V6KkmLUmwBPtEJUY1j_mIsP_REq4xGRX0EKkLGvpSeLOvEtaqmLyIiEpjplAgBBHicQ7ypR1x3svRT-B6hhjzHsF8wRhPRja7-P7ONNJQMhuz4VNA4DlqZW-0C8Ma71AVUhmrFEYETwl2lJd3AFZv_z7zcw_7gbHndpaLtsjW6HuEmZTdlSptkGoPXTJfAuY5Hm-A",
+            "content-type": "application/json; charset=utf-8",
+            "ms-cv": "glZGhpvD8Eah7Am4+PA3MA.1.1.1.1752404284.1.1",
+            "x-forwarded-for": "52.112.76.0",
+            "x-forwarded-host": "n8n.204it.ca",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "56106bb26c1c",
+            "x-ms-conversation-id": "a:1XhTsZnZprNvF3bFufKy0WfwVismXRd2COlr7tp8SfPaDPOURSqPu7gt9ZTvFkJ25pXXv4m1PW2nw8cpY9fIO3K-viNoZdEsv4ZHdP5HObL68QFFNORspq1LJFSN3nUtm",
+            "x-ms-tenant-id": "79e67d0a-4bbf-4041-a4ff-45137653036e",
+            "x-real-ip": "52.112.76.0",
+            "accept-encoding": "gzip"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "Do you clean carpets of cars?",
+            "textFormat": "plain",
+            "attachments": [
+              {
+                "contentType": "text/html",
+                "content": "<p>Do you clean carpets of cars?</p>"
+              }
+            ],
+            "type": "message",
+            "timestamp": "2025-08-11T15:05:04.4509755Z",
+            "localTimestamp": "2025-08-11T08:05:04.4509755-07:00",
+            "id": "1754924704398",
+            "channelId": "msteams",
+            "serviceUrl": "https://smba.trafficmanager.net/ca/79e67d0a-4bbf-4041-a4ff-45137653036e/",
+            "from": {
+              "id": "29:19aVGLlxzSJjeRk7nGGp-vkSl63ql4-4WxwV9YjsIibNRnTJVKXNhx11nycm04Q4IN0zJGS9UMywCprjd0Ck2Qg",
+              "name": "IT Support",
+              "aadObjectId": "d295dce0-8cf4-4283-9543-012d0da0f4e6"
+            },
+            "conversation": {
+              "conversationType": "personal",
+              "tenantId": "79e67d0a-4bbf-4041-a4ff-45137653036e",
+              "id": "a:1XhTsZnZprNvF3bFufKy0WfwVismXRd2COlr7tp8SfPaDPOURSqPu7gt9ZTvFkJ25pXXv4m1PW2nw8cpY9fIO3K-viNoZdEsv4ZHdP5HObL68QFFNORspq1LJFSN3nUtm"
+            },
+            "recipient": {
+              "id": "28:e3745cc3-6844-4e98-89b7-c50cf940a834",
+              "name": "Anago Teams Chatbot"
+            },
+            "entities": [
+              {
+                "locale": "en-US",
+                "country": "US",
+                "platform": "Mac",
+                "timezone": "America/Los_Angeles",
+                "type": "clientInfo"
+              }
+            ],
+            "channelData": {
+              "tenant": {
+                "id": "79e67d0a-4bbf-4041-a4ff-45137653036e"
+              }
+            },
+            "locale": "en-US",
+            "localTimezone": "America/Los_Angeles"
+          },
+          "webhookUrl": "https://n8n.204it.ca:5678/webhook/teamschatbot",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "eaf25995-f83e-4d54-ba83-bae0f9c90393",
+  "activeVersionId": "eaf25995-f83e-4d54-ba83-bae0f9c90393",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-11T14:05:03.531Z",
+      "createdAt": "2025-08-11T14:05:03.531Z",
+      "role": "workflow:owner",
+      "workflowId": "befc7TjLf7t8jqBN",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-11-27T23:57:16.304Z",
+    "createdAt": "2025-11-27T23:57:16.304Z",
+    "versionId": "eaf25995-f83e-4d54-ba83-bae0f9c90393",
+    "workflowId": "befc7TjLf7t8jqBN",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "Webhook data is coming from Azure Bot Configuration using production URL (not test) https://portal.azure.com/#@NETORG10246608.onmicrosoft.com/resource/subscriptions/1ecadd04-fd29-4dc8-acc7-caac526ccf3f/resourceGroups/teams/providers/Microsoft.BotService/botServices/anagoteamschatbot/config.",
+          "height": 304,
+          "width": 384
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -560,
+          160
+        ],
+        "id": "99771745-4412-4cc5-b832-16a1ae143ac2",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "65b19840-a001-4290-85cd-47e00d4cda5f",
+                "name": "user_aad_id",
+                "value": "={{ $json.body.from.aadObjectId }}",
+                "type": "string"
+              },
+              {
+                "id": "29028395-cc8e-4246-8723-7dd9cb221400",
+                "name": "conversation_id",
+                "value": "={{ $json.headers['x-ms-conversation-id'] }}",
+                "type": "string"
+              },
+              {
+                "id": "d51152b9-4b29-484e-a3da-8d85bb9c0cba",
+                "name": "user_message",
+                "value": "={{ $json.body.text }}",
+                "type": "string"
+              },
+              {
+                "id": "4c2771ae-55b2-4808-9f44-1f0a4f668f7f",
+                "name": "service_url",
+                "value": "={{ $json.body.serviceUrl }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          608,
+          128
+        ],
+        "id": "514340b4-bfd8-4ea9-8948-c65f5f85b0f6",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5cfd5d78-64a0-4547-a994-451d212285c7",
+                "name": "=text",
+                "value": "={{ $json.output.replace(/\\n/g, '\\\\n') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          544,
+          480
+        ],
+        "id": "e47e5bc0-1357-4a2f-91db-3ca01bada5fa",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          816,
+          304
+        ],
+        "id": "07c35b1a-d24e-464a-a70e-2653dd41ad87",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "content": "## This workflow is based on the video\n**There are some changes made so the reply comes from the Bot and not from the user\n\nhttps://www.youtube.com/watch?v=Q7iZWSXpXU8",
+          "width": 448
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "d08fed78-3c8a-46fa-aa39-7d366a8b20d2",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4.1-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -16,
+          704
+        ],
+        "id": "dcba9355-b6bd-46c0-afdb-72f64d4fe125",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $json.headers['x-ms-conversation-id'] }}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          112,
+          704
+        ],
+        "id": "a9795d8e-2610-4c90-b717-0d670c14c1d9",
+        "name": "Postgres Chat Memory",
+        "credentials": {
+          "postgres": {
+            "id": "8j3kx3xVrJ5s0dwo",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "retrieve-as-tool",
+          "toolDescription": "Call this tool to look up information about Anago to answer the questions in the chat and provide information about the services provided by Anago",
+          "tableName": {
+            "__rl": true,
+            "value": "documents",
+            "mode": "list",
+            "cachedResultName": "documents"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+        "typeVersion": 1.3,
+        "position": [
+          224,
+          704
+        ],
+        "id": "91f7cbc9-ed7f-4231-ac70-1126cca697d0",
+        "name": "Supabase Vector Store",
+        "credentials": {
+          "supabaseApi": {
+            "id": "uWuWv6TXvVhMjwX1",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          304,
+          912
+        ],
+        "id": "d33824ce-a717-4abf-b561-07c8d3e1dfbf",
+        "name": "Embeddings OpenAI",
+        "credentials": {
+          "openAiApi": {
+            "id": "OhcxKqaJMIt2UKDI",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://smba.trafficmanager.net/ca/v3/conversations/{{ $json.conversation_id }}/activities/{{ $('Webhook1').item.json.body.id }}\n",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "oAuth2Api",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"type\": \"message\", \n  \"text\": \"{{ $json.text }}\"\n} ",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1040,
+          304
+        ],
+        "id": "c831efa6-8a1b-4346-a8d2-86ce060e131d",
+        "name": "HTTP Request1",
+        "credentials": {
+          "oAuth2Api": {
+            "id": "hUwpDh27MflTkpZP",
+            "name": "Azure API"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "394c5b60-f896-4ccb-88d5-7c1220744c3f",
+                "leftValue": "={{ $json.body.text }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.2,
+        "position": [
+          -240,
+          480
+        ],
+        "id": "5f93f465-deee-4e5b-a147-e7e514473308",
+        "name": "Filter"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "teamschatbot",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          -464,
+          304
+        ],
+        "id": "e2827e7d-e22f-4656-a7c9-7fdfaa46ccf8",
+        "name": "Webhook1",
+        "webhookId": "6858d9f2-3f92-4086-ba9c-cc219cfce95e"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.body.text }}",
+          "options": {
+            "systemMessage": "You are a helpful assistant for Anago Cleaning. You help direct customers to Anago and match what they are looking for to services that Anago provides based on the Supabase vector tool provided. The output should be formatted in a way that will be be safe to pass as a text that will be included in the api push. Add line breaks in \\n if needed."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2,
+        "position": [
+          16,
+          480
+        ],
+        "id": "db9c2ad1-3396-499a-a5e8-c17489753655",
+        "name": "AI Agent1"
+      },
+      {
+        "parameters": {
+          "content": "- workflow triggered by slack message\n- filter ensures message is not blank\n- ai agent intakes user message and using analog document folder via supabase matches user needs to Anago services\n- all variables mapped into nodes to effectively respond to user message in slack",
+          "height": 192,
+          "width": 336,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          832,
+          944
+        ],
+        "id": "2e160303-ddbe-4bf7-8dd0-849218009aeb",
+        "name": "Sticky Note1"
+      }
+    ],
+    "connections": {
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Embeddings OpenAI": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Supabase Vector Store",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter": {
+        "main": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Chat Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase Vector Store": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
