@@ -1,0 +1,3688 @@
+{
+  "updatedAt": "2025-11-22T22:24:58.000Z",
+  "createdAt": "2025-10-18T22:31:48.437Z",
+  "id": "E2PNpV2LRA3hdC19",
+  "name": "Social Media Rida - Topic Generation Workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1856,
+        -720
+      ],
+      "id": "6d35511f-f326-4998-b7de-ff513c81f945",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        1600
+      ],
+      "id": "4087b502-c746-47ba-83db-12302f203d05",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate this week’s three post topic ideas for Right at Home Winnipeg. Today’s date is {{ $('Schedule Trigger').item.json.Month }} {{ $('Schedule Trigger').item.json['Day of month'] }}, {{ $('Schedule Trigger').item.json.Year }}.\n\nThis content plan is for the week of {{ $('Schedule Trigger').item.json.Month }} {{ $('Schedule Trigger').item.json['Day of month'] }} to {{ $json.endOfWeek }}. When choosing awareness days, use only observances happening in Canada during this date range that would be relevant to seniors, caregivers, or families.\n\nReturn the output strictly as a JSON array of objects with \"Post Type\" and \"Idea\" fields, one object per idea. Example:\n\n[\n  { \"Post Type\": \"Marketing\", \"Idea\": \"...\" },\n  { \"Post Type\": \"Calendar\", \"Idea\": \"...\" },\n  { \"Post Type\": \"Human\", \"Idea\": \"...\" }\n]\n",
+        "options": {
+          "systemMessage": "=Generate this week’s three post topic ideas for Right at Home Winnipeg. Today’s date is {{ $('Schedule Trigger').item.json.Month }} {{ $('Schedule Trigger').item.json['Day of month'] }}, {{ $('Schedule Trigger').item.json.Year }}.\n\nThis content plan is for the week of {{ $('Schedule Trigger').item.json.Month }} {{ $('Schedule Trigger').item.json['Day of month'] }} to {{ $json.endOfWeek }}. When choosing awareness days, use only observances happening in Canada during this date range that would be relevant to seniors, caregivers, or families.\n\nReturn the output strictly as a JSON array of objects with \"Post Type\" and \"Idea\" fields, one object per idea. Example:\n\n[\n  { \"Post Type\": \"Marketing\", \"Idea\": \"...\" },\n  { \"Post Type\": \"Calendar\", \"Idea\": \"...\" },\n  { \"Post Type\": \"Human\", \"Idea\": \"...\" }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        4016,
+        -784
+      ],
+      "id": "7bb38198-1fe7-4216-9b30-9503c3f81db9",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Start date: {{ $json.startDate }}\nEnd date: {{ $json.endDate }}\n\nWebsite to reference:\nhttps://www.rightathomecanada.com/winnipeg\n\nTask:\nGenerate one marketing topic idea for the week that helps promote Right at Home Winnipeg.\n\nRequirements:\n- The topic should focus on a specific service, resource, or general company highlight found on the website.\n- Include the valid URL to the relevant webpage (or the main URL if general).\n\nOutput format:\nWeek of {{ $json.week }}\nTopic: [Insert concise topic idea]\nURL: [Insert matching URL]",
+        "options": {
+          "systemMessage": "You are a professional marketing strategist and content planner for Right at Home Winnipeg, a trusted in-home senior care agency.\n\nYou are provided with:\n- The start and end date for a specific week.\n- The company website: https://www.rightathomecanada.com/winnipeg\n\nYour task:\n1. Review the Right at Home Winnipeg website.\n2. Generate one **weekly marketing topic idea** that promotes the company’s services, programs, or brand.\n3. The topic should be specific — such as highlighting a care service, educational resource, or company value mentioned on the site.\n4. Include the **valid URL** that corresponds to the page for that topic.  \n   - If the topic is general (e.g., company spotlight, community trust, personalized care), use the main URL: https://www.rightathomecanada.com/winnipeg.\n5. Do **not** include explanations, captions, or summaries — only the topic name/idea and its corresponding URL.\n6. Ensure the topic is relevant and appealing to the target audience (seniors, caregivers, and families), and aligns with Right at Home Winnipeg’s compassionate, community-centered brand tone."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2528,
+        416
+      ],
+      "id": "ed359558-9e01-48e7-885b-f7e2ecccfb4d",
+      "name": "Marketing"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        4512,
+        -720
+      ],
+      "id": "29f4b493-a034-4237-8d55-11ff2c3dd04a",
+      "name": "Human",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Start date: {{ $('Loop Over Items').item.json.startDate }}\nEnd date: {{ $('Loop Over Items').item.json.endDate }}\n\nMaster event list:\nOCTOBER 2025\nOct 1: National Seniors Day (Canada/Manitoba)\nOct 1: International Day of Older Persons (UN)\nOct 4: National Cinnamon Bun Day – Community baking activity\nOct 6–12: Mental Illness Awareness Week\nOct (Month): Healthy Workplace Month, Breast Cancer Awareness Month, Occupational Therapy Month\nOct 10: World Mental Health Day\nOct 10: World Hospice/Palliative Care Day\nOct 13: Thanksgiving (Canada)\nOct 15: Pregnancy and Infant Loss Awareness Day\nOct 16 onwards: Manitoba Fall Prevention & Active Aging programs\nOct 20: Diwali (multicultural celebration)\nOct 23: Birth of Bahá'u'lláh (Bahá’í)\nOct 24: Brain Cancer Awareness Day\nOct 31: Halloween — crafts, baking\nOctober: Manitoba Healthy Aging Awards\n\nNOVEMBER 2025\nNovember: Lung Cancer Awareness Month, Fall Prevention Month, Diabetes Awareness Month\nNov 1–7: Canadian Patient Safety Week\nNov 7: Inuit Day\nNov 8: Indigenous Veterans Day\nNov 13: World Kindness Day — card-making, crafts\nNov 14: World Diabetes Day\nNov 20: Transgender Day of Remembrance\nNov 17: National Homemade Bread Day — baking or sharing recipes\n\nDECEMBER 2025\nDec 1: World AIDS Day\nDec 3: International Day of Persons with Disabilities\nDec 4: National Cookie Day — group baking\nDec 14–22: Hanukkah — crafts, food-themed events\nDec 21: Winter Solstice\nDec 25: Christmas Day\nDec 26–Jan 1: Kwanzaa\n\nJANUARY 2026\nJanuary: Alzheimer’s Awareness Month\nJan 4: World Braille Day\nJan 18: Museum Selfie Day — virtual or local museum visits\nJan 21: National Squirrel Appreciation Day — nature watching\nJan 24: National Fun at Work Day — team games\nJan 25: Family Literacy Day — book clubs/reading\n\nFEBRUARY 2026\nFebruary: Heart Health Month, Black History Month, Psychology Month\nFeb 4: World Cancer Day\nFeb 13: Wear Red Canada (Women’s Heart Health)\nFeb 15: International Childhood Cancer Day\nFeb 20: National Love Your Pet Day — share pet photos, stories\nLast Day: Rare Disease Day\n\nMARCH 2026\nMarch: Kidney Health Month, Nutrition Month\nMar 8: International Women’s Day\nMar 14: Pi Day — bake pies, math fun\nMar 21: World Down Syndrome Day\nMar 22: World Water Day — gardening, nature themed events\nMar 31: Transgender Day of Visibility\n\nAPRIL 2026\nApril: Parkinson’s Awareness Month\nApr 2: World Autism Awareness Day\nApr 7: World Health Day — cooking/nutrition\nApr 11: World Parkinson’s Day\nApr 16: National Advance Care Planning Day\nApr 18: National Haiku Poetry Day — creative writing workshop\nApr 20–26: National Organ & Tissue Donation Awareness Week\n\nMAY 2026\nMay: Brain Tumor Awareness Month, Speech and Hearing Month, Mental Health Awareness Month, Bladder Cancer Awareness Month, Asian Heritage Month\nMay 6–12: National Nursing Week\nMay 8: World Ovarian Cancer Day\nMay 12: International Nurses Day\nMay 17: World Baking Day — staff/client bake-off\nMay 24: Victoria Day\nMay 25: National Scavenger Hunt Day — group activity\nMay 31: World No Tobacco Day\n\nJUNE 2026\nJune: ALS Awareness Month, National Indigenous History Month, Stroke Awareness Month, Canadian Men’s Health Month\nJun 1: Intergenerational Day\nJun 5: World Environment Day — gardening, sustainability projects\nJun 13–15: Garden Days Canada — garden visits, crafts\nJun 15: World Elder Abuse Awareness Day\nJun 21: National Indigenous Peoples Day, Summer Solstice\nJun 21: International Yoga Day — wellness activity\n\nJULY 2026\nJuly: UV Safety Month\nJul 7: National Chocolate Day — cooking/baking\nJul 11: National Cheer Up the Lonely Day — outreach, crafts\nJul 24: International Self-Care Day — relaxation activities\nJul 26: Disability Independence Day\n\nAUGUST 2026\nAug 8: International Cat Day — pet events\nAug 12: International Youth Day — youth crafts\nAug 30: National Toasted Marshmallow Day — treats\nAug 31: International Overdose Awareness Day\n\nSEPTEMBER 2026\nSeptember: World Alzheimer’s Month, Arthritis Awareness Month, Prostate Cancer Awareness Month, Childhood Cancer Awareness Month\nSep 8: International Literacy Day — reading club\nSep 10: World Suicide Prevention Day\nSep 13: National Grandparents Day — intergenerational events\nSep 15–21: National Dementia Awareness Week\nSep 21: World Alzheimer’s Day\nSep 30: National Day for Truth and Reconciliation\n\n---\n\nPlease identify which of these dates or awareness observances fall from **{{ $('Loop Over Items').item.json.week }}**, list all the days of that week (e.g. October 6, October 7, …), and then suggest the **most suitable one** for the senior care audience that week.",
+        "options": {
+          "systemMessage": "You are an expert content and event-planning assistant for Right at Home Winnipeg, a trusted in-home senior care agency serving older adults in Manitoba.\n\nYou are given:\n- A start and end date for a specific week (e.g. October 6–12, 2025)\n- A master list of awareness days, holidays, and observances between October 2025 and September 2026.\n\nYour job:\n1. Identify all events, holidays, or observances from the list that fall within the given date range.\n2. Write out the days of the week (e.g. October 6, October 7, October 8, …) separated by commas.\n3. Suggest **which event or day that week** is most relevant or suitable for Right at Home Winnipeg’s audience (primarily seniors, caregivers, and community health & wellness).\n4. Keep your tone professional, warm, and concise — the output will be used for automated scheduling and planning.\n\nIf there are no direct matches, identify the **closest relevant ongoing awareness month or week** that overlaps with the given dates."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2880,
+        416
+      ],
+      "id": "7e491670-dc38-4cc8-bec7-6d8bc4c235c5",
+      "name": "Calendar"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "87158930-7e73-4954-837d-b94b65307f85",
+              "name": "week",
+              "value": "={{ $('Loop Over Items').item.json.week }}",
+              "type": "string"
+            },
+            {
+              "id": "dda3fcb0-2d76-48de-be7c-7834b3b9dc02",
+              "name": "marketing",
+              "value": "={{ $('Marketing').item.json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "83c6b975-5ddb-49fe-af79-c78f31a879fe",
+              "name": "calendar",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "ed687997-f613-4880-acba-40c5831c0d4d",
+              "name": "human",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3216,
+        416
+      ],
+      "id": "112e63f1-5337-4f34-a69e-e1d86de5b081",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 768276005,
+          "mode": "list",
+          "cachedResultName": "topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=768276005"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Week": "={{ $json.week }}",
+            "Marketing": "={{ $json.marketing }}",
+            "Calendar": "={{ $json.calendar }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Week",
+              "displayName": "Week",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Marketing",
+              "displayName": "Marketing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Calendar",
+              "displayName": "Calendar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Human",
+              "displayName": "Human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3440,
+        416
+      ],
+      "id": "381688d2-74d4-468d-bd3b-9d1ab5838478",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2832,
+        672
+      ],
+      "id": "7ea51080-0f07-42ae-94fd-384ff9fc2f55",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2464,
+        640
+      ],
+      "id": "cbf0ae8c-d343-4bfb-93a4-329a09ac9cc0",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "January",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1296,
+        -688
+      ],
+      "id": "d0e912ea-aaa3-4d93-9db9-916bbebdfbcc",
+      "name": "Jan"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "February",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1136,
+        -432
+      ],
+      "id": "143853f6-4919-44c6-bad3-19f4acac37e6",
+      "name": "Feb"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "March",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -960,
+        -192
+      ],
+      "id": "2241dcf9-3882-43ac-84ca-d0c5459f7572",
+      "name": "Mar"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "April",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -816,
+        64
+      ],
+      "id": "c74cfdf4-a2f7-485b-8baa-7640e702f917",
+      "name": "Apr"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "May",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        320
+      ],
+      "id": "8ce29b1b-6d30-4cc3-8323-df4f293b46c2",
+      "name": "May"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "June",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        576
+      ],
+      "id": "e733437e-5259-41d4-9662-1c4a05c321c6",
+      "name": "Jun"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "July",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        832
+      ],
+      "id": "fc170df7-cc7c-4f94-ac8a-3732567537f5",
+      "name": "Jul"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "August",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        1104
+      ],
+      "id": "09f019cb-796f-4e68-8393-645ac9edd609",
+      "name": "Aug"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "September",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        1360
+      ],
+      "id": "e356db16-89a7-4fc5-af7b-a55bc14d2b4f",
+      "name": "Sep"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "October",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        1600
+      ],
+      "id": "8cadde3c-621e-441f-92ab-02461989ef6b",
+      "name": "Oct"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "030a60da-818d-4446-8453-dee501da34e4",
+              "leftValue": "={{ $json.Month }}",
+              "rightValue": "November",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        1872
+      ],
+      "id": "cc7f7add-6cfb-495a-a4d2-6528b25e8f69",
+      "name": "Nov"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        1600
+      ],
+      "id": "bdebadca-4be8-471c-81bb-27f687ee0ef2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "November",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "October",
+              "type": "string"
+            },
+            {
+              "id": "bcd592d6-c089-4209-ba5a-c68102692bde",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "6ded8ae0-10ab-431a-89d4-f8221fbef45f",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        1504
+      ],
+      "id": "b86a2660-e254-4c47-b0a4-58a2c60aa94b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "October",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "October",
+              "type": "string"
+            },
+            {
+              "id": "ec84968b-ff4e-4810-aad4-7b9d58997dc9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4a611d32-5b75-4d17-a452-4e0f913d5400",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        1648
+      ],
+      "id": "f3b9ec58-2e47-4506-b823-d096cc26a6cd",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1104,
+        -704
+      ],
+      "id": "3187e5f1-535b-4fc8-99e3-d70a2cf43fd0",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -896,
+        -704
+      ],
+      "id": "131e1381-1d2a-4564-98eb-87a203a92540",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "February",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "January",
+              "type": "string"
+            },
+            {
+              "id": "c317f0bc-4103-4f0f-a1f4-f9f7404d68b3",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "f1defd9b-f7c2-4b30-b351-7ed7fa192905",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        -800
+      ],
+      "id": "10552f63-7d4e-4b67-b5be-935ab9915027",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "January",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "January",
+              "type": "string"
+            },
+            {
+              "id": "da36fd1b-ff60-48c0-8e85-41a25f1a8fb1",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "79591227-069b-4da1-8b68-739149d54539",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        -656
+      ],
+      "id": "54b96391-e4bb-4aed-8f14-9d64ac4ce706",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        -208
+      ],
+      "id": "726ca717-304b-47b2-a4f4-4da10fc8c4ac",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        -208
+      ],
+      "id": "b7cccb4f-7064-4dc4-8ee6-131b4b98627a",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "April",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "March",
+              "type": "string"
+            },
+            {
+              "id": "fa6983ee-1096-4409-bee9-42ffd01b820a",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "d8f70e71-fa62-45eb-8b34-ad25e80720a4",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        -304
+      ],
+      "id": "0ce6286a-577b-4671-b1f5-7212b75c2b40",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "March",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "March",
+              "type": "string"
+            },
+            {
+              "id": "361399c1-28ef-4967-984f-9a269603fa16",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4b81f7ed-4585-4050-8f3f-c1d6a4b34d17",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        -160
+      ],
+      "id": "49fcdb81-f6c9-4961-862c-ae7f786e1abb",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        304
+      ],
+      "id": "d5dfc81c-ca3b-4620-b64b-e8d6e0128368",
+      "name": "Edit Fields10"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        304
+      ],
+      "id": "a5c62910-52f4-4bb2-b8d9-722e53c0ca7a",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "June",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "May",
+              "type": "string"
+            },
+            {
+              "id": "6b11e179-d0fd-4af7-b83f-e67f9db4f17c",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "cdac1a72-ef15-46e6-a945-45e40bfc47c2",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        208
+      ],
+      "id": "637711f9-c1b9-4d06-816a-857c955ac881",
+      "name": "Edit Fields11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "May",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "May",
+              "type": "string"
+            },
+            {
+              "id": "af348fad-a078-4c17-85d6-9e1b9a1196f9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "8cee4ba2-f345-472a-8a52-ca27529b3086",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        352
+      ],
+      "id": "18f65bd2-cdd4-4e95-9870-d6f31d26c086",
+      "name": "Edit Fields12"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        816
+      ],
+      "id": "09150260-3cbf-4472-96e2-39c32a3fa785",
+      "name": "Edit Fields13"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        816
+      ],
+      "id": "a22cd92b-f773-460d-9b96-483df0fef0c8",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "August",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "July",
+              "type": "string"
+            },
+            {
+              "id": "38b9a635-131f-448d-a42b-861abd9ff809",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "ea24a6c5-425b-48e6-963f-07d3dc3e53d7",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        720
+      ],
+      "id": "4ba2bc26-12ea-4a19-9900-5c512271c105",
+      "name": "Edit Fields14"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "July",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "July",
+              "type": "string"
+            },
+            {
+              "id": "2b723b36-17fe-41d6-b486-ad9fc3701dab",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "12face5c-fcb0-44fb-93b4-a2b206529588",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        864
+      ],
+      "id": "0d717009-beb0-4a7e-b1af-c653515280a4",
+      "name": "Edit Fields15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        1088
+      ],
+      "id": "c871730e-0034-455b-b7b4-fa11321eab44",
+      "name": "Edit Fields16"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        1088
+      ],
+      "id": "0e737d33-7a7e-44ae-ba17-aac0dc14d10d",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "September",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "August",
+              "type": "string"
+            },
+            {
+              "id": "07846f25-65ea-48ab-a1a6-fc388f39fd9d",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "60b9a54c-8992-4e81-bfc4-51b2a3d288e3",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        992
+      ],
+      "id": "4644a5a5-c8ac-4083-8de5-8bdd36a835fa",
+      "name": "Edit Fields17"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "August",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "August",
+              "type": "string"
+            },
+            {
+              "id": "1cadf17d-94c2-4f69-bd13-c6df647c0166",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "cdab08bd-c0a1-4801-a461-c5ff83cd6e1c",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        1136
+      ],
+      "id": "faee1382-3868-4c26-ab61-154b26a82bfa",
+      "name": "Edit Fields18"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        2144
+      ],
+      "id": "df881fbb-a07c-47f3-8f86-75cdfa88c10a",
+      "name": "Edit Fields19"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 31,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        576,
+        2144
+      ],
+      "id": "02ae3daa-9bf8-4a58-ab96-a8399102a4cb",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 31}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "January",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "December",
+              "type": "string"
+            },
+            {
+              "id": "85a20a60-5792-42a0-9bf8-fce835a3a4a2",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "1e5a16f3-8bb4-487f-86ea-e5b0579d6c7e",
+              "name": "endYear",
+              "value": "={{ parseInt( $('Schedule Trigger').item.json.Year) + 0001 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        2064
+      ],
+      "id": "e0f7b665-7bd7-42d5-801f-e1b6d032ac32",
+      "name": "Edit Fields20"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "October",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "October",
+              "type": "string"
+            },
+            {
+              "id": "27d4d5a6-3f2f-4502-9f08-0123112aa8c7",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "7d6a6e96-e39a-470d-ae38-db8c120b6295",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        2192
+      ],
+      "id": "a0f4e407-4ddc-4a8d-8aea-ab531c92a320",
+      "name": "Edit Fields21"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        1856
+      ],
+      "id": "1993c6f9-6534-42c5-88b2-700cbccb018a",
+      "name": "Edit Fields22"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 30,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        1856
+      ],
+      "id": "340d2655-c4d8-4cab-bf6a-a7e7b82765ed",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 30}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "December",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "November",
+              "type": "string"
+            },
+            {
+              "id": "bcd592d6-c089-4209-ba5a-c68102692bde",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "6ded8ae0-10ab-431a-89d4-f8221fbef45f",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        1760
+      ],
+      "id": "ce6f9f20-4cfa-42d2-8cfe-1075729cc7d9",
+      "name": "Edit Fields23"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "November",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "November",
+              "type": "string"
+            },
+            {
+              "id": "ec84968b-ff4e-4810-aad4-7b9d58997dc9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4a611d32-5b75-4d17-a452-4e0f913d5400",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        1904
+      ],
+      "id": "34ccd4a5-d469-444d-9f09-4502eed39d93",
+      "name": "Edit Fields24"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        1344
+      ],
+      "id": "d5c0bd30-4fe9-4982-8404-55a6067d8a3d",
+      "name": "Edit Fields25"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 30,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        1344
+      ],
+      "id": "77c4c457-b8dd-4977-9f5c-aa44bef850c9",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 30}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "October",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "September",
+              "type": "string"
+            },
+            {
+              "id": "bcd592d6-c089-4209-ba5a-c68102692bde",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "6ded8ae0-10ab-431a-89d4-f8221fbef45f",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        1248
+      ],
+      "id": "212c2c54-678d-46e0-9b16-43cab9731006",
+      "name": "Edit Fields26"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "September",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "September",
+              "type": "string"
+            },
+            {
+              "id": "ec84968b-ff4e-4810-aad4-7b9d58997dc9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4a611d32-5b75-4d17-a452-4e0f913d5400",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        1392
+      ],
+      "id": "85dc04dd-c680-4f37-b598-578bae817cb7",
+      "name": "Edit Fields27"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        560
+      ],
+      "id": "5256f35d-8047-4ecc-88bd-9b7647e6d263",
+      "name": "Edit Fields28"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 30,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        560
+      ],
+      "id": "38e7e921-e447-44a4-b86c-6232629f27b7",
+      "name": "If9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 30}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "July",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "June",
+              "type": "string"
+            },
+            {
+              "id": "bcd592d6-c089-4209-ba5a-c68102692bde",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "6ded8ae0-10ab-431a-89d4-f8221fbef45f",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        464
+      ],
+      "id": "39035dca-da71-4447-bf51-b44cb4438758",
+      "name": "Edit Fields29"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "June",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "June",
+              "type": "string"
+            },
+            {
+              "id": "ec84968b-ff4e-4810-aad4-7b9d58997dc9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4a611d32-5b75-4d17-a452-4e0f913d5400",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        608
+      ],
+      "id": "5b2ad999-792b-4123-bbc4-1c3f4fc89b65",
+      "name": "Edit Fields30"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -624,
+        48
+      ],
+      "id": "846ffff5-4482-449d-a89d-0581a9b35a7d",
+      "name": "Edit Fields31"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 30,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        48
+      ],
+      "id": "924d75c3-03f0-4b52-b0b0-2ef4f3746cf7",
+      "name": "If10"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 30}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "May",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "April",
+              "type": "string"
+            },
+            {
+              "id": "bcd592d6-c089-4209-ba5a-c68102692bde",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "6ded8ae0-10ab-431a-89d4-f8221fbef45f",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        -48
+      ],
+      "id": "d138fa8e-9004-4495-8d2f-cdf371d09fbf",
+      "name": "Edit Fields32"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "April",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "April",
+              "type": "string"
+            },
+            {
+              "id": "ec84968b-ff4e-4810-aad4-7b9d58997dc9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4a611d32-5b75-4d17-a452-4e0f913d5400",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "dc482453-2b6a-4883-beec-fa2fc254d4e1",
+      "name": "Edit Fields33"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14b1c903-2185-4e88-8e07-e4b5d17a2347",
+              "name": "endOfWeek",
+              "value": "={{ parseInt($json['Day of month']) + 6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -944,
+        -448
+      ],
+      "id": "44f1cb3a-b76c-4f42-a177-76da08734524",
+      "name": "Edit Fields34"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d34ba7c-d267-4673-a462-54c40f03c728",
+              "leftValue": "={{ parseInt($json.endOfWeek)}}",
+              "rightValue": 28,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -736,
+        -448
+      ],
+      "id": "e1f7c8b1-052e-4575-a1d6-659b64134d87",
+      "name": "If11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ parseInt($json.endOfWeek) - 28}}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "March",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "February",
+              "type": "string"
+            },
+            {
+              "id": "bcd592d6-c089-4209-ba5a-c68102692bde",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "6ded8ae0-10ab-431a-89d4-f8221fbef45f",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -528,
+        -544
+      ],
+      "id": "c9d278cd-5e23-464f-b75d-5fc8f29fea16",
+      "name": "Edit Fields35"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e834b0c8-3ae7-47d8-8b23-1635ecd12a68",
+              "name": "endDate",
+              "value": "={{ $json.endOfWeek }}",
+              "type": "string"
+            },
+            {
+              "id": "8cfccaf4-6c57-47d2-8b24-340a8bfcfa74",
+              "name": "endMonth",
+              "value": "February",
+              "type": "string"
+            },
+            {
+              "id": "2a285f20-9ef4-4842-b1aa-fec5335ed441",
+              "name": "startDate",
+              "value": "={{ $('Schedule Trigger').item.json['Day of month'] }}",
+              "type": "string"
+            },
+            {
+              "id": "22095732-8c9f-4b5a-8530-c4f8a5131efa",
+              "name": "startMonth",
+              "value": "February",
+              "type": "string"
+            },
+            {
+              "id": "ec84968b-ff4e-4810-aad4-7b9d58997dc9",
+              "name": "startYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            },
+            {
+              "id": "4a611d32-5b75-4d17-a452-4e0f913d5400",
+              "name": "endYear",
+              "value": "={{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -528,
+        -400
+      ],
+      "id": "e7d427bc-942a-47db-95c1-c282c50b737f",
+      "name": "Edit Fields36"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a78cb10-5d1a-437f-9812-317c54c6fbb7",
+              "name": "week",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }} to {{ $json.endMonth }} {{ $json.endDate }}, {{ $json.startYear }}",
+              "type": "string"
+            },
+            {
+              "id": "9c9e75f3-bd6a-4729-b3a5-8621149f546d",
+              "name": "dateRange",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }} - {{ $json.endMonth }} {{ $json.endDate }}",
+              "type": "string"
+            },
+            {
+              "id": "b79aa943-59e9-49d6-a886-cc96241d27d5",
+              "name": "startDate",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }}, {{ $json.startYear }}",
+              "type": "string"
+            },
+            {
+              "id": "21a0f441-3057-4650-9642-025b11cab5ad",
+              "name": "endDate",
+              "value": "={{ $json.endMonth }} {{ $json.endDate }}, {{ $json.endYear }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        144
+      ],
+      "id": "a70d8e39-db99-4361-a14e-dc07de699875",
+      "name": "Edit Fields37"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a78cb10-5d1a-437f-9812-317c54c6fbb7",
+              "name": "week",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }} to {{ $json.endDate }}, {{ $json.startYear }}",
+              "type": "string"
+            },
+            {
+              "id": "9c9e75f3-bd6a-4729-b3a5-8621149f546d",
+              "name": "dateRange",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }} - {{ $json.endDate }}",
+              "type": "string"
+            },
+            {
+              "id": "de8523c9-ae54-49bf-ab20-8008470fc235",
+              "name": "startDate",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }}, {{ $json.startYear }}",
+              "type": "string"
+            },
+            {
+              "id": "5f708655-277e-469c-95fe-156753cb1807",
+              "name": "endDate",
+              "value": "={{ $json.endMonth }} {{ $json.endDate }}, {{ $json.endYear }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        400
+      ],
+      "id": "14df6016-dadb-4f5d-9fe2-369ddc37e88a",
+      "name": "Edit Fields38"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a78cb10-5d1a-437f-9812-317c54c6fbb7",
+              "name": "week",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }}, {{ $json.startYear }} to {{ $json.endMonth }} {{ $json.endDate }}, {{ $json.endYear }}",
+              "type": "string"
+            },
+            {
+              "id": "9c9e75f3-bd6a-4729-b3a5-8621149f546d",
+              "name": "dateRange",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }}, {{ $json.startYear }} - {{ $json.endMonth }} {{ $json.endDate }}, {{ $json.endYear }}",
+              "type": "string"
+            },
+            {
+              "id": "ed406430-87bd-43f2-b953-b81ee23281c4",
+              "name": "startDate",
+              "value": "={{ $json.startMonth }} {{ $json.startDate }}, {{ $json.startYear }}",
+              "type": "string"
+            },
+            {
+              "id": "f701ad26-5cfd-4450-94cb-b6a43e8afb18",
+              "name": "endDate",
+              "value": "={{ $json.endMonth }} {{ $json.endDate }}, {{ $json.endYear }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        640
+      ],
+      "id": "43d120ba-3c10-4cb0-9a36-fd154d283ab3",
+      "name": "Edit Fields40"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2208,
+        400
+      ],
+      "id": "f23ff329-8453-406b-bb73-f7be78832707",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Jan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Marketing": {
+      "main": [
+        [
+          {
+            "node": "Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human": {
+      "main": [
+        []
+      ]
+    },
+    "Calendar": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Marketing",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jan": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Feb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feb": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields34",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mar": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Apr",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apr": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields31",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "May",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "May": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields10",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jun",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jun": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields28",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jul",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jul": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields13",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aug": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields16",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sep": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields25",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Oct",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Oct": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nov",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields10": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields11",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields13": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields14",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields16": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields17",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields19": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields20",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nov": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields22",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields22": {
+      "main": [
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields23",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields25": {
+      "main": [
+        [
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields26",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields27",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields28": {
+      "main": [
+        [
+          {
+            "node": "If9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If9": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields29",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields30",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields31": {
+      "main": [
+        [
+          {
+            "node": "If10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If10": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields32",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields34": {
+      "main": [
+        [
+          {
+            "node": "If11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If11": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields35",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields36",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields35": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields32": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields11": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields29": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields14": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields17": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields26": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields23": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields20": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields40",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields36": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields33": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields12": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields30": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields15": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields18": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields27": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields24": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields21": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields37": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields38": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields40": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Marketing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d9a71554-04ee-47b2-872f-6ca9e90ff50c",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-18T22:31:48.439Z",
+      "createdAt": "2025-10-18T22:31:48.439Z",
+      "role": "workflow:owner",
+      "workflowId": "E2PNpV2LRA3hdC19",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
