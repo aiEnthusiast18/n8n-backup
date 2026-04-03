@@ -1,0 +1,646 @@
+{
+  "updatedAt": "2025-11-04T03:10:38.754Z",
+  "createdAt": "2025-11-04T03:10:38.754Z",
+  "id": "SRwsR6PYOYtfM3cM",
+  "name": "posting 3",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5884822b-5d26-4a1f-9ea2-27332e325aa7",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        768,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/<YOUR PAGE ID HERE>/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "<YOUR IMAGE URL HERE>"
+            },
+            {
+              "name": "caption",
+              "value": "<YOUR CAPTION HERE>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d620dcdb-62a7-4a6a-99f6-212dc6c8833c",
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1024,
+        784
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/17841404935066235/media_publish",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9a89fdb-2410-4825-b0a4-46d1989804f9",
+      "name": "Publish instagram post",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1424,
+        784
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "**How to Generate a Facebook Short-Lived Access Token for Instagram + Facebook Page Posting**\n\n### What You Need\n\n* A **Facebook account**\n* A **Facebook Page** (must be linked to an Instagram Business account if you plan to post to IG)\n* Access to [Meta for Developers](https://developers.facebook.com/)\n\n---\nStep-by-Step: How to Generate Your Short-Lived Token\n\n#### 1. Go to Meta for Developers\n\n* Visit: [https://developers.facebook.com/apps](https://developers.facebook.com/apps)\n* Log in with your Facebook credentials\n\n#### 2. Create a New App\n\n* Click the blue **Create App** button\n* Choose **Other** as the app type\n* On the next screen, select **Business**\n* Enter an app name and contact email, then click **Create App**\n\n#### 3. Open the App Dashboard\n\n* After creation, you’ll be redirected to the app’s dashboard\n* This is where you’ll manage products, permissions, and tokens\n\n#### 4. Add Products\n\n* In the left sidebar, scroll down to **Add Product**\n* Click **Set Up** on both:\n\n  * **Instagram Graph API**\n  * **Facebook Graph API** (If missing it is automatically setup when you create the app) \n\n>  If you do not see the \"Add Product\" section, your app may already be locked to a specific template or be in Live mode. You can still continue to the Graph API Explorer.\n\n#### 5. Go to the Graph API Explorer\n\n* Visit: [https://developers.facebook.com/tools/explorer/](https://developers.facebook.com/tools/explorer/)\n* In the top-right dropdown, select your app\n* Under \"User or Page\", keep **User Token** selected\n\n#### 6. Generate a User Access Token\n\n* Click **Get Token** > **Get User Access Token**\n* A permissions dialog will appear\n\n#### 7. Select the Required Permissions (Scopes)\n\nCheck the following boxes:\n\n* `pages_show_list`\n* `pages_read_engagement`\n* `pages_manage_posts`\n* `instagram_basic`\n* `instagram_content_publish`\n\n> These allow you to post to both Facebook Pages and Instagram accounts. Some may require approval for production use.\n\n#### 8. Authenticate and Authorize\n\n* A pop-up will prompt you to log into Facebook and approve the app\n* Be sure to authorize access to your Facebook Page and linked Instagram account\n\n#### 9. Copy the Short-Lived Token\n\n* After successful login, the Graph API Explorer will refresh\n* Your new **short-lived token** will appear in the top bar\n* **Copy it immediately** — this token is valid for 1–2 hours\n\n",
+        "height": 1900,
+        "width": 540
+      },
+      "id": "6cfb0fa4-ebfd-47a8-9e3b-02b5830f35f9",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Facebook will only give you a \"Long Live Token\" if you are verified. If you are testing or not verified you can use the below method.\nThe initial token will only last a few hours, you can use the below to get the one that last for 2 months. Once you have the 2 month token you can put it in here and set the schedule to run every 30-60 days which will refresh and be saved in the static data.\n\n\n##Please note static Data does not run on a test, you can use a form submitted node to activate the flow.\n##Please note this is just a work around for testing and not practical for permanent use. ",
+        "height": 540,
+        "width": 1460
+      },
+      "id": "161d8bc9-d102-4682-a5dd-037a62702340",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/oauth/access_token",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "fb_exchange_token"
+            },
+            {
+              "name": "client_id",
+              "value": "<Your Client ID>"
+            },
+            {
+              "name": "client_secret",
+              "value": "<Your Secret Here>"
+            },
+            {
+              "name": "fb_exchange_token",
+              "value": "<your short token>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "56a87e37-e0d3-4490-8504-0b15e26c49f7",
+      "name": "Refresh token",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1024,
+        192
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 30,
+              "triggerAtHour": 1
+            }
+          ]
+        }
+      },
+      "id": "5092f0ef-5613-4dcc-97c3-6f0b29aea5ea",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        640,
+        192
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nreturn [{\n  json: {\n    token: staticData.fb_token\n  }\n}];\n"
+      },
+      "id": "d89f660c-62a9-4055-97fe-4ecdba151d3d",
+      "name": "Get Current Token",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        832,
+        192
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.fb_token = $json.access_token;\n\nreturn [{\n  json: {\n    status: 'Token saved to static data',\n    token: staticData.fb_token\n  }\n}];\n"
+      },
+      "id": "18202a80-6e7f-4bed-9910-1b056bc10377",
+      "name": "Push to Static Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1248,
+        192
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nreturn [{\n  json: {\n    token: staticData.fb_token\n  }\n}];\n"
+      },
+      "id": "d75f3dcc-2dd5-4a4d-8ab5-812047368342",
+      "name": "Get Token from static Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        688,
+        368
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/<Instagram Page ID>/media",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "<Your Image Url>"
+            },
+            {
+              "name": "caption",
+              "value": "<Your Caption>"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d260f36e-b9a7-4e76-9325-b4d8258e110a",
+      "name": "Post to Instagram1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        912,
+        368
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/<your instagram page id>/media_publish",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Get Token from static Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0a4c0365-e37a-41ee-8e5d-482dea72ad97",
+      "name": "Publish instagram post1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1264,
+        368
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/266271423823110/photos",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "https://images.pexels.com/photos/5475816/pexels-photo-5475816.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
+            },
+            {
+              "name": "caption",
+              "value": "This is the caption for the post"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.data[0].access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d9277113-baee-432f-bb73-98d67bdbaacc",
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2112,
+        784
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/me/accounts",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "options": {}
+      },
+      "id": "09a94870-1d53-497e-92af-8a63cc543132",
+      "name": "Use System token to get page token",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1648,
+        784
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "Using the permanant never expire token",
+        "height": 360,
+        "width": 1760,
+        "color": 5
+      },
+      "id": "3bff313e-8af4-4ea9-97a7-cef7d5ec61ae",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": " How to Create a Permanent System User Token (Recommended)\n\nThis token doesn’t expire and is best for automation use cases\n\n1. Verify Your Business\n\nGo to https://business.facebook.com/settings/info\n\nComplete business verification under Business Info tab\n\nSubmit your business documents and wait for approval (Sometimes you just have to submit an EIN/Tax-ID.\n\nApproval can take 1-5 Business days\n\nOnce Approved do the following.\n\n2. Create a System User\n\nIn Business Settings\n\nGo to System Users > Click Add\n\nAssign a name (e.g. n8n-bot) and select Admin access\n\n3. Assign Assets to System User\n\nIn the same System User view, assign:\n\nYour Facebook Page (with Full Control)\n\nYour Instagram Account (linked via Page)\n\nYour App\n\n4. Generate a Token\n\nClick Generate Token\n\nSelect your App\n\nSet expiration to Never\n\nGrant these permissions:\n\npages_show_list\n\npages_read_engagement\n\npages_manage_posts\n\ninstagram_basic\n\ninstagram_content_publish\n\n-If instagram_content_publish is not visible, you may need to request it via App Review under the App dashboard.\n\n5. Use This Token\n\nStore it in the Facebook Graph API\n\n",
+        "height": 1220,
+        "width": 680
+      },
+      "id": "e8906563-70a2-4335-909b-cc9d49d1cbb6",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2400,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "const page = $json.data.find(p => p.id === '266271423823110');\nreturn [{ json: { access_token: page.access_token } }];\n"
+      },
+      "id": "55e14b22-b2e5-4e20-ad9c-83db361ca6c4",
+      "name": "Get Correct Page Token",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1888,
+        784
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "3f9dc5fe-e8a0-45b3-ae41-9f69fd41c910",
+      "name": "Wait 2 Second",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1200,
+        784
+      ],
+      "webhookId": "c40b180e-016c-4648-898a-5942b8a9b00d",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "1f93985a-04a1-4d6a-a4e8-e8db92b1486b",
+      "name": "Wait 2 Second1",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1088,
+        368
+      ],
+      "webhookId": "c40b180e-016c-4648-898a-5942b8a9b00d",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/me/accounts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Get Token from static Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ff9e9c8-d6a9-4c00-9500-8f59aa2d1502",
+      "name": "Use System token to get page token1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1488,
+        368
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const page = $json.data.find(p => p.id === '<YOUR PAGE ID HERE>');\nreturn [{ json: { access_token: page.access_token } }];\n"
+      },
+      "id": "62d4733d-ead3-415c-8285-f53bd9e670e9",
+      "name": "Get Correct Page Token1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1712,
+        368
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/<YOUR PAGE ID HERE>/photos",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "<YOUR IMAGE URL HERE>"
+            },
+            {
+              "name": "caption",
+              "value": "<YOUR CAPTION  HERE>"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.data[0].access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a79d0e13-e1dc-421b-bdae-02c593a34e9d",
+      "name": "Post to Facebook1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1904,
+        368
+      ],
+      "typeVersion": 4.2
+    }
+  ],
+  "connections": {
+    "Refresh token": {
+      "main": [
+        [
+          {
+            "node": "Push to Static Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 Second": {
+      "main": [
+        [
+          {
+            "node": "Publish instagram post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 Second1": {
+      "main": [
+        [
+          {
+            "node": "Publish instagram post1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Current Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Token": {
+      "main": [
+        [
+          {
+            "node": "Refresh token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Instagram": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 Second",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Instagram1": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 Second1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Correct Page Token": {
+      "main": [
+        [
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish instagram post": {
+      "main": [
+        [
+          {
+            "node": "Use System token to get page token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Correct Page Token1": {
+      "main": [
+        [
+          {
+            "node": "Post to Facebook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish instagram post1": {
+      "main": [
+        [
+          {
+            "node": "Use System token to get page token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Token from static Data": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use System token to get page token": {
+      "main": [
+        [
+          {
+            "node": "Get Correct Page Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use System token to get page token1": {
+      "main": [
+        [
+          {
+            "node": "Get Correct Page Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4bf7144d-7f13-4f9f-ba3f-9b07b2bc68a7",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-04T03:10:38.756Z",
+      "createdAt": "2025-11-04T03:10:38.756Z",
+      "role": "workflow:owner",
+      "workflowId": "SRwsR6PYOYtfM3cM",
+      "projectId": "Fb7bbcgiQzvFuU2R"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
