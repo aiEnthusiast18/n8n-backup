@@ -1,0 +1,1525 @@
+{
+  "updatedAt": "2026-02-21T22:53:21.442Z",
+  "createdAt": "2025-09-15T20:00:28.369Z",
+  "id": "AAn6g1aP0N0gBRCh",
+  "name": "#Social Media Post Generation - RAH copy",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        16
+      ],
+      "id": "66ad1b36-d33c-4c2d-9ab2-d8215c595f34",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate timely social media post ideas based on the information you can get from websites provided. ",
+        "options": {
+          "systemMessage": "You are a helpful researcher and social media content writer. You analyze and summarize content provided by external sources. Use the content from the following websites as reference:\n\nhttps://www.rightathome.ca/winnipeg/news-events\n\nhttps://www.rightathome.ca/winnipeg/blog\n\nhttps://alzheimer.mb.ca/news/\n\nhttps://agefriendlymanitoba.ca/news/\n\nhttps://www.wrha.mb.ca/news/\n\nhttps://trends.google.com/trends/api/dailytrends\n\nBased on summaries or extracted content from these sources (assume relevant insights are available), generate one social media content for each:\n\nLinkedIn post – written in a professional and informative tone.\n\nInstagram caption – written in an engaging and community- or wellness-focused tone.\n\nFacebook post – written in a friendly, conversational, and locally relevant tone.\n\nEach post should:\n\nBe relevant and timely.\n\nSubtly promote the services of Right at Home Winnipeg and direct them to https://www.rightathomecanada.com/winnipeg website.\n\nBe consistent with your tone to follow similar messaging and format as below:\n\n\"Grandparent-grandchild relationships can boost mental sharpness, reduce loneliness, and build resilience across generations. \nFrom shared stories to caregiving roles, these bonds offer real health benefits for both young and old.\nHere are practical tips to strengthen the connection and improve well-being at any age.\n\n#AgingInPlace #SeniorCare #IndependentLiving #HomeCareSupport #ElderCare #HomeCare #Caregiving\"\n\n\n\n\nFinally, push each post as one row in a Google Sheet tool in the following columns:\n\nLinkedin – for the LinkedIn post\n\nInsta – for the Instagram caption\n\nFB – for the Facebook post\n\n\n⛔ Do not generate more or fewer than 1 row."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        944,
+        16
+      ],
+      "id": "b59c7ca3-79b3-404c-9fe7-62789653668d",
+      "name": "AI Agent",
+      "alwaysOutputData": true,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        240
+      ],
+      "id": "60db4a2b-8e45-4389-9048-fb2c3ff32328",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4",
+          "mode": "list",
+          "cachedResultName": "Social media automation rah copy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit#gid=0"
+        },
+        "event": "rowUpdate",
+        "options": {
+          "columnsToWatch": [
+            "Review Status"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        672
+      ],
+      "id": "c38aa10c-cc74-4444-823b-334b25161283",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "iifT1oSLkTtsuZYs",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2cdd22b0-ffa6-4f87-a23d-ef061f1dcbd2",
+              "leftValue": "={{ $json['Review Status'] }}",
+              "rightValue": "Approved",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        672
+      ],
+      "id": "ce7b1bb2-f728-4781-a3b0-0c0fbe61cc47",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "person": "9M8QZO77EU",
+        "text": "={{ $json.Linkedin }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {
+          "visibility": "CONNECTIONS"
+        }
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        864,
+        768
+      ],
+      "id": "c63b57cc-7638-4ca0-b134-1a8b0614d965",
+      "name": "LinkedIn",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['Image URL'] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        352
+      ],
+      "id": "2fff122d-f5ff-462e-b825-2fd2db522a7a",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "\"**Adding Facebook Graph API Credential**\n\nhttps://komododecks.com/recordings/9Ww13y5XMIH3C5cdZuqB\n\nYou need the access token from Facebook to use this module. To get it, do the following:\n\n1. Go to https://developers.facebook.com/apps/\n2. Click on Create App button on the upper right.\n3. Fill out the form.\n4. Go to https://developers.facebook.com/tools/explorer/\n5. Select the Meta App you just created. \n6. Select the Page under User or Page. \n7. Set the necessary permissions. \n8. Click on Generate Access Token\n9. Extend the token access to make it useable for the next 2 months\n       ",
+        "height": 520,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -256
+      ],
+      "id": "bb9cb49f-d5d4-4904-ace1-f9cd1cecacd7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "**Adding LinkedIn Credential**\n\nConnect using Standard connection. Turn off Organization Support. \nLog in to your LinkedIn account. \n\nThis LinkedIn account is deactivated to avoid accidental posting on Jem's account. Replace this with another LinkedIn account.\n   ",
+        "height": 180,
+        "width": 380,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        784
+      ],
+      "id": "a0ab3b05-9eba-40bf-8425-c170b4a8f7dc",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4",
+          "mode": "list",
+          "cachedResultName": "Social media automation rah copy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Unique ID": "={{ $json['[\\'Unique ID\\']'] }}",
+            "Review Status": "Posted",
+            "Scheduled Post Date and Time": "={{ $json['Scheduled Post Date and Time'] || $json.Post_DateandTime}}"
+          },
+          "matchingColumns": [
+            "Unique ID"
+          ],
+          "schema": [
+            {
+              "id": "Unique ID",
+              "displayName": "Unique ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Topic Approval",
+              "displayName": "Topic Approval",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post_DateandTime",
+              "displayName": "Post_DateandTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insta",
+              "displayName": "Insta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FB",
+              "displayName": "FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Review Status",
+              "displayName": "Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled Post Date and Time",
+              "displayName": "Scheduled Post Date and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File ID",
+              "displayName": "File ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1072,
+        576
+      ],
+      "id": "93bedd41-3cad-46b4-a8cf-7d7b37721a4c",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4",
+          "mode": "list",
+          "cachedResultName": "Social media automation rah copy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post_DateandTime": "={{ DateTime.now().setZone('America/Winnipeg').toFormat('MMM dd, yyyy HH:mm') }}",
+            "Linkedin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Linkedin', ``, 'string') }}",
+            "Insta": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Insta', ``, 'string') }}",
+            "FB": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('FB', ``, 'string') }}",
+            "Image URL": "=",
+            "Unique ID": "={{ $('Edit Fields').item.json.unique_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Unique ID",
+              "displayName": "Unique ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Topic Approval",
+              "displayName": "Topic Approval",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Post_DateandTime",
+              "displayName": "Post_DateandTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insta",
+              "displayName": "Insta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FB",
+              "displayName": "FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Review Status",
+              "displayName": "Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scheduled Post Date and Time",
+              "displayName": "Scheduled Post Date and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Header_Row', `Push the data in the next available row from the top`, 'number') }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1136,
+        240
+      ],
+      "id": "9d988b15-5bae-4265-be76-3ee0b72262a4",
+      "name": "Append row in sheet in Google Sheets",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "417710d4-48e5-4ae3-b30f-f427db5e186c",
+              "name": "counter",
+              "value": "=[1]",
+              "type": "array"
+            },
+            {
+              "id": "e10cd08e-24a4-4194-b7ef-eedb48dca7c6",
+              "name": "unique_id",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        16
+      ],
+      "id": "f992d015-9a18-498a-a665-7dcc17341d86",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "counter",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        656,
+        16
+      ],
+      "id": "dee9bab7-cc03-46b9-92ea-7518111b9cdc",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "me",
+        "edge": "feed",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $('Google Sheets Trigger').item.json.FB }}"
+              },
+              {
+                "name": "link",
+                "value": "={{ $('Google Sheets Trigger').item.json['Image URL'] }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        400
+      ],
+      "id": "089d89f0-1181-4914-a18f-d0ec37544982",
+      "name": "Facebook Graph API2",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "Jb7jXqX8nuGiOKnK",
+          "name": "RAH Instagram Credential"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a highly detailed and photorealistic description of an image in Canadian setting that will be a great match for this post social media post: {{ $json.output }}\nInclude:\n\nThe main subject (person, object, or scene) with precise physical details.\n\nThe environment and background, specifying location, season, time of day, and weather.\n\nThe camera setup (real camera model, lens type, focal length, and shot type).\n\nLighting style (e.g., natural sunlight, golden hour glow, soft studio light).\n\nPhotographic effects (depth of field, bokeh, motion blur, HDR).\n\nExtra realism cues such as skin texture, fabric detail, reflections, shadows, and imperfections.\nOutput the prompt in a natural, continuous sentence that can be fed directly into DALL·E. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        816,
+        -336
+      ],
+      "id": "89b3bfc9-f0cf-4538-828c-b07db1e095e9",
+      "name": "Message a model",
+      "executeOnce": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.message.content }}",
+        "options": {
+          "dalleQuality": "standard",
+          "size": "1792x1024",
+          "style": "natural",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1136,
+        -336
+      ],
+      "id": "6dfe1c73-4fc1-4f8e-a5af-d77435fce0ac",
+      "name": "Generate an image",
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request and returns the image URL of the image generated",
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('JSON', `This value should be generated by the AI agent following the JSON structure: \n\n{ \n\"prompt\": \"generate prompt\", \"n\": 1, \n\"size\": \"1024x1024\" \n}`, 'json') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1024,
+        336
+      ],
+      "id": "9315778e-3089-4a6e-bc60-bb99a8e846fd",
+      "name": "HTTP Request",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "OhcxKqaJMIt2UKDI",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fileName": "=SM-Image-{{ $now }}.png",
+        "parentId": "01W3Z5GT64WWMWGEBUCRGLICT34EOLKBS3",
+        "binaryData": true
+      },
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -336
+      ],
+      "id": "37d48b86-782a-44ac-be22-68ab2546cac5",
+      "name": "Upload a file",
+      "credentials": {
+        "microsoftOneDriveOAuth2Api": {
+          "id": "8hS0uGg5EsJSpBD0",
+          "name": "Microsoft Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        -336
+      ],
+      "id": "30ce22cc-f9a8-4eb5-959f-257e0b9059e7",
+      "name": "HTTP Request2",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        32
+      ],
+      "id": "14ae4b27-f3de-4dae-aa94-de1cfd5aa84d",
+      "name": "Upload a file1",
+      "credentials": {
+        "microsoftOneDriveOAuth2Api": {
+          "id": "8hS0uGg5EsJSpBD0",
+          "name": "Microsoft Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=binary.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -128
+      ],
+      "id": "cfe0f246-3e4e-4608-a781-83eb8e7ed05f",
+      "name": "Split Out1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $json['Formatted Date'] }}\n\n"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        672
+      ],
+      "id": "6cd6a57b-71ca-4b51-8690-f2bb7557781a",
+      "name": "Wait",
+      "webhookId": "53977ff3-5ade-4d7b-b394-da7d500972f9"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1EJaVxn5LuT1BK1ib7tYiWgTwPM_UBJQ41ciF6KdN7Jg",
+          "mode": "list",
+          "cachedResultName": "Social Media Automation-RAH",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EJaVxn5LuT1BK1ib7tYiWgTwPM_UBJQ41ciF6KdN7Jg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "sma1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EJaVxn5LuT1BK1ib7tYiWgTwPM_UBJQ41ciF6KdN7Jg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Linkedin": "=",
+            "row_number": 0,
+            "Unique ID": "={{ $('Edit Fields').item.json.unique_id }}",
+            "Image URL": "={{ $json.link.webUrl }}"
+          },
+          "matchingColumns": [
+            "Unique ID"
+          ],
+          "schema": [
+            {
+              "id": "Unique ID",
+              "displayName": "Unique ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Topic Approval",
+              "displayName": "Topic Approval",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post_DateandTime",
+              "displayName": "Post_DateandTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insta",
+              "displayName": "Insta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FB",
+              "displayName": "FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Review Status",
+              "displayName": "Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled Post Date and Time",
+              "displayName": "Scheduled Post Date and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2544,
+        16
+      ],
+      "id": "4e5d0820-8af5-4dd6-b198-6c8999ed1497",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "byB2xXfrapuxChwj",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1EJaVxn5LuT1BK1ib7tYiWgTwPM_UBJQ41ciF6KdN7Jg",
+          "mode": "list",
+          "cachedResultName": "Social Media Automation-RAH",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EJaVxn5LuT1BK1ib7tYiWgTwPM_UBJQ41ciF6KdN7Jg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "sma1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EJaVxn5LuT1BK1ib7tYiWgTwPM_UBJQ41ciF6KdN7Jg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Post_DateandTime"
+            }
+          ]
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2480,
+        -256
+      ],
+      "id": "feb88f22-14dc-4468-a188-97a7f4ce5cae",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "byB2xXfrapuxChwj",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access all input items\nconst items = $input.all();\n\n// Process each item\nconst newItems = items.map(item => {\n  // Extract the scheduled date (assuming it's in Excel serial format)\n  const excelSerialDate = Number(item.json['Scheduled Post Date and Time']);\n  \n  // Convert Excel serial date to JavaScript Date\n  // Excel serial date starts from 1900-01-01 (25569 days after 1970-01-01)\n  const milliseconds = (excelSerialDate - 25569) * 86400 * 1000;\n  let date = new Date(milliseconds);\n  \n  // Add 5 hours\n  date.setHours(date.getHours() + 5);\n  \n  // Format the date to ISO 8601 string with timezone\n  const formattedDate = date.toISOString();\n  \n  // Return a new object with the original data plus the formatted date\n  return {\n    ...item.json,\n    'Formatted Date': formattedDate\n  };\n});\n\n// Return the array of processed items\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        672
+      ],
+      "id": "9ccdbd1c-695b-4fdd-8430-603374faa51a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": "={{ $json.id }}",
+        "type": "view",
+        "scope": "anonymous"
+      },
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        -336
+      ],
+      "id": "fef5ad8e-e632-46fe-a7a7-f9e041a9b438",
+      "name": "Share a file",
+      "credentials": {
+        "microsoftOneDriveOAuth2Api": {
+          "id": "8hS0uGg5EsJSpBD0",
+          "name": "Microsoft Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['Unique ID']",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        672
+      ],
+      "id": "2342483d-8bb7-4efe-9732-1c7ae8c65366",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "content": "- workflow triggered timely\n- ai agent generates right at home posts for multiple platforms and adds to row in google sheets\n- creates image prompt to go with post\n- image generation\n- image uploaded and saved as doc\n- doc share used to add image to sheet\n\n- once posts reviewed and review status changed in sheet, second workflow triggered\n- if approved, post fetched and posted on Facebook at specified time\n- status changed to posted in sheet",
+        "height": 304,
+        "width": 352,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        528
+      ],
+      "id": "65fcdf7b-6f74-453a-9148-4e61d8ef48e5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 256,
+        "width": 1312
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -384
+      ],
+      "id": "2dc735cc-2aa2-4dfd-b18c-d5055766d0d9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "XD7X1QrgxmQUdKcW",
+          "mode": "list",
+          "cachedResultName": "drive image retrieval"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        16
+      ],
+      "id": "27fa8a42-1cca-43c1-9f52-b61e63639d28",
+      "name": "Call 'drive image retrieval'"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4",
+          "mode": "list",
+          "cachedResultName": "Social media automation rah copy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hQM1jncdzZV8NwGcEvpDVVC0o7GsDb7X7Dt3TkRc0f4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Unique ID": "={{ $('Edit Fields').item.json.unique_id }}",
+            "Image URL": "={{ $json.webViewLink }}"
+          },
+          "matchingColumns": [
+            "Unique ID"
+          ],
+          "schema": [
+            {
+              "id": "Unique ID",
+              "displayName": "Unique ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Topic Approval",
+              "displayName": "Topic Approval",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Post_DateandTime",
+              "displayName": "Post_DateandTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Insta",
+              "displayName": "Insta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "FB",
+              "displayName": "FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Review Status",
+              "displayName": "Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled Post Date and Time",
+              "displayName": "Scheduled Post Date and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "File ID",
+              "displayName": "File ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1600,
+        16
+      ],
+      "id": "944edfb2-c4fa-4339-9e9a-5e5056ddef2c",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "me",
+        "edge": "photos",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "url",
+                "value": "={{ $json['Image URL'] }}"
+              },
+              {
+                "name": "published",
+                "value": "true"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $json.FB }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        848,
+        464
+      ],
+      "id": "6d44b70f-bd9b-48f1-8122-7ec068c2e8ab",
+      "name": "Facebook Graph API",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "lxIgTBiTcGKwF1vI",
+          "name": "Facebook Graph account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## calls image retrieval workflow to attach rah images in folder to post\n",
+        "height": 176,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        368
+      ],
+      "id": "9a7ce201-c576-476b-a2dc-8c232acbfa0d",
+      "name": "Sticky Note4"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Call 'drive image retrieval'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "Share a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share a file": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'drive image retrieval'": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e5bc0ad1-bdc7-4d3b-b6b6-b29fd274822b",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-15T20:00:28.375Z",
+      "createdAt": "2025-09-15T20:00:28.375Z",
+      "role": "workflow:owner",
+      "workflowId": "AAn6g1aP0N0gBRCh",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
