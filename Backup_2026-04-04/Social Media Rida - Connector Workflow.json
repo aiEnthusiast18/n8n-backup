@@ -1,0 +1,30 @@
+{
+  "updatedAt": "2025-10-27T01:58:49.000Z",
+  "createdAt": "2025-10-27T01:57:56.879Z",
+  "id": "1tBicovhmTNakbqg",
+  "name": "Social Media Rida - Connector Workflow",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "32f141f7-05d9-4039-af5f-34b7db7d5178",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-27T01:57:56.883Z",
+      "createdAt": "2025-10-27T01:57:56.883Z",
+      "role": "workflow:owner",
+      "workflowId": "1tBicovhmTNakbqg",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
