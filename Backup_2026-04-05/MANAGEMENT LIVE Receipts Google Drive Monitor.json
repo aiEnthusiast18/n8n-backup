@@ -1,0 +1,2838 @@
+{
+  "updatedAt": "2026-03-08T17:35:39.350Z",
+  "createdAt": "2025-12-27T14:49:09.617Z",
+  "id": "7FJyQrahyzzbkYpo",
+  "name": "MANAGEMENT LIVE Receipts Google Drive Monitor",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        48
+      ],
+      "id": "49898a91-9fc7-4d2a-9770-12a1a41fc053",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        272
+      ],
+      "id": "4bad6b9f-76c6-4138-aec0-bae3a1e7efa8",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX",
+          "mode": "list",
+          "cachedResultName": "Anago Receipts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        48
+      ],
+      "id": "782e335b-9b5f-4d1b-9aee-94e98e338754",
+      "name": "Anago Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1vpbxwHvnatfgCiUjJIcB8U5shECi75Be",
+          "mode": "list",
+          "cachedResultName": "RAH Receipts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1vpbxwHvnatfgCiUjJIcB8U5shECi75Be"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        272
+      ],
+      "id": "b87ae9d4-46f3-4343-8592-792688d353ee",
+      "name": "RAH Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('RAH Google Drive Trigger').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1uLdnve20v4HxF2pyDTuxEFXGoD3fQSnC",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -144,
+        272
+      ],
+      "id": "b15aae2c-608f-4945-9343-21865bee6408",
+      "name": "Move file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Anago Google Drive Trigger').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1Pu4oD21l2y3ljao0ck2E_tJM7_dwUhjr",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -144,
+        48
+      ],
+      "id": "ebb70ed2-5488-4814-aba6-53d7d771083c",
+      "name": "Move file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        496
+      ],
+      "id": "2cea9ef5-96d3-4e6b-808b-eb628aa34049",
+      "name": "Download file2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('204IT Google Drive Trigger').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1lJytGM-NMCNg9lx7nseL1VpaRc8QM5EY",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -144,
+        496
+      ],
+      "id": "90d60dea-ecc1-4975-a49a-e917ed4c3a41",
+      "name": "Move file to 2o4IT Processed folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB",
+          "mode": "list",
+          "cachedResultName": "204IT Receipts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        496
+      ],
+      "id": "ed0536d8-9103-414b-ada4-7ea35704f594",
+      "name": "204IT Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "AnagoMB@qbodocs.com",
+        "subject": "Anago Google Drive Folder Monitor",
+        "emailType": "text",
+        "message": "This file was added to your Anago google drive folder.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        48
+      ],
+      "id": "7ccae8df-8c67-45df-b794-d6b88271e728",
+      "name": "Send email to QBO",
+      "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "RAHWinnipeg@qbodocs.com",
+        "subject": "RAH Google Drive Folder Monitor",
+        "emailType": "text",
+        "message": "This file was added to your RAH google drive folder.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        272
+      ],
+      "id": "a15a278c-100e-424c-8e52-181b6794be03",
+      "name": "Send email to QBO1",
+      "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "receipts10048335@gmail.com",
+        "subject": "204 IT Google Drive Receipt Folder Monitor",
+        "emailType": "text",
+        "message": "This file was added to your 204 IT google drive folder.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        496
+      ],
+      "id": "619e6644-48d9-422e-bfca-654fb730be31",
+      "name": "Send email to Receipts",
+      "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "anago-connection-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        -32
+      ],
+      "id": "17dc01bb-166d-49fd-a3fe-2c6fb34d3b3a",
+      "name": "Anago: Connection OK?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "rah-connection-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        352
+      ],
+      "id": "8901dc43-9608-45ff-bb29-3db5e6f89d83",
+      "name": "RAH: Connection OK?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        160
+      ],
+      "id": "168bc46a-7f04-4306-ba89-51ffc036ec59",
+      "name": "Anago: Filter New Files"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        352
+      ],
+      "id": "7b4b551d-debf-40e0-bb3d-cf426e5b0f74",
+      "name": "RAH: Filter New Files"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare error notification for Anago connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = 'Anago';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        -32
+      ],
+      "id": "d5a84f6c-a80a-4760-b08c-0d84e91cdefe",
+      "name": "Anago: Connection Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare error notification for RAH connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = 'RAH';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        544
+      ],
+      "id": "737e0f8c-a9d5-4298-bbcf-0fcd1db5800a",
+      "name": "RAH: Connection Error"
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=🔴 CRITICAL: Google Drive Connection Failed - {{ $json.clientName }}",
+        "message": "=<h2 style=\"color: red;\">Google Drive Connection Failure</h2>\n<p><strong>Client:</strong> {{ $json.clientName }}</p>\n<p><strong>Error Type:</strong> {{ $json.errorType }}</p>\n<p><strong>Timestamp:</strong> {{ $json.errorTimestamp }}</p>\n<p><strong>Error Message:</strong></p>\n<pre style=\"background: #f4f4f4; padding: 10px; border-radius: 5px;\">{{ $json.errorMessage }}</pre>\n<hr>\n<h3>Action Required:</h3>\n<ul>\n  <li>Check if Google Drive credentials need to be re-authorized</li>\n  <li>Verify OAuth token hasn't expired</li>\n  <li>Check Google Drive API quotas and limits</li>\n  <li>Ensure the service account has proper permissions</li>\n</ul>\n<p><em>The workflow will continue attempting to connect on the next schedule cycle.</em></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        -32
+      ],
+      "id": "a96328df-f304-4f8f-ac71-c79ec6d7e12c",
+      "name": "Send Connection Failure Alert",
+      "webhookId": "connection-failure-webhook",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = 'Anago';\n  item.json.recipientEmail = 'AnagoMB@qbodocs.com';\n  item.json.processedFolderId = '1Pu4oD21l2y3ljao0ck2E_tJM7_dwUhjr';\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        160
+      ],
+      "id": "3ca73ed5-fc1b-45e1-af51-e23c0d6e6921",
+      "name": "Anago: Set Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = 'RAH';\n  item.json.recipientEmail = 'RAHWinnipeg@qbodocs.com';\n  item.json.processedFolderId = '1uLdnve20v4HxF2pyDTuxEFXGoD3fQSnC';\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        352
+      ],
+      "id": "3318de10-3afe-4041-aed2-df8c0ce92e99",
+      "name": "RAH: Set Context"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2352,
+        256
+      ],
+      "id": "c24903d7-9cfb-47af-ab40-d005b42a9f81",
+      "name": "Download File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "download-success-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        256
+      ],
+      "id": "ec588be8-6a3d-492f-998c-1f7b5a3aad1d",
+      "name": "Download Success?"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.recipientEmail }}",
+        "subject": "=New Receipt: {{ $json.originalFileName }}",
+        "message": "=This file was added to your {{ $json.clientName }} google drive folder.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3408,
+        256
+      ],
+      "id": "57507df7-9d49-446a-801f-a25471179d19",
+      "name": "Send Email",
+      "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "email-success-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3632,
+        224
+      ],
+      "id": "0d00cbff-adf1-45fe-b83d-7c35c5829f5e",
+      "name": "Email Success?"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.processedFolderId }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4128,
+        224
+      ],
+      "id": "b8b3b4cb-1242-474c-a7e9-ec767f067525",
+      "name": "Move to Processed",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze error to determine if retryable\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown error';\n  \n  // Check for retryable errors (network, timeout, rate limit)\n  const retryableErrors = [\n    'ETIMEDOUT',\n    'ECONNRESET',\n    'ENOTFOUND',\n    'ECONNREFUSED',\n    'timeout',\n    'network',\n    'rate limit',\n    'too many requests',\n    '429',\n    '503',\n    '504'\n  ];\n  \n  const isRetryable = retryableErrors.some(err => \n    errorMessage.toLowerCase().includes(err.toLowerCase())\n  );\n  \n  item.json.isRetryableError = isRetryable;\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3792,
+        464
+      ],
+      "id": "03e78b98-6818-4af9-9ac7-652de9abe088",
+      "name": "Analyze Error"
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=❌ Receipt Processing Failed - {{ $json.clientName }}",
+        "message": "=<h2>Receipt Processing Failed</h2>\n<p><strong>Client:</strong> {{ $json.clientName }}</p>\n<p><strong>Filename:</strong> {{ $json.originalFileName }}</p>\n<p><strong>Timestamp:</strong> {{ $json.errorTimestamp }}</p>\n<p><strong>Error Message:</strong></p>\n<pre>{{ $json.errorMessage }}</pre>\n<hr>\n<p><em>The file remains in the original folder for manual review.</em></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        4016,
+        464
+      ],
+      "id": "7f590115-fe20-44b8-bacc-12a6bd6ec6dc",
+      "name": "Send Failure Notification",
+      "webhookId": "failure-notification-webhook",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GXmTRI7BnCOw6knb",
+          "name": "Receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "rah-connection-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        736
+      ],
+      "id": "82e338e9-ea50-439b-b0a5-93a916bc0798",
+      "name": "204IT: Connection OK?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        736
+      ],
+      "id": "45190a63-c8e6-4d50-b5f3-825f1f8b1a4e",
+      "name": "204IT: Filter New Files"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = '204IT';\n  item.json.recipientEmail = 'receipts10048335@gmail.com';\n  item.json.processedFolderId = '1lJytGM-NMCNg9lx7nseL1VpaRc8QM5EY';\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        736
+      ],
+      "id": "3dcf2d4b-f5db-41ef-93ca-7801b2b03932",
+      "name": "204IT: Set Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare error notification for RAH connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = '204IT';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        928
+      ],
+      "id": "619b1b48-2ef0-4c30-944b-ca37b3068142",
+      "name": "204IT: Connection Error"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3904,
+        160
+      ],
+      "id": "9a708580-24fb-4b3f-bd62-ebc6ee9a0d8e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX",
+          "mode": "list",
+          "cachedResultName": "Anago Receipts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -32
+      ],
+      "id": "badfc50c-2d70-4832-96f5-fab77dfc8caa",
+      "name": "Anago Google Drive Trigger2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1vpbxwHvnatfgCiUjJIcB8U5shECi75Be",
+          "mode": "list",
+          "cachedResultName": "RAH Receipts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1vpbxwHvnatfgCiUjJIcB8U5shECi75Be"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        352
+      ],
+      "id": "3612fc0b-6bb8-4281-8468-137ecc82fb81",
+      "name": "RAH Google Drive Trigger2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB",
+          "mode": "list",
+          "cachedResultName": "204IT Receipts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        736
+      ],
+      "id": "0992cfb0-657f-48b8-a29f-953f9fe35422",
+      "name": "204IT Google Drive Trigger2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I8rpYY79iLB3A6aA",
+          "name": "receiptsmanagement2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node (JavaScript)\n * Merges 2 incoming items into 1, preserving all JSON + binary data.\n */\n\nfunction isObject(v) {\n\treturn v !== null && typeof v === 'object' && !Array.isArray(v);\n}\n\nfunction deepMerge(a, b) {\n\t// Arrays: concatenate\n\tif (Array.isArray(a) && Array.isArray(b)) return [...a, ...b];\n\n\t// Objects: recursive merge\n\tif (isObject(a) && isObject(b)) {\n\t\tconst out = { ...a };\n\t\tfor (const [k, v] of Object.entries(b)) {\n\t\t\tif (k in out) out[k] = deepMerge(out[k], v);\n\t\t\telse out[k] = v;\n\t\t}\n\t\treturn out;\n\t}\n\n\t// Fallback: keep both if different by wrapping, else keep b\n\tif (a === undefined) return b;\n\tif (b === undefined) return a;\n\tif (a === b) return a;\n\treturn { _a: a, _b: b };\n}\n\nconst items = $input.all();\n\nif (items.length < 2) {\n\t// Nothing to merge; return as-is\n\treturn items;\n}\n\nconst merged = {\n\tjson: {},\n\tbinary: {},\n};\n\n// Merge JSON of all items (works for 2 or more)\nfor (const item of items) {\n\tmerged.json = deepMerge(merged.json, item.json ?? {});\n}\n\n// Merge binary of all items, avoid overwrites\nfor (let i = 0; i < items.length; i++) {\n\tconst bin = items[i].binary ?? {};\n\tfor (const [key, value] of Object.entries(bin)) {\n\t\tif (!(key in merged.binary)) {\n\t\t\tmerged.binary[key] = value;\n\t\t} else {\n\t\t\t// rename to avoid overwriting existing binary key\n\t\t\tlet n = 2;\n\t\t\tlet newKey = `${key}_${n}`;\n\t\t\twhile (newKey in merged.binary) {\n\t\t\t\tn++;\n\t\t\t\tnewKey = `${key}_${n}`;\n\t\t\t}\n\t\t\tmerged.binary[newKey] = value;\n\t\t}\n\t}\n}\n\nreturn [merged];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3168,
+        256
+      ],
+      "id": "7d8a4243-0ed4-4063-a530-0af4b2b7cbf5",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2944,
+        240
+      ],
+      "id": "393d326f-8d73-485e-8c82-303c13fa0078",
+      "name": "Merge1"
+    }
+  ],
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Send email to QBO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Send email to QBO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file2": {
+      "main": [
+        [
+          {
+            "node": "Send email to Receipts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "204IT Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email to QBO": {
+      "main": [
+        [
+          {
+            "node": "Move file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email to QBO1": {
+      "main": [
+        [
+          {
+            "node": "Move file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email to Receipts": {
+      "main": [
+        [
+          {
+            "node": "Move file to 2o4IT Processed folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Connection OK?": {
+      "main": [
+        [
+          {
+            "node": "Anago: Filter New Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Anago: Connection Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Connection OK?": {
+      "main": [
+        [
+          {
+            "node": "RAH: Filter New Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RAH: Connection Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Filter New Files": {
+      "main": [
+        [
+          {
+            "node": "Anago: Set Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Filter New Files": {
+      "main": [
+        [
+          {
+            "node": "RAH: Set Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Connection Error": {
+      "main": [
+        [
+          {
+            "node": "Send Connection Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Connection Error": {
+      "main": [
+        [
+          {
+            "node": "Send Connection Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago: Set Context": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH: Set Context": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Download Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Success?": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Analyze Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Email Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Success?": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Analyze Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Error": {
+      "main": [
+        [
+          {
+            "node": "Send Failure Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "204IT: Connection OK?": {
+      "main": [
+        [
+          {
+            "node": "204IT: Filter New Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "204IT: Connection Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "204IT: Filter New Files": {
+      "main": [
+        [
+          {
+            "node": "204IT: Set Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "204IT: Set Context": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "204IT: Connection Error": {
+      "main": [
+        [
+          {
+            "node": "Send Connection Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Move to Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anago Google Drive Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Anago: Connection OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAH Google Drive Trigger2": {
+      "main": [
+        [
+          {
+            "node": "RAH: Connection OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "204IT Google Drive Trigger2": {
+      "main": [
+        [
+          {
+            "node": "204IT: Connection OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v"
+  },
+  "staticData": {
+    "node:Google Drive Trigger": {
+      "lastTimeChecked": "2026-01-07T22:13:45Z"
+    },
+    "node:Google Drive Trigger1": {
+      "lastTimeChecked": "2026-01-07T22:13:05Z"
+    },
+    "node:Anago Google Drive Trigger": {
+      "lastTimeChecked": "2026-02-11T16:29:21Z"
+    },
+    "node:RAH Google Drive Trigger": {
+      "lastTimeChecked": "2026-02-11T16:28:47Z"
+    },
+    "node:204IT Google Drive Trigger": {
+      "lastTimeChecked": "2026-02-11T16:29:29Z"
+    },
+    "node:Anago Google Drive Trigger2": {
+      "lastTimeChecked": "2026-04-04T18:01:58Z"
+    },
+    "node:RAH Google Drive Trigger2": {
+      "lastTimeChecked": "2026-04-04T18:01:34Z"
+    },
+    "node:204IT Google Drive Trigger2": {
+      "lastTimeChecked": "2026-04-04T18:02:20Z"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "048d5e6b-5710-445b-95a1-c7d458ad8e0b",
+  "activeVersionId": "048d5e6b-5710-445b-95a1-c7d458ad8e0b",
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2025-12-27T14:49:09.620Z",
+      "createdAt": "2025-12-27T14:49:09.620Z",
+      "role": "workflow:owner",
+      "workflowId": "7FJyQrahyzzbkYpo",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T17:35:43.000Z",
+    "createdAt": "2026-03-08T17:35:39.351Z",
+    "versionId": "048d5e6b-5710-445b-95a1-c7d458ad8e0b",
+    "workflowId": "7FJyQrahyzzbkYpo",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -592,
+          48
+        ],
+        "id": "49898a91-9fc7-4d2a-9770-12a1a41fc053",
+        "name": "Download file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -592,
+          272
+        ],
+        "id": "4bad6b9f-76c6-4138-aec0-bae3a1e7efa8",
+        "name": "Download file1",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX",
+            "mode": "list",
+            "cachedResultName": "Anago Receipts",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          -816,
+          48
+        ],
+        "id": "782e335b-9b5f-4d1b-9aee-94e98e338754",
+        "name": "Anago Google Drive Trigger",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1vpbxwHvnatfgCiUjJIcB8U5shECi75Be",
+            "mode": "list",
+            "cachedResultName": "RAH Receipts",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1vpbxwHvnatfgCiUjJIcB8U5shECi75Be"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          -816,
+          272
+        ],
+        "id": "b87ae9d4-46f3-4343-8592-792688d353ee",
+        "name": "RAH Google Drive Trigger",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "operation": "move",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $('RAH Google Drive Trigger').item.json.id }}",
+            "mode": "id"
+          },
+          "driveId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1uLdnve20v4HxF2pyDTuxEFXGoD3fQSnC",
+            "mode": "id"
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -144,
+          272
+        ],
+        "id": "b15aae2c-608f-4945-9343-21865bee6408",
+        "name": "Move file1",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "operation": "move",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $('Anago Google Drive Trigger').item.json.id }}",
+            "mode": "id"
+          },
+          "driveId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1Pu4oD21l2y3ljao0ck2E_tJM7_dwUhjr",
+            "mode": "id"
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -144,
+          48
+        ],
+        "id": "ebb70ed2-5488-4814-aba6-53d7d771083c",
+        "name": "Move file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -592,
+          496
+        ],
+        "id": "2cea9ef5-96d3-4e6b-808b-eb628aa34049",
+        "name": "Download file2",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "operation": "move",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $('204IT Google Drive Trigger').item.json.id }}",
+            "mode": "id"
+          },
+          "driveId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1lJytGM-NMCNg9lx7nseL1VpaRc8QM5EY",
+            "mode": "id"
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -144,
+          496
+        ],
+        "id": "90d60dea-ecc1-4975-a49a-e917ed4c3a41",
+        "name": "Move file to 2o4IT Processed folder",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB",
+            "mode": "list",
+            "cachedResultName": "204IT Receipts",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          -816,
+          496
+        ],
+        "id": "ed0536d8-9103-414b-ada4-7ea35704f594",
+        "name": "204IT Google Drive Trigger",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "sendTo": "AnagoMB@qbodocs.com",
+          "subject": "Anago Google Drive Folder Monitor",
+          "emailType": "text",
+          "message": "This file was added to your Anago google drive folder.",
+          "options": {
+            "attachmentsUi": {
+              "attachmentsBinary": [
+                {}
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          -368,
+          48
+        ],
+        "id": "7ccae8df-8c67-45df-b794-d6b88271e728",
+        "name": "Send email to QBO",
+        "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "GXmTRI7BnCOw6knb",
+            "name": "Receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "sendTo": "RAHWinnipeg@qbodocs.com",
+          "subject": "RAH Google Drive Folder Monitor",
+          "emailType": "text",
+          "message": "This file was added to your RAH google drive folder.",
+          "options": {
+            "attachmentsUi": {
+              "attachmentsBinary": [
+                {}
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          -368,
+          272
+        ],
+        "id": "a15a278c-100e-424c-8e52-181b6794be03",
+        "name": "Send email to QBO1",
+        "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "GXmTRI7BnCOw6knb",
+            "name": "Receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "sendTo": "receipts10048335@gmail.com",
+          "subject": "204 IT Google Drive Receipt Folder Monitor",
+          "emailType": "text",
+          "message": "This file was added to your 204 IT google drive folder.",
+          "options": {
+            "attachmentsUi": {
+              "attachmentsBinary": [
+                {}
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          -368,
+          496
+        ],
+        "id": "619e6644-48d9-422e-bfca-654fb730be31",
+        "name": "Send email to Receipts",
+        "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "GXmTRI7BnCOw6knb",
+            "name": "Receiptsmanagement2025"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "anago-connection-check",
+                "leftValue": "={{ $json.error }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1312,
+          -32
+        ],
+        "id": "17dc01bb-166d-49fd-a3fe-2c6fb34d3b3a",
+        "name": "Anago: Connection OK?"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "rah-connection-check",
+                "leftValue": "={{ $json.error }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1312,
+          352
+        ],
+        "id": "8901dc43-9608-45ff-bb29-3db5e6f89d83",
+        "name": "RAH: Connection OK?"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1536,
+          160
+        ],
+        "id": "168bc46a-7f04-4306-ba89-51ffc036ec59",
+        "name": "Anago: Filter New Files"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1536,
+          352
+        ],
+        "id": "7b4b551d-debf-40e0-bb3d-cf426e5b0f74",
+        "name": "RAH: Filter New Files"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Prepare error notification for Anago connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = 'Anago';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1536,
+          -32
+        ],
+        "id": "d5a84f6c-a80a-4760-b08c-0d84e91cdefe",
+        "name": "Anago: Connection Error"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Prepare error notification for RAH connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = 'RAH';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1536,
+          544
+        ],
+        "id": "737e0f8c-a9d5-4298-bbcf-0fcd1db5800a",
+        "name": "RAH: Connection Error"
+      },
+      {
+        "parameters": {
+          "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "=🔴 CRITICAL: Google Drive Connection Failed - {{ $json.clientName }}",
+          "message": "=<h2 style=\"color: red;\">Google Drive Connection Failure</h2>\n<p><strong>Client:</strong> {{ $json.clientName }}</p>\n<p><strong>Error Type:</strong> {{ $json.errorType }}</p>\n<p><strong>Timestamp:</strong> {{ $json.errorTimestamp }}</p>\n<p><strong>Error Message:</strong></p>\n<pre style=\"background: #f4f4f4; padding: 10px; border-radius: 5px;\">{{ $json.errorMessage }}</pre>\n<hr>\n<h3>Action Required:</h3>\n<ul>\n  <li>Check if Google Drive credentials need to be re-authorized</li>\n  <li>Verify OAuth token hasn't expired</li>\n  <li>Check Google Drive API quotas and limits</li>\n  <li>Ensure the service account has proper permissions</li>\n</ul>\n<p><em>The workflow will continue attempting to connect on the next schedule cycle.</em></p>",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1760,
+          -32
+        ],
+        "id": "a96328df-f304-4f8f-ac71-c79ec6d7e12c",
+        "name": "Send Connection Failure Alert",
+        "webhookId": "connection-failure-webhook",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "GXmTRI7BnCOw6knb",
+            "name": "Receiptsmanagement2025"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = 'Anago';\n  item.json.recipientEmail = 'AnagoMB@qbodocs.com';\n  item.json.processedFolderId = '1Pu4oD21l2y3ljao0ck2E_tJM7_dwUhjr';\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1744,
+          160
+        ],
+        "id": "3ca73ed5-fc1b-45e1-af51-e23c0d6e6921",
+        "name": "Anago: Set Context"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = 'RAH';\n  item.json.recipientEmail = 'RAHWinnipeg@qbodocs.com';\n  item.json.processedFolderId = '1uLdnve20v4HxF2pyDTuxEFXGoD3fQSnC';\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          352
+        ],
+        "id": "3318de10-3afe-4041-aed2-df8c0ce92e99",
+        "name": "RAH: Set Context"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          2352,
+          256
+        ],
+        "id": "c24903d7-9cfb-47af-ab40-d005b42a9f81",
+        "name": "Download File",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "download-success-check",
+                "leftValue": "={{ $json.error }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          2640,
+          256
+        ],
+        "id": "ec588be8-6a3d-492f-998c-1f7b5a3aad1d",
+        "name": "Download Success?"
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $json.recipientEmail }}",
+          "subject": "=New Receipt: {{ $json.originalFileName }}",
+          "message": "=This file was added to your {{ $json.clientName }} google drive folder.",
+          "options": {
+            "attachmentsUi": {
+              "attachmentsBinary": [
+                {}
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          3408,
+          256
+        ],
+        "id": "57507df7-9d49-446a-801f-a25471179d19",
+        "name": "Send Email",
+        "webhookId": "4c47246e-06a9-45fd-9b16-b183bfc4e4e9",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "GXmTRI7BnCOw6knb",
+            "name": "Receiptsmanagement2025"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "email-success-check",
+                "leftValue": "={{ $json.error }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          3632,
+          224
+        ],
+        "id": "0d00cbff-adf1-45fe-b83d-7c35c5829f5e",
+        "name": "Email Success?"
+      },
+      {
+        "parameters": {
+          "operation": "move",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "driveId": {
+            "__rl": true,
+            "value": "My Drive",
+            "mode": "list",
+            "cachedResultName": "My Drive",
+            "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.processedFolderId }}"
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          4128,
+          224
+        ],
+        "id": "b8b3b4cb-1242-474c-a7e9-ec767f067525",
+        "name": "Move to Processed",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Analyze error to determine if retryable\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown error';\n  \n  // Check for retryable errors (network, timeout, rate limit)\n  const retryableErrors = [\n    'ETIMEDOUT',\n    'ECONNRESET',\n    'ENOTFOUND',\n    'ECONNREFUSED',\n    'timeout',\n    'network',\n    'rate limit',\n    'too many requests',\n    '429',\n    '503',\n    '504'\n  ];\n  \n  const isRetryable = retryableErrors.some(err => \n    errorMessage.toLowerCase().includes(err.toLowerCase())\n  );\n  \n  item.json.isRetryableError = isRetryable;\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3792,
+          464
+        ],
+        "id": "03e78b98-6818-4af9-9ac7-652de9abe088",
+        "name": "Analyze Error"
+      },
+      {
+        "parameters": {
+          "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "=❌ Receipt Processing Failed - {{ $json.clientName }}",
+          "message": "=<h2>Receipt Processing Failed</h2>\n<p><strong>Client:</strong> {{ $json.clientName }}</p>\n<p><strong>Filename:</strong> {{ $json.originalFileName }}</p>\n<p><strong>Timestamp:</strong> {{ $json.errorTimestamp }}</p>\n<p><strong>Error Message:</strong></p>\n<pre>{{ $json.errorMessage }}</pre>\n<hr>\n<p><em>The file remains in the original folder for manual review.</em></p>",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          4016,
+          464
+        ],
+        "id": "7f590115-fe20-44b8-bacc-12a6bd6ec6dc",
+        "name": "Send Failure Notification",
+        "webhookId": "failure-notification-webhook",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "GXmTRI7BnCOw6knb",
+            "name": "Receiptsmanagement2025"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "rah-connection-check",
+                "leftValue": "={{ $json.error }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1312,
+          736
+        ],
+        "id": "82e338e9-ea50-439b-b0a5-93a916bc0798",
+        "name": "204IT: Connection OK?"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Check for new files created in last 2 minutes\nconst twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);\n\nconst newFiles = [];\nfor (const item of $input.all()) {\n  const createdTime = new Date(item.json.createdTime);\n  if (createdTime > twoMinutesAgo) {\n    newFiles.push(item);\n  }\n}\n\nreturn newFiles;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1536,
+          736
+        ],
+        "id": "45190a63-c8e6-4d50-b5f3-825f1f8b1a4e",
+        "name": "204IT: Filter New Files"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Add client identifier and retry counter\nfor (const item of $input.all()) {\n  item.json.clientName = '204IT';\n  item.json.recipientEmail = 'receipts10048335@gmail.com';\n  item.json.processedFolderId = '1lJytGM-NMCNg9lx7nseL1VpaRc8QM5EY';\n  item.json.originalFileName = item.json.name;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          736
+        ],
+        "id": "3dcf2d4b-f5db-41ef-93ca-7801b2b03932",
+        "name": "204IT: Set Context"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Prepare error notification for RAH connection failure\nfor (const item of $input.all()) {\n  const error = item.json.error;\n  const errorMessage = error?.message || JSON.stringify(error) || 'Unknown connection error';\n  \n  item.json.clientName = '204IT';\n  item.json.errorType = 'Google Drive Connection Failure';\n  item.json.errorMessage = errorMessage;\n  item.json.errorTimestamp = new Date().toISOString();\n  item.json.originalFileName = 'N/A - Connection Failed';\n  item.json.retryCount = 0;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1536,
+          928
+        ],
+        "id": "619b1b48-2ef0-4c30-944b-ca37b3068142",
+        "name": "204IT: Connection Error"
+      },
+      {
+        "parameters": {
+          "mode": "chooseBranch"
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          3904,
+          160
+        ],
+        "id": "9a708580-24fb-4b3f-bd62-ebc6ee9a0d8e",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX",
+            "mode": "list",
+            "cachedResultName": "Anago Receipts",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1NA5s7mF1FLqe8yj-ZbVUE-fZ7RY0razX"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          1120,
+          -32
+        ],
+        "id": "badfc50c-2d70-4832-96f5-fab77dfc8caa",
+        "name": "Anago Google Drive Trigger2",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1vpbxwHvnatfgCiUjJIcB8U5shECi75Be",
+            "mode": "list",
+            "cachedResultName": "RAH Receipts",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1vpbxwHvnatfgCiUjJIcB8U5shECi75Be"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          1120,
+          352
+        ],
+        "id": "3612fc0b-6bb8-4281-8468-137ecc82fb81",
+        "name": "RAH Google Drive Trigger2",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB",
+            "mode": "list",
+            "cachedResultName": "204IT Receipts",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1wI1Cl1QTj1bAQ1ZkmtlbC4zsRNG1uKYB"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          1120,
+          736
+        ],
+        "id": "0992cfb0-657f-48b8-a29f-953f9fe35422",
+        "name": "204IT Google Drive Trigger2",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "I8rpYY79iLB3A6aA",
+            "name": "receiptsmanagement2025"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node (JavaScript)\n * Merges 2 incoming items into 1, preserving all JSON + binary data.\n */\n\nfunction isObject(v) {\n\treturn v !== null && typeof v === 'object' && !Array.isArray(v);\n}\n\nfunction deepMerge(a, b) {\n\t// Arrays: concatenate\n\tif (Array.isArray(a) && Array.isArray(b)) return [...a, ...b];\n\n\t// Objects: recursive merge\n\tif (isObject(a) && isObject(b)) {\n\t\tconst out = { ...a };\n\t\tfor (const [k, v] of Object.entries(b)) {\n\t\t\tif (k in out) out[k] = deepMerge(out[k], v);\n\t\t\telse out[k] = v;\n\t\t}\n\t\treturn out;\n\t}\n\n\t// Fallback: keep both if different by wrapping, else keep b\n\tif (a === undefined) return b;\n\tif (b === undefined) return a;\n\tif (a === b) return a;\n\treturn { _a: a, _b: b };\n}\n\nconst items = $input.all();\n\nif (items.length < 2) {\n\t// Nothing to merge; return as-is\n\treturn items;\n}\n\nconst merged = {\n\tjson: {},\n\tbinary: {},\n};\n\n// Merge JSON of all items (works for 2 or more)\nfor (const item of items) {\n\tmerged.json = deepMerge(merged.json, item.json ?? {});\n}\n\n// Merge binary of all items, avoid overwrites\nfor (let i = 0; i < items.length; i++) {\n\tconst bin = items[i].binary ?? {};\n\tfor (const [key, value] of Object.entries(bin)) {\n\t\tif (!(key in merged.binary)) {\n\t\t\tmerged.binary[key] = value;\n\t\t} else {\n\t\t\t// rename to avoid overwriting existing binary key\n\t\t\tlet n = 2;\n\t\t\tlet newKey = `${key}_${n}`;\n\t\t\twhile (newKey in merged.binary) {\n\t\t\t\tn++;\n\t\t\t\tnewKey = `${key}_${n}`;\n\t\t\t}\n\t\t\tmerged.binary[newKey] = value;\n\t\t}\n\t}\n}\n\nreturn [merged];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3168,
+          256
+        ],
+        "id": "7d8a4243-0ed4-4063-a530-0af4b2b7cbf5",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          2944,
+          240
+        ],
+        "id": "393d326f-8d73-485e-8c82-303c13fa0078",
+        "name": "Merge1"
+      }
+    ],
+    "connections": {
+      "Download file": {
+        "main": [
+          [
+            {
+              "node": "Send email to QBO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download file1": {
+        "main": [
+          [
+            {
+              "node": "Send email to QBO1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anago Google Drive Trigger": {
+        "main": [
+          [
+            {
+              "node": "Download file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RAH Google Drive Trigger": {
+        "main": [
+          [
+            {
+              "node": "Download file1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download file2": {
+        "main": [
+          [
+            {
+              "node": "Send email to Receipts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "204IT Google Drive Trigger": {
+        "main": [
+          [
+            {
+              "node": "Download file2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send email to QBO": {
+        "main": [
+          [
+            {
+              "node": "Move file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send email to QBO1": {
+        "main": [
+          [
+            {
+              "node": "Move file1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send email to Receipts": {
+        "main": [
+          [
+            {
+              "node": "Move file to 2o4IT Processed folder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anago: Connection OK?": {
+        "main": [
+          [
+            {
+              "node": "Anago: Filter New Files",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Anago: Connection Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RAH: Connection OK?": {
+        "main": [
+          [
+            {
+              "node": "RAH: Filter New Files",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "RAH: Connection Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anago: Filter New Files": {
+        "main": [
+          [
+            {
+              "node": "Anago: Set Context",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RAH: Filter New Files": {
+        "main": [
+          [
+            {
+              "node": "RAH: Set Context",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anago: Connection Error": {
+        "main": [
+          [
+            {
+              "node": "Send Connection Failure Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RAH: Connection Error": {
+        "main": [
+          [
+            {
+              "node": "Send Connection Failure Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anago: Set Context": {
+        "main": [
+          [
+            {
+              "node": "Download File",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RAH: Set Context": {
+        "main": [
+          [
+            {
+              "node": "Download File",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download File": {
+        "main": [
+          [
+            {
+              "node": "Download Success?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download Success?": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 1
+            }
+          ],
+          [
+            {
+              "node": "Analyze Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Email": {
+        "main": [
+          [
+            {
+              "node": "Email Success?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Email Success?": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ],
+          [
+            {
+              "node": "Analyze Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Analyze Error": {
+        "main": [
+          [
+            {
+              "node": "Send Failure Notification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "204IT: Connection OK?": {
+        "main": [
+          [
+            {
+              "node": "204IT: Filter New Files",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "204IT: Connection Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "204IT: Filter New Files": {
+        "main": [
+          [
+            {
+              "node": "204IT: Set Context",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "204IT: Set Context": {
+        "main": [
+          [
+            {
+              "node": "Download File",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "204IT: Connection Error": {
+        "main": [
+          [
+            {
+              "node": "Send Connection Failure Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Move to Processed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anago Google Drive Trigger2": {
+        "main": [
+          [
+            {
+              "node": "Anago: Connection OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RAH Google Drive Trigger2": {
+        "main": [
+          [
+            {
+              "node": "RAH: Connection OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "204IT Google Drive Trigger2": {
+        "main": [
+          [
+            {
+              "node": "204IT: Connection OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Send Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 048d5e6b",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
