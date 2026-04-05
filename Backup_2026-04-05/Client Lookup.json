@@ -1,0 +1,612 @@
+{
+  "updatedAt": "2026-03-08T22:41:12.895Z",
+  "createdAt": "2026-03-08T19:01:57.986Z",
+  "id": "QSUt1z8NIeyDkmto",
+  "name": "Client Lookup",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        96
+      ],
+      "id": "1fe4d157-6e98-4323-abf1-d3230dded9c0",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+          "mode": "list",
+          "cachedResultName": "Call Agent CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AgDO-r3qUk8y2HoYW8pw13dkkyHLqf1XB93ou9nGBE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -384,
+        96
+      ],
+      "id": "7409b29d-4fa7-48b9-b9c5-88c7688dc7dd",
+      "name": "Client Lookup",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "92b8d39f-ffdc-4bfe-9477-576907a28ac3",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "e6bab812-bb59-4dcf-a304-36bded661e25",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+          "mode": "list",
+          "cachedResultName": "Call Agent CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2008710317,
+          "mode": "list",
+          "cachedResultName": "Appointment Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AgDO-r3qUk8y2HoYW8pw13dkkyHLqf1XB93ou9nGBE/edit#gid=2008710317"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8f18cc4a-8da2-468b-98e4-bb34b4bdd355",
+      "name": "Get Info",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6ca6414a-39cb-4ee9-8250-f753f14ebf35",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a378a362-a6b0-45c3-a062-8ea7e25a1d9e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b134f4e0-755d-46ca-aed5-0ac130407bd7",
+              "name": "message",
+              "value": "This client exists in the CRM. However, he or she has no previous appointments with Hercules detailing.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        96
+      ],
+      "id": "e637ba4d-fd78-41b5-9ddc-ec4e61e75246",
+      "name": "Message"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c8dc1cb-0b90-4363-b0c9-e86713560ef0",
+              "name": "message",
+              "value": "This is a new client, they don't exist in the CRM",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        192
+      ],
+      "id": "d42434c2-3c38-4d83-9e2c-e617a9fb226c",
+      "name": "New Client Message"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Client Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Lookup": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New Client Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Info": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "heO-R-Fdix8eEk6h6FI2v",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "37d3f5a3-88e1-4b3a-85ed-4ec55af6106b",
+  "activeVersionId": "37d3f5a3-88e1-4b3a-85ed-4ec55af6106b",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-08T19:01:57.988Z",
+      "createdAt": "2026-03-08T19:01:57.988Z",
+      "role": "workflow:owner",
+      "workflowId": "QSUt1z8NIeyDkmto",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T22:40:54.000Z",
+    "createdAt": "2026-03-08T22:34:35.491Z",
+    "versionId": "37d3f5a3-88e1-4b3a-85ed-4ec55af6106b",
+    "workflowId": "QSUt1z8NIeyDkmto",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "email"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -592,
+          96
+        ],
+        "id": "1fe4d157-6e98-4323-abf1-d3230dded9c0",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+            "mode": "list",
+            "cachedResultName": "Call Agent CRM",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Clients",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AgDO-r3qUk8y2HoYW8pw13dkkyHLqf1XB93ou9nGBE/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Email",
+                "lookupValue": "={{ $json.email }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -384,
+          96
+        ],
+        "id": "7409b29d-4fa7-48b9-b9c5-88c7688dc7dd",
+        "name": "Client Lookup",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "92b8d39f-ffdc-4bfe-9477-576907a28ac3",
+                "leftValue": "={{ $json.Email }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -208,
+          96
+        ],
+        "id": "e6bab812-bb59-4dcf-a304-36bded661e25",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4",
+            "mode": "list",
+            "cachedResultName": "Call Agent CRM",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jvbuxHtwJhK9HcJj6g5I_l840w1z0aqrx-9tOwCSGY4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 2008710317,
+            "mode": "list",
+            "cachedResultName": "Appointment Log",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AgDO-r3qUk8y2HoYW8pw13dkkyHLqf1XB93ou9nGBE/edit#gid=2008710317"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Email",
+                "lookupValue": "={{ $json.Email }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          0,
+          0
+        ],
+        "id": "8f18cc4a-8da2-468b-98e4-bb34b4bdd355",
+        "name": "Get Info",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "gdMjVhNcbLsjMrDP",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "6ca6414a-39cb-4ee9-8250-f753f14ebf35",
+                "leftValue": "={{ $json.Email }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "a378a362-a6b0-45c3-a062-8ea7e25a1d9e",
+        "name": "If1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b134f4e0-755d-46ca-aed5-0ac130407bd7",
+                "name": "message",
+                "value": "This client exists in the CRM. However, he or she has no previous appointments with Hercules detailing.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          416,
+          96
+        ],
+        "id": "e637ba4d-fd78-41b5-9ddc-ec4e61e75246",
+        "name": "Message"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5c8dc1cb-0b90-4363-b0c9-e86713560ef0",
+                "name": "message",
+                "value": "This is a new client, they don't exist in the CRM",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          0,
+          192
+        ],
+        "id": "d42434c2-3c38-4d83-9e2c-e617a9fb226c",
+        "name": "New Client Message"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Client Lookup",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Client Lookup": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Get Info",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "New Client Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Info": {
+        "main": [
+          [
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf lakhani",
+    "name": "Version 37d3f5a3",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
