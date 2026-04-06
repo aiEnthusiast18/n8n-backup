@@ -1,0 +1,1445 @@
+{
+  "updatedAt": "2025-11-02T21:11:40.000Z",
+  "createdAt": "2025-11-02T18:37:41.437Z",
+  "id": "sEDiVwJtZJt7K7f6",
+  "name": "SMS Shift Reminder System",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Cron (1am CST)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1.1,
+      "position": [
+        -1312,
+        32
+      ],
+      "id": "e01dba44-1fb1-449d-93db-90da59e7e948",
+      "webhookId": "50c00c0f-3e84-486a-85d8-370c976f571b",
+      "retryOnFail": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Set (Config)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        32
+      ],
+      "id": "642c3eda-1bf6-424a-982e-45d6766ec937",
+      "retryOnFail": false,
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Date & Time (Range Start)",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2.2,
+      "position": [
+        -880,
+        32
+      ],
+      "id": "5c5119dc-b00c-4055-9da5-e6543b2d95a6",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Date & Time (Range End)",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        32
+      ],
+      "id": "5dc4dcce-7aae-47be-bd67-c053660b4c93",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "googleApi",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": ""
+      },
+      "name": "Read Contacts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        -432,
+        -96
+      ],
+      "id": "0747c6bc-1f26-4cdf-86ff-90cca82f3fd8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "googleApi",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": ""
+      },
+      "name": "Read Shifts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        -432,
+        144
+      ],
+      "id": "26084c19-3c54-48ec-b2a7-01a8bf3b9f08",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3.1,
+      "position": [
+        -240,
+        144
+      ],
+      "id": "c2d294f9-b373-40a9-88b3-fa27c3ee826e",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Code (Filter by Time)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        144
+      ],
+      "id": "e51f832a-a176-427b-946b-0127512c6fa4",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Merge (Add Contact Info)",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        176,
+        32
+      ],
+      "id": "eb46d0a0-1d52-4d18-b363-d4bcb0c9162b",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Set (Format Message)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        32
+      ],
+      "id": "561ff1e9-3c44-4757-b110-2f45f7fd5a74",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Twilio (Send SMS)",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        32
+      ],
+      "id": "26af3718-646f-4487-8ca9-c9acf7ccb326",
+      "credentials": {},
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        }
+      },
+      "id": "31457bf1-98b7-4dd0-b5ce-251f04b7720f",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -2032,
+        896
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "9b0d2cda-ac20-4619-b989-6b60f8ad61fd",
+      "name": "Get Shift Schedule",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -1824,
+        784
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "5a49e2e3-4c7d-4daa-928e-811c118dc3f6",
+      "name": "Get Employee Contacts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -1824,
+        992
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "ba670ae7-9d4d-41fe-bf12-4d51fd1e8fb3",
+      "name": "Filter Shifts 24h Before",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -1632,
+        784
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "mergeByKey",
+        "options": {}
+      },
+      "id": "f7c1d86c-4cc2-405d-be0b-c5787e1cdb70",
+      "name": "Merge by Employee Id",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        -1424,
+        896
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "46536700-21b2-45a0-9821-dd8ccbcfd09f",
+      "name": "Send Twilio SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 2,
+      "position": [
+        -1232,
+        896
+      ],
+      "credentials": {},
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "2290a5f3-70f5-46e3-a97b-fcfc6c24d30a",
+      "name": "Daily Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { DateTime } = globalThis.luxon;\n\n// Get configuration from the Config node\nconst allItems = $input.all();\nconst config = $node[\"Configuration\"].json;\nconst hoursBeforeShift = config.hoursBeforeShift || 24;\nconst timezone = config.timezone || 'America/Chicago';\nconst debugMode = config.debugMode || false;\n\nconst filteredItems = [];\nconst errors = [];\n\nfor (const item of allItems) {\n  try {\n    const shiftDate = item.json['Date'];\n    const shiftInTime = item.json['In'];\n    const status = item.json['Status'];\n    const employeeId = item.json['Employee Id'];\n    \n    // Skip if shift is not scheduled\n    if (status !== 'Scheduled' && status !== 'SCHEDULED') {\n      if (debugMode) {\n        console.log(`Skipping shift for employee ${employeeId}: Status is ${status}`);\n      }\n      continue;\n    }\n    \n    // Skip if date or time is missing\n    if (!shiftDate || !shiftInTime) {\n      errors.push({\n        employeeId,\n        error: 'Missing date or time',\n        date: shiftDate,\n        time: shiftInTime\n      });\n      continue;\n    }\n    \n    // Parse the shift date and time\n    const dateTimeString = `${shiftDate} ${shiftInTime}`;\n    \n    // Try multiple date formats\n    let shiftDateTime;\n    const formats = [\n      'M/d/yyyy h:mm a',\n      'MM/dd/yyyy h:mm a',\n      'M/d/yyyy HH:mm',\n      'MM/dd/yyyy HH:mm'\n    ];\n    \n    for (const format of formats) {\n      shiftDateTime = DateTime.fromFormat(\n        dateTimeString, \n        format,\n        { zone: timezone }\n      );\n      if (shiftDateTime.isValid) break;\n    }\n    \n    if (!shiftDateTime || !shiftDateTime.isValid) {\n      errors.push({\n        employeeId,\n        error: 'Invalid date/time format',\n        dateTimeString,\n        invalidReason: shiftDateTime?.invalidReason\n      });\n      continue;\n    }\n    \n    // Get current time in the same timezone\n    const now = DateTime.now().setZone(timezone);\n    \n    // Calculate hours until shift\n    const hoursUntilShift = shiftDateTime.diff(now, 'hours').hours;\n    \n    // Check if shift is within the reminder window (±30 minutes)\n    if (hoursUntilShift >= (hoursBeforeShift - 0.5) && \n        hoursUntilShift <= (hoursBeforeShift + 0.5)) {\n      \n      // Add formatted datetime to the data\n      item.json.shiftDateTime = shiftDateTime.toISO();\n      item.json.formattedDate = shiftDateTime.toFormat('EEEE, MMMM d');\n      item.json.formattedTime = shiftDateTime.toFormat('h:mm a');\n      item.json.hoursUntilShift = Math.round(hoursUntilShift);\n      item.json.shouldSendReminder = true;\n      \n      filteredItems.push(item);\n      \n      if (debugMode) {\n        console.log(`Reminder scheduled for ${item.json['Employee']} - Shift in ${hoursUntilShift.toFixed(1)} hours`);\n      }\n    } else if (debugMode) {\n      console.log(`No reminder for ${item.json['Employee']} - Shift in ${hoursUntilShift.toFixed(1)} hours (outside window)`);\n    }\n    \n  } catch (error) {\n    errors.push({\n      employeeId: item.json['Employee Id'],\n      error: error.message,\n      data: item.json\n    });\n  }\n}\n\n// Log errors if any\nif (errors.length > 0) {\n  console.log('Processing errors:', JSON.stringify(errors, null, 2));\n}\n\nif (debugMode) {\n  console.log(`Filtered ${filteredItems.length} shifts from ${allItems.length} total`);\n}\n\nreturn filteredItems;"
+      },
+      "id": "07614fb1-69e7-46dd-b6ef-c129866c64c7",
+      "name": "Filter Upcoming Shifts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "phone_check",
+              "leftValue": "={{ $json['emp phone number'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "60980a65-8ca9-4e18-8d36-48ec1bf65e94",
+      "name": "Check Phone Number",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the phone number from either field\nlet phoneNumber = $json['emp phone number'] || $json['phone'];\n\nif (!phoneNumber) {\n  throw new Error('No phone number found');\n}\n\n// Convert to string in case it's a number\nphoneNumber = String(phoneNumber);\n\n// Remove all non-digit characters\nphoneNumber = phoneNumber.replace(/\\D/g, '');\n\n// Validate phone number length\nif (phoneNumber.length < 10) {\n  throw new Error(`Invalid phone number: ${phoneNumber} (too short)`);\n}\n\n// Add country code if not present (assuming US +1)\nif (phoneNumber.length === 10) {\n  phoneNumber = '1' + phoneNumber;\n}\n\n// Format with + prefix\nif (!phoneNumber.startsWith('+')) {\n  phoneNumber = '+' + phoneNumber;\n}\n\n// Validate final format\nif (!phoneNumber.match(/^\\+1\\d{10}$/)) {\n  console.warn(`Phone number may not be properly formatted: ${phoneNumber}`);\n}\n\n// Add formatted phone number to the data\n$json.formattedPhoneNumber = phoneNumber;\n$json.originalPhoneNumber = $json['emp phone number'];\n\nreturn $json;"
+      },
+      "id": "4f90ff2e-2d89-4ffe-866e-5e64d90a5677",
+      "name": "Format Phone Number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        1488
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "from": "={{ $node[\"Configuration\"].json[\"twilioPhoneNumber\"] }}",
+        "to": "={{ $json.formattedPhoneNumber }}",
+        "message": "=REMINDER: You have a shift from {{ $json['In'] }} - {{ $json['Out'] }} on {{ $json['formattedDate'] }} at {{ $json['Client'] }} ({{ $json['clt address'] }})",
+        "options": {}
+      },
+      "id": "b5a335f6-7d08-4bf5-b8df-342c6d30e8c3",
+      "name": "Send SMS Reminder",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        1488
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "vU3mbO7KVIHVzXG5",
+          "name": "Twilio account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "=",
+        "options": {
+          "removeOtherFields": false
+        }
+      },
+      "id": "0fb12e84-83c5-4dd8-8a4e-36765bbd2c05",
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        1296
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const successfulReminders = $input.all();\nconst failedReminders = $node[\"Log Missing Phone\"].all() || [];\n\nconst summary = {\n  executionTime: new Date().toISOString(),\n  totalProcessed: successfulReminders.length + failedReminders.length,\n  successfulSMS: successfulReminders.length,\n  failedSMS: failedReminders.length,\n  successfulEmployees: successfulReminders.map(item => ({\n    name: item.json['Employee'],\n    id: item.json['Employee Id'],\n    shiftTime: `${item.json['Date']} ${item.json['In']}-${item.json['Out']}`,\n    client: item.json['Client']\n  })),\n  failedEmployees: failedReminders.map(item => ({\n    name: item.json.employeeName,\n    id: item.json.employeeId,\n    reason: item.json.status,\n    shiftInfo: item.json.shiftInfo\n  }))\n};\n\nreturn [{ json: summary }];"
+      },
+      "id": "dab639f9-7229-454b-9428-5624a30480fa",
+      "name": "Create Summary Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 📱 SMS Shift Reminder System Setup\n\n## Required Configuration:\n\n### 1. Google Sheets\n- Replace `YOUR_SHIFT_SCHEDULE_SHEET_ID` in \"Get Shift Schedule\" node\n- Replace `YOUR_EMPLOYEE_CONTACTS_SHEET_ID` in \"Get Employee Contacts\" node\n- Sheet IDs are found in the Google Sheets URL after `/d/`\n\n### 2. Twilio\n- Update `twilioPhoneNumber` in \"Configuration\" node\n- Format: +1234567890 (with country code)\n\n### 3. Credentials\n- Add Google Sheets OAuth2 credentials\n- Add Twilio API credentials (Account SID & Auth Token)\n\n### 4. Timezone & Timing\n- Adjust `timezone` in Configuration node (default: America/Chicago)\n- Modify `hoursBeforeShift` to change reminder timing (default: 24 hours)\n- Change schedule in \"Daily Schedule Trigger\" (default: 9 AM daily)",
+        "height": 640,
+        "width": 564,
+        "color": 7
+      },
+      "id": "511b70ce-071e-4330-9d3e-c1cd7effc599",
+      "name": "Setup Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ✨ Key Features\n\n- **Smart Date Parsing**: Handles multiple date/time formats\n- **Error Handling**: Continues on failures, logs issues\n- **Phone Validation**: Formats US numbers automatically\n- **Duplicate Prevention**: Ensures one SMS per shift\n- **Debug Mode**: Enable in Configuration for detailed logs\n- **Comprehensive Reporting**: Summary of all sent/failed reminders\n- **Timezone Support**: Handles CST and other timezones\n- **Status Filtering**: Only sends for \"Scheduled\" shifts",
+        "height": 346,
+        "width": 400,
+        "color": 4
+      },
+      "id": "58838b37-b9b8-46fc-96e6-4293c0ef85e2",
+      "name": "Key Features",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔄 Data Flow\n\n1. **Daily Trigger** runs at scheduled time\n2. **Fetch Data** from both Google Sheets\n3. **Merge** employee contacts with shift data\n4. **Filter** shifts ~24 hours away\n5. **Validate** phone numbers exist\n6. **Format** phone numbers for SMS\n7. **Send SMS** via Twilio\n8. **Remove Duplicates** to prevent double-sends\n9. **Generate Summary** report of results",
+        "height": 282,
+        "width": 350,
+        "color": 5
+      },
+      "id": "3611f792-2fce-4b99-be5b-5e1128c842ed",
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        96,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Shift Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A:K"
+            }
+          }
+        }
+      },
+      "id": "f99ef7a7-ea9f-4c24-bdb9-fd41a7c67891",
+      "name": "Get Shift Schedule1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        1488
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 176289378,
+          "mode": "list",
+          "cachedResultName": "Employee Contact",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=176289378"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A:C"
+            }
+          }
+        }
+      },
+      "id": "522dc1d1-39ff-497f-8379-f81ab7153d6c",
+      "name": "Get Employee Contacts1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        1632
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdMjVhNcbLsjMrDP",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "joinMode": "enrichInput1",
+        "options": {}
+      },
+      "id": "e6a0f222-0d2d-43e6-ad3f-97953a5087b9",
+      "name": "Merge Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1168,
+        2560
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "a1",
+              "leftValue": "={{ $json.shouldSendReminder }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e605f53f-b5da-4a1f-8c6d-6b5cf1a07f71",
+      "name": "Remove Empty Results",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        2560
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "b1",
+              "leftValue": "={{ $json['emp phone number'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2c45b608-1562-45ce-8406-8c39694a2df4",
+      "name": "Check for Phone Number",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        2528
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "10e8fb28-4ad3-4e3b-b95f-a295e15157aa",
+      "name": "Log Missing Phone Numbers",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        2624
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "21bf4328-367d-4b3d-bbfa-dfe4193d9a2a",
+      "name": "Success Summary",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        240,
+        2640
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## SMS Shift Reminder Workflow\n\n### Configuration Required:\n1. **Google Sheets IDs**: Replace `YOUR_SHIFT_SCHEDULE_SHEET_ID` and `YOUR_EMPLOYEE_CONTACTS_SHEET_ID` with your actual Google Sheet IDs\n2. **Twilio Phone Number**: Update in Configuration node\n3. **Reminder Timing**: Adjust `hoursBeforeShift` in Configuration node (default: 24 hours)\n4. **Timezone**: Set your local timezone in Configuration node (default: America/Chicago for CST)\n\n### How it works:\n- Runs daily at 9 AM (adjustable in Schedule Trigger)\n- Fetches all shifts and employee contacts\n- Filters shifts occurring 24 hours from now\n- Sends personalized SMS reminders via Twilio\n- Logs any missing phone numbers for review",
+        "height": 250,
+        "width": 600
+      },
+      "id": "40e61224-1703-42aa-ba02-fe58f50284ea",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        2288
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "### Date Filtering Logic\n\nThe Code node checks if shifts are within a 1-hour window of the configured reminder time.\n\nFor example, if `hoursBeforeShift` = 24:\n- Shifts 23.5 to 24.5 hours away will be matched\n- This accounts for the workflow running once daily\n\nAdjust the window in the Filter node if needed.",
+        "height": 150,
+        "width": 350
+      },
+      "id": "dc1af069-eab8-4f70-a2ec-5117d161d15b",
+      "name": "Sticky Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        2288
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "### SMS Message Format\n\n```\nREMINDER: You have a shift from [In] - [Out] on [Date] at [Client] ([clt address])\n```\n\nCustomize the message template in the Send SMS Reminder node.",
+        "height": 120,
+        "width": 400
+      },
+      "id": "fc4f8eb0-9cf9-420e-aa69-72b5ebaf531a",
+      "name": "Sticky Note 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        2288
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "09b0c041-73c6-4ddd-8ed8-5e1d892e7e15",
+      "name": "Daily Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1776,
+        2480
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SHIFT_SCHEDULE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Shift Schedule",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "fbdd009b-88b9-40d5-aab4-778250742609",
+      "name": "Get Shift Schedule2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1568,
+        2480
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_EMPLOYEE_CONTACTS_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Employee Contacts",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "ca3dbb91-f9f6-4d0b-baa5-6414f8b42a2f",
+      "name": "Get Employee Contacts2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1568,
+        2624
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "865e8bc5-71ee-4bc5-ac6a-ee07b381c117",
+      "name": "Configuration1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1376,
+        2480
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get configuration\nconst config = $node[\"Configuration1\"].json;\nconst hoursBeforeShift = config.hoursBeforeShift || 24;\nconst timezone = config.timezone || 'America/Chicago';\n\n// Import DateTime from Luxon\nconst { DateTime } = require('luxon');\n\n// Get current item data\nconst shiftDate = $json['Date'];\nconst shiftInTime = $json['In'];\nconst status = $json['Status'];\n\n// Skip if shift is not scheduled\nif (status !== 'Scheduled' && status !== 'SCHEDULED') {\n  return null;\n}\n\n// Parse the shift date and time\n// Assuming Date is in format MM/DD/YYYY and In is in format HH:MM AM/PM\ntry {\n  // Combine date and time\n  const dateTimeString = `${shiftDate} ${shiftInTime}`;\n  \n  // Parse the datetime in the specified timezone\n  const shiftDateTime = DateTime.fromFormat(\n    dateTimeString, \n    'M/d/yyyy h:mm a',\n    { zone: timezone }\n  );\n  \n  if (!shiftDateTime.isValid) {\n    console.log('Invalid date/time:', dateTimeString, shiftDateTime.invalidExplanation);\n    return null;\n  }\n  \n  // Get current time in the same timezone\n  const now = DateTime.now().setZone(timezone);\n  \n  // Calculate hours until shift\n  const hoursUntilShift = shiftDateTime.diff(now, 'hours').hours;\n  \n  // Check if shift is within the reminder window\n  // We want shifts that are between (hoursBeforeShift - 0.5) and (hoursBeforeShift + 0.5) hours away\n  // This gives us a 1-hour window to catch the shift\n  if (hoursUntilShift >= (hoursBeforeShift - 0.5) && hoursUntilShift <= (hoursBeforeShift + 0.5)) {\n    // Add formatted datetime to the data\n    $json.shiftDateTime = shiftDateTime.toISO();\n    $json.formattedDate = shiftDateTime.toFormat('EEEE, MMMM d');\n    $json.hoursUntilShift = Math.round(hoursUntilShift);\n    $json.shouldSendReminder = true;\n    \n    return $json;\n  }\n  \n} catch (error) {\n  console.log('Error processing shift:', error.message);\n  return null;\n}\n\n// Don't send reminder for this shift\nreturn null;"
+      },
+      "id": "349b8704-b0c1-4418-a294-0ef3ee1067eb",
+      "name": "Filter Upcoming Shifts1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        2560
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the phone number\nlet phoneNumber = $json['emp phone number'];\n\n// Remove all non-digit characters\nphoneNumber = phoneNumber.replace(/\\D/g, '');\n\n// Add country code if not present (assuming US +1)\nif (phoneNumber.length === 10) {\n  phoneNumber = '1' + phoneNumber;\n}\n\n// Format with + prefix\nif (!phoneNumber.startsWith('+')) {\n  phoneNumber = '+' + phoneNumber;\n}\n\n// Add formatted phone number to the data\n$json.formattedPhoneNumber = phoneNumber;\n\nreturn $json;"
+      },
+      "id": "3b19c262-b80c-4318-8bf9-3cbf010b39d3",
+      "name": "Format Phone Number1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        2512
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "={{ $node[\"Configuration1\"].json[\"twilioPhoneNumber\"] }}",
+        "to": "={{ $json.formattedPhoneNumber }}",
+        "message": "=REMINDER: You have a shift from {{ $json['In'] }} - {{ $json['Out'] }} on {{ $json['formattedDate'] }} at {{ $json['Client'] }} ({{ $json['clt address'] }})",
+        "options": {}
+      },
+      "id": "9102775d-4fc4-44ce-a9dc-c21affc7ca6f",
+      "name": "Send SMS Reminder1",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        2512
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": {
+          "fields": [
+            {
+              "fieldName": "Employee Id"
+            },
+            {
+              "fieldName": "Date"
+            },
+            {
+              "fieldName": "In"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dd3cb80b-ba1a-45af-b36b-a6e53f949cd6",
+      "name": "Remove Duplicates1",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        2512
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parameters - adjust interval here\nconst REMINDER_INTERVAL_HOURS = 24;\n\n// Parse Employee Contacts\nconst contactsRaw = items[0].json.value || items[0].json.rows || items[0].json;\nconst contacts = Array.isArray(contactsRaw) ? contactsRaw : contactsRaw.data;\n// Parse Shift Schedule\nconst shiftsRaw = items[1].json.value || items[1].json.rows || items[1].json;\nconst shifts = Array.isArray(shiftsRaw) ? shiftsRaw : shiftsRaw.data;\n\nconst now = new Date();\nconst targetMin = new Date(now.getTime() + REMINDER_INTERVAL_HOURS * 60 * 60 * 1000);\nconst targetMax = new Date(targetMin.getTime() + 59 * 60 * 1000); // 1 hour window\n\nlet reminders = [];\nlet sentHashes = new Set();\n\nfor (const shift of shifts) {\n  // Assume column keys match label names\n  if (shift.Status !== 'Scheduled') continue;\n  \n  // Parse Date + In to get start time\n  const shiftDate = shift.Date;\n  const shiftIn = shift.In;\n  // Example format: '2025-11-03' and '09:00'\n  const shiftDateTimeStr = `${shiftDate}T${shiftIn}:00-06:00`;\n  const shiftDateTime = new Date(shiftDateTimeStr);\n\n  if (shiftDateTime >= targetMin && shiftDateTime <= targetMax) {\n    // Find contact info\n    const contact = contacts.find(c => c['Employee Id'] === shift['Employee Id']);\n    if (contact && contact['emp phone number']) {\n      // Use Account Id + Date + In + Employee Id to de-duplicate\n      const hash = `${shift['Account Id']}_${shiftDate}_${shiftIn}_${shift['Employee Id']}`;\n      if (!sentHashes.has(hash)) {\n        reminders.push({\n          phone: contact['emp phone number'],\n          message: `REMINDER: You have a shift from ${shift.In} - ${shift.Out} on ${shift.Date} at ${shift.Client} (${shift['clt address']})`,\n          hash\n        });\n        sentHashes.add(hash);\n      }\n    }\n  }\n}\n\nreturn reminders.map(r => ({ json: r }));\n"
+      },
+      "name": "Filter & Format Reminders",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        384
+      ],
+      "id": "4aeb18f6-1788-4823-9e33-2ace27e4ccd3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "+YOUR_TWILIO_NUMBER",
+        "to": "={{$json[\"phone\"]}}",
+        "message": "={{$json[\"message\"]}}",
+        "options": {}
+      },
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        384
+      ],
+      "id": "86892e11-6c57-48d8-ac7c-a1128c10d312",
+      "credentials": {
+        "twilioApi": {
+          "id": null,
+          "name": "YOUR_TWILIO_CREDENTIAL_NAME"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "name": "Cron1",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        384
+      ],
+      "id": "e8c245cd-8a86-49e8-855a-84f282c6d7f0",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "name": "Get Employee Contacts3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1520,
+        320
+      ],
+      "id": "12535ba0-41fa-4cbb-a30f-f19cb179bf66",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "name": "Get Shift Schedule3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1536,
+        496
+      ],
+      "id": "d519dd2f-8ddb-4c02-ad39-477ae14b2169",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "Employee Id",
+        "joinMode": "enrichInput1",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferLast"
+            }
+          },
+          "multipleMatches": "first"
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        928,
+        1568
+      ],
+      "id": "b37addfd-4a91-4cca-8376-1d5f942fc2f8",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "034d7d0d-130b-4c30-a6b1-0fdbb12f09ad",
+              "name": "hoursBeforeShift",
+              "value": 24,
+              "type": "number"
+            },
+            {
+              "id": "6c1ca67f-7fc1-4ee3-86e4-91d1af5dddf3",
+              "name": "twilioPhoneNumber",
+              "value": "+15077055576",
+              "type": "string"
+            },
+            {
+              "id": "8e55d3f0-2ddd-4896-9ac7-4edb2c0692d6",
+              "name": "timezone",
+              "value": "America/Winnipeg",
+              "type": "string"
+            },
+            {
+              "id": "3f1524a9-fabc-45c7-80e5-60d25c501b3b",
+              "name": "debugMode",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        1488
+      ],
+      "id": "d1f15272-5139-40c1-972a-40f59e5caa86",
+      "name": "Configuration"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c8fb7e07-4acf-4dae-82f3-f0e89aa899d8",
+              "name": "status",
+              "value": "Failed - Missing Phone",
+              "type": "string"
+            },
+            {
+              "id": "24b1b734-1237-42ea-9bf8-ff52ac3b86cb",
+              "name": "employeeName",
+              "value": "={{ $json['Employee Id'] }}",
+              "type": "string"
+            },
+            {
+              "id": "10919154-e2f7-440c-ba25-08009a6902eb",
+              "name": "shiftInfo",
+              "value": "={{ $json['Date'] }} {{ $json['In'] }} - {{ $json['Out'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d0d119a5-d348-42e2-99a0-ba560b89d51f",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1616,
+        1648
+      ],
+      "id": "1b8b97a3-f33c-437b-bc5c-c3ba9dbefc5b",
+      "name": "Log Missing Phone1"
+    }
+  ],
+  "connections": {
+    "Read Contacts": {
+      "main": [
+        [
+          {
+            "node": "Merge (Add Contact Info)",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge (Add Contact Info)": {
+      "main": [
+        [
+          {
+            "node": "Set (Format Message)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Get Shift Schedule",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Employee Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employee Contacts": {
+      "main": [
+        [
+          {
+            "node": "Merge by Employee Id",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Daily Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Shift Schedule1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Employee Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Upcoming Shifts": {
+      "main": [
+        [
+          {
+            "node": "Check Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Phone Number": {
+      "main": [
+        [
+          {
+            "node": "Format Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Missing Phone1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Phone Number": {
+      "main": [
+        [
+          {
+            "node": "Send SMS Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Reminder": {
+      "main": [
+        [
+          {
+            "node": "Create Summary Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        []
+      ]
+    },
+    "Get Shift Schedule1": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employee Contacts1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Upcoming Shifts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Empty Results": {
+      "main": [
+        [
+          {
+            "node": "Check for Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Phone Number": {
+      "main": [
+        [
+          {
+            "node": "Format Phone Number1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Missing Phone Numbers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get Employee Contacts2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Shift Schedule2": {
+      "main": [
+        [
+          {
+            "node": "Configuration1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employee Contacts2": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Configuration1": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Upcoming Shifts1": {
+      "main": [
+        [
+          {
+            "node": "Remove Empty Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Phone Number1": {
+      "main": [
+        [
+          {
+            "node": "Send SMS Reminder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Reminder1": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Success Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Format Reminders": {
+      "main": [
+        [
+          {
+            "node": "Send SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron1": {
+      "main": [
+        [
+          {
+            "node": "Get Employee Contacts3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Shift Schedule3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employee Contacts3": {
+      "main": [
+        [
+          {
+            "node": "Filter & Format Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Missing Phone Numbers": {
+      "main": [
+        [
+          {
+            "node": "Success Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Filter Upcoming Shifts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Missing Phone1": {
+      "main": [
+        [
+          {
+            "node": "Create Summary Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "8e237ddb-90d0-49f4-9a03-35edb4362f13",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-02T18:37:41.440Z",
+      "createdAt": "2025-11-02T18:37:41.440Z",
+      "role": "workflow:owner",
+      "workflowId": "sEDiVwJtZJt7K7f6",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
