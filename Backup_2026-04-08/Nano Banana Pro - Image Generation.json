@@ -1,0 +1,224 @@
+{
+  "updatedAt": "2026-02-12T02:03:15.094Z",
+  "createdAt": "2026-02-11T02:59:18.211Z",
+  "id": "clX26WmNk7PhpkoMyGbgr",
+  "name": "Nano Banana Pro - Image Generation",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Nano Banana Pro — Image Generator",
+        "formDescription": "Upload two reference images and enter a prompt to generate a new image. The reference images will NOT be warped or modified in any way.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Image Prompt",
+              "fieldType": "textarea",
+              "placeholder": "e.g. Combine these two product images into a lifestyle photo on a wooden desk",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Reference Image 1",
+              "fieldType": "file",
+              "acceptFileTypes": ".png,.jpg,.jpeg,.webp",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Reference Image 2",
+              "fieldType": "file",
+              "acceptFileTypes": ".png,.jpg,.jpeg,.webp",
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "44df89a0-b2ea-4236-b1ea-817efef0bddb",
+      "name": "Image Generation Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -880,
+        80
+      ],
+      "webhookId": "5578ba8e-5900-4441-90ee-b6b0cf2247e3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the Gemini API multimodal request payload.\n// The two reference images are read from the form's binary uploads\n// and are NOT modified or warped in any way.\n\nconst item = $input.first();\n\n// Get the prompt from the form submission\nconst prompt = item.json['Image Prompt'];\nif (!prompt) {\n  throw new Error('Missing required field: Image Prompt');\n}\n\n// Get file binary data from the form uploads\nconst binaryKeys = Object.keys(item.binary || {});\nif (binaryKeys.length < 2) {\n  throw new Error('Two image files are required. Only ' + binaryKeys.length + ' file(s) were uploaded.');\n}\n\n// --- FIX STARTS HERE ---\n// Read the two uploaded images using getBinaryDataBuffer to resolve filesystem pointers\nconst key1 = binaryKeys[0];\nconst key2 = binaryKeys[1];\n\n// Helper to convert binary to base64\nasync function getBase64(index, key) {\n  const buffer = await this.helpers.getBinaryDataBuffer(index, key);\n  return buffer.toString('base64');\n}\n\n// Convert both images to base64\nconst image1Base64 = await getBase64.call(this, 0, key1);\nconst image2Base64 = await getBase64.call(this, 0, key2);\n// --- FIX ENDS HERE ---\n\nconst file1 = item.binary[key1];\nconst file2 = item.binary[key2];\nconst mimeType1 = file1.mimeType || 'image/png';\nconst mimeType2 = file2.mimeType || 'image/png';\n\nconst payload = {\n  contents: [\n    {\n      role: \"user\",\n      parts: [\n        {\n          inlineData: {\n            mimeType: mimeType1,\n            data: image1Base64\n          }\n        },\n        {\n          inlineData: {\n            mimeType: mimeType2,\n            data: image2Base64\n          }\n        },\n        {\n          text: prompt + \"\\n\\nIMPORTANT: Use the two provided images as exact references. Do NOT warp, distort, or modify those images in any way. Generate a new image that incorporates them faithfully.\"\n        }\n      ]\n    }\n  ],\n  generationConfig: {\n    responseModalities: [\"TEXT\", \"IMAGE\"],\n    temperature: 1,\n    topP: 0.95,\n    topK: 40\n  }\n};\n\nreturn [{ json: { payload } }];"
+      },
+      "id": "d6c47386-f695-4eaf-8aec-d7ae6fdc12c5",
+      "name": "Prepare API Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=AIzaSyA_t5Df_-BzLiNJBnvuidi5rdvdWxUHziA",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "id": "5541cce1-9773-4cc8-8ef6-c2722f8eb014",
+      "name": "Call Nano Banana Pro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract the generated image and any text from the Gemini API response.\n\nconst response = $input.first().json;\n\n// Handle error responses\nif (response.error) {\n  return [{\n    json: {\n      success: false,\n      error: response.error.message || 'Unknown API error',\n      code: response.error.code || 500\n    }\n  }];\n}\n\nconst candidates = response.body?.candidates || response.candidates;\nif (!candidates || candidates.length === 0) {\n  return [{\n    json: {\n      success: false,\n      error: 'No candidates returned by the model. The request may have been blocked by safety filters.'\n    }\n  }];\n}\n\nconst parts = candidates[0].content?.parts || [];\n\nlet generatedImageBase64 = null;\nlet generatedMimeType = null;\nlet textResponse = '';\n\nfor (const part of parts) {\n  if (part.inlineData) {\n    generatedImageBase64 = part.inlineData.data;\n    generatedMimeType = part.inlineData.mimeType;\n  }\n  if (part.text) {\n    textResponse += part.text;\n  }\n}\n\nif (!generatedImageBase64) {\n  return [{\n    json: {\n      success: false,\n      error: 'No image was generated. The model returned only text.',\n      textResponse: textResponse\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    success: true,\n    generatedImage: generatedImageBase64,\n    mimeType: generatedMimeType,\n    dataUri: `data:${generatedMimeType};base64,${generatedImageBase64}`,\n    textResponse: textResponse\n  }\n}];"
+      },
+      "id": "09077ccb-2b11-45c4-a6cc-1dc109f4144a",
+      "name": "Extract Generated Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Nano Banana Pro – Image Generation\n\n**How it works:**\n1. Fill out the form: enter a prompt and upload two reference images\n2. The workflow calls the Gemini API (`gemini-3-pro-image-preview`) with both images + prompt\n3. The generated image is returned in the response\n\n**Setup:**\n- Set `GEMINI_API_KEY` as an n8n environment variable, OR replace `{{ $env.GEMINI_API_KEY }}` in the HTTP Request node URL with your actual key\n\n**The two input images are NEVER warped or modified — they are passed directly as reference context.**",
+        "height": 356,
+        "width": 480,
+        "color": 5
+      },
+      "id": "7b2dfc0e-cc4d-48db-89eb-56733951c919",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        -512
+      ]
+    }
+  ],
+  "connections": {
+    "Image Generation Form": {
+      "main": [
+        [
+          {
+            "node": "Prepare API Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare API Payload": {
+      "main": [
+        [
+          {
+            "node": "Call Nano Banana Pro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Nano Banana Pro": {
+      "main": [
+        [
+          {
+            "node": "Extract Generated Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Generated Image": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Image Generation Form": [
+      {
+        "json": {
+          "Image Prompt": "Create a high-quality, professional ‘Canva-style’ Instagram post (square 1080×1080 px) that uses the provided photo as the hero image and the provided company logo as the brand mark. Do not edit, retouch, crop, recolor, filter, or otherwise change the photo or the logo in any way.\r\n\r\nThis image is to accompany the following post: Winter days can be the perfect time to create special memories with your loved ones, including seniors. ❄️ From cozy indoor games to gentle walks in the snow, our latest blog offers 5 meaningful activities that bring families closer while keeping everyone safe and engaged. At Right at Home Winnipeg, we believe every moment counts—especially during the colder months. Enjoy simple joys together that warm the heart and brighten the season. 💙 Visit our blog to discover ideas tailored for families with senior members. Reach out to see how we can support your family’s care journey. (204) 318-5554\r\n\r\nRead more here: https://www.rightathomecanada.com/winnipeg/blog/5-fun-winter-activities-for-families-with-senior-members\r\n\r\n#dementiacare #alzheimerscare #seniors #familytime #RightAtHomeWinnipeg\r\n\r\ninclude a short header (≤10 words) on the visual derived from that text, but keep all copy minimal so the design stays clean and airy.\r\n\r\nInclude the company name Right At Home Winnipeg, phone (204) 318-5554, and website rightathomecanada.com/winnipeg in a clear footer or badge near the logo; ensure legibility at mobile size. Use soft warm neutrals with one subtle accent, rounded sans-serif type, generous negative space, and an optional small CTA pill only if it doesn’t clutter the layout. If needed for legibility, place a low-opacity translucent panel behind text — do not change the photo’s colors.\r\n\r\nConstraints: no extra logos or watermarks, no generated logo replacements, no long paragraphs of text, and no edits to faces or the photo.\r\nDeliverables: 1080×1080 PNG (high quality), mobile-safe crop preview (center ±10%), and one-line alt-text suggestion.",
+          "Reference Image 1": [
+            {
+              "filename": "logo-canada copy.png",
+              "mimetype": "image/png",
+              "size": 21207
+            }
+          ],
+          "Reference Image 2": [
+            {
+              "filename": "images.jpeg",
+              "mimetype": "image/jpeg",
+              "size": 12281
+            }
+          ],
+          "submittedAt": "2026-02-11T19:44:37.130-06:00",
+          "formMode": "test"
+        },
+        "binary": {
+          "Reference_Image_1": {
+            "mimeType": "image/png",
+            "fileType": "image",
+            "fileExtension": "png",
+            "data": "filesystem-v2",
+            "fileName": "logo-canada copy.png",
+            "id": "filesystem-v2:workflows/clX26WmNk7PhpkoMyGbgr/executions/temp/binary_data/4d0ae33e-c013-4207-a662-79af66d925b9",
+            "fileSize": "21.2 kB"
+          },
+          "Reference_Image_2": {
+            "mimeType": "image/jpeg",
+            "fileType": "image",
+            "fileExtension": "jpg",
+            "data": "filesystem-v2",
+            "fileName": "images.jpeg",
+            "id": "filesystem-v2:workflows/clX26WmNk7PhpkoMyGbgr/executions/temp/binary_data/1650103e-2ec9-47b4-832c-94f2bfd09e19",
+            "fileSize": "12.3 kB"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "d193d920-cfdd-44ee-a49a-35cda8f1bcfb",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T02:59:18.215Z",
+      "createdAt": "2026-02-11T02:59:18.215Z",
+      "role": "workflow:owner",
+      "workflowId": "clX26WmNk7PhpkoMyGbgr",
+      "projectId": "Ata3MFLKCxwgGTPX"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
