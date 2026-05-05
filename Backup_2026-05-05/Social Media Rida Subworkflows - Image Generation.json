@@ -1,0 +1,774 @@
+{
+  "updatedAt": "2026-05-03T22:15:33.673Z",
+  "createdAt": "2026-05-03T21:48:22.792Z",
+  "id": "khaharnQFAyotlXS",
+  "name": "Social Media Rida Subworkflows - Image Generation",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "prompt"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1248,
+        16
+      ],
+      "id": "9717fc9e-143d-467a-8e86-4df68a83d537",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36031878-8176-430b-a310-b4616bc06a98",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "0b5c15ca-9d20-4788-adfa-41d5ae9af93a",
+              "name": "image1",
+              "value": "=\"https://i.ibb.co/99JKcX84/rahrevtypetealbox.jpg\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -800,
+        16
+      ],
+      "id": "c054f2ed-3134-44cc-b780-6c615e580658",
+      "name": "Prompt/Images2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        16
+      ],
+      "id": "5ea19d84-da19-41d2-867c-bcff2d7b817c",
+      "name": "Wait7",
+      "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "02809ce2-dae3-424a-8127-66fed1497d77",
+      "name": "Get Image7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      {{ $json.image1 }}\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -608,
+        16
+      ],
+      "id": "12be40c6-827e-431c-b594-a28f8fe7e87f",
+      "name": "Edit Images"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+              "name": "image",
+              "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        16
+      ],
+      "id": "cc211a1e-6349-4333-8c55-c0d5667b13a7",
+      "name": "Result7"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "generating",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generating"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6a5ac028-0e6e-47d9-b812-d063d8f36a64",
+      "name": "Switch7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript)\n// Makes prompt safe to inject into a JSON string\n\nconst input = $json.prompt ?? \"\";\n\nconst jsonSafePrompt = input\n  // escape backslashes FIRST\n  .replace(/\\\\/g, \"\\\\\\\\\")\n  \n  // escape double quotes\n  .replace(/\"/g, '\\\\\"')\n\n  // remove line breaks\n  .replace(/[\\r\\n]+/g, \" \")\n\n  // normalize smart quotes\n  .replace(/[“”]/g, '\\\\\"')\n  .replace(/[‘’]/g, \"'\")\n\n  // normalize long dashes\n  .replace(/[–—]/g, \"-\")\n\n  // collapse extra spaces\n  .replace(/\\s{2,}/g, \" \")\n\n  // trim\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      prompt: jsonSafePrompt\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        16
+      ],
+      "id": "a9ff5f33-7fd3-4b0f-b690-cba07e294d8a",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt/Images2": {
+      "main": [
+        [
+          {
+            "node": "Edit Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait7": {
+      "main": [
+        [
+          {
+            "node": "Get Image7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image7": {
+      "main": [
+        [
+          {
+            "node": "Switch7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Images": {
+      "main": [
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch7": {
+      "main": [
+        [
+          {
+            "node": "Result7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Prompt/Images2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d5b42151-026e-4086-8843-50139e98317d",
+  "activeVersionId": "d5b42151-026e-4086-8843-50139e98317d",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T21:48:22.792Z",
+      "createdAt": "2026-05-03T21:48:22.792Z",
+      "role": "workflow:owner",
+      "workflowId": "khaharnQFAyotlXS",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-03T22:15:27.395Z",
+    "createdAt": "2026-05-03T21:48:27.263Z",
+    "versionId": "d5b42151-026e-4086-8843-50139e98317d",
+    "workflowId": "khaharnQFAyotlXS",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "prompt"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -1248,
+          16
+        ],
+        "id": "9717fc9e-143d-467a-8e86-4df68a83d537",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "36031878-8176-430b-a310-b4616bc06a98",
+                "name": "prompt",
+                "value": "={{ $json.prompt }}",
+                "type": "string"
+              },
+              {
+                "id": "0b5c15ca-9d20-4788-adfa-41d5ae9af93a",
+                "name": "image1",
+                "value": "=\"https://i.ibb.co/99JKcX84/rahrevtypetealbox.jpg\"",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -800,
+          16
+        ],
+        "id": "c054f2ed-3134-44cc-b780-6c615e580658",
+        "name": "Prompt/Images2"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          -320,
+          16
+        ],
+        "id": "5ea19d84-da19-41d2-867c-bcff2d7b817c",
+        "name": "Wait7",
+        "webhookId": "8363f037-4a20-4f6b-9c5c-780dfb313864"
+      },
+      {
+        "parameters": {
+          "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "taskId",
+                "value": "={{ $json.data.taskId }}"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -160,
+          16
+        ],
+        "id": "02809ce2-dae3-424a-8127-66fed1497d77",
+        "name": "Get Image7"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.kie.ai/api/v1/jobs/createTask",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer e2c94b7cc078a571657f393be46d9653"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"nano-banana-pro\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"aspect_ratio\": \"1:1\",\n    \"resolution\": \"4K\",\n    \"output_format\": \"png\",\n    \"image_input\": [\n      {{ $json.image1 }}\n    ]\n  }\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -608,
+          16
+        ],
+        "id": "12be40c6-827e-431c-b594-a28f8fe7e87f",
+        "name": "Edit Images"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b5346dc9-b2c3-405d-aa78-a844b4332cd9",
+                "name": "image",
+                "value": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          224,
+          16
+        ],
+        "id": "cc211a1e-6349-4333-8c55-c0d5667b13a7",
+        "name": "Result7"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "success",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "success"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "generating",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "generating"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "fail",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "fail"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "a0a854f7-cd5b-4176-be6a-d1dc98a1f46c",
+                      "leftValue": "={{ $json.data.state }}",
+                      "rightValue": "waiting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "6a5ac028-0e6e-47d9-b812-d063d8f36a64",
+        "name": "Switch7"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node (JavaScript)\n// Makes prompt safe to inject into a JSON string\n\nconst input = $json.prompt ?? \"\";\n\nconst jsonSafePrompt = input\n  // escape backslashes FIRST\n  .replace(/\\\\/g, \"\\\\\\\\\")\n  \n  // escape double quotes\n  .replace(/\"/g, '\\\\\"')\n\n  // remove line breaks\n  .replace(/[\\r\\n]+/g, \" \")\n\n  // normalize smart quotes\n  .replace(/[“”]/g, '\\\\\"')\n  .replace(/[‘’]/g, \"'\")\n\n  // normalize long dashes\n  .replace(/[–—]/g, \"-\")\n\n  // collapse extra spaces\n  .replace(/\\s{2,}/g, \" \")\n\n  // trim\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      prompt: jsonSafePrompt\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1040,
+          16
+        ],
+        "id": "a9ff5f33-7fd3-4b0f-b690-cba07e294d8a",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prompt/Images2": {
+        "main": [
+          [
+            {
+              "node": "Edit Images",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait7": {
+        "main": [
+          [
+            {
+              "node": "Get Image7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Image7": {
+        "main": [
+          [
+            {
+              "node": "Switch7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Images": {
+        "main": [
+          [
+            {
+              "node": "Wait7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch7": {
+        "main": [
+          [
+            {
+              "node": "Result7",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait7",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [],
+          [
+            {
+              "node": "Wait7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Prompt/Images2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version d5b42151",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
