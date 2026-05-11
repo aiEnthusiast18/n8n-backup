@@ -1,0 +1,436 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        864
+      ],
+      "id": "841977a5-bf5c-48db-b016-4cbe6dd27c3d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.twilio.com/2010-04-01/Accounts/TWILIO_ID/Messages/{{ $json.sid }}.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "Basic QUM2Yjk2ZmJkZjE2MTQ3Y2FiZTNhNTM0ZjE2MDlhODE5Mzo2OWEwMmQ2MDI5MmM5NjFhYWFiYTFmYmM1NzVhNDEzZg=="
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -176,
+        864
+      ],
+      "id": "96915a8a-73a2-4a73-bccf-0eaf9665b550",
+      "name": "Sms status node"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "delivered",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d365e2d-6c1d-48fd-b1e1-dc6ed403e684"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "delivered"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b233b687-f81c-428e-bce7-459684a6a34b",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "Message Created",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Message Created"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2dd094f6-2d8a-4052-a935-0063003c30a5",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "Enqueued",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Enqueued"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3ad3c76e-e876-4a4e-a9fa-7590a1dc2162",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "Dequeued",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Dequeued"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cff3ad89-b1b3-4ff4-91eb-cc4861e7ed53",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "Sent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69d8ccbf-d327-4705-9159-b7be48f99e73",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "undelivered",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "undelivered"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "943cb2ad-de3b-4ba7-805f-0d6fcc833488",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "failed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        0,
+        832
+      ],
+      "id": "85596483-b7b3-4cb9-8d65-4b1af8af0e33",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f95ce42c-cc19-48f4-b2cd-b780bee5a0e2",
+              "name": "STATUS",
+              "value": "=SENT",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        736
+      ],
+      "id": "4a35d203-2cb4-4b1e-ad75-e5b4c961316f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f95ce42c-cc19-48f4-b2cd-b780bee5a0e2",
+              "name": "STATUS",
+              "value": "FAILED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        1008
+      ],
+      "id": "2aabd281-cff6-404b-8f97-49b1f95602c5",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        864
+      ],
+      "id": "eb7cde13-f33f-4d17-b246-b567fe6a866f",
+      "name": "Wait1",
+      "webhookId": "9211d77a-d900-43ac-b0a6-046fa7ea699e"
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "SMS Caregiver Shift Reminders - ERROR",
+        "message": "=Error Summary\nDate: {{ $json.date_created }}\nMessage: {{ $json.body }}\nStatus: {{ $json.status }}\nError Code: {{ $json.error_code }}\nError Message: {{ $json.error_message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        1008
+      ],
+      "id": "ae88979c-ed58-40a9-af5d-e3d8e4fe326e",
+      "name": "Send a message1",
+      "webhookId": "34b9fe7e-5b0e-416a-996f-66c0510029c4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "SMS Caregiver Shift Reminders - ERROR",
+        "bodyContent": "=Error Summary\nDate: {{ $json.date_created }}\nMessage: {{ $json.body }}\nStatus: {{ $json.status }}\nError Code: {{ $json.error_code }}\nError Message: {{ $json.error_message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        352,
+        1280
+      ],
+      "id": "48ebd8e2-e0e4-4d36-8bcd-54624c3de810",
+      "name": "Send a message",
+      "webhookId": "360e860e-ed81-4753-a47e-1dbad5b8a499",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sms status node": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Sms status node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7d3fa4eed2b2418ebf9d338b0eccdc4d6d7dbd10f5fa499c22bacb25dd0ca6e5"
+  }
+}
