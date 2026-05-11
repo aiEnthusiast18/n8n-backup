@@ -1,0 +1,772 @@
+{
+  "updatedAt": "2026-05-11T01:53:26.569Z",
+  "createdAt": "2026-05-03T22:28:20.790Z",
+  "id": "ABnglh3zsoVt4CJh",
+  "name": "Backup",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "660bf086-d031-4458-84f8-6bb2e12b29ee",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "58c9d00d-2e58-48c5-a30d-fcaeb48e8341",
+      "name": "Get many workflows",
+      "credentials": {
+        "n8nApi": {
+          "id": "WkybEijDdgeV5sj3",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "281f6100-a25a-41a6-b055-5657fb3aec42",
+              "name": "folderName",
+              "value": "=Backup_2026-05-11",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ee036a1f-ff46-453b-a4c8-9addfb84c46f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "0b01f121-e45e-4146-9382-158af51f59bc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9803c2f8-ec9f-405c-970b-15c6f7dee386",
+              "name": "nodes",
+              "value": "={{ JSON.stringify($json, null, 2) }}",
+              "type": "string"
+            },
+            {
+              "id": "c6bce84e-b36f-4edb-b24a-0c4ae90b4314",
+              "name": "fileName",
+              "value": "={{ $json.name }}.json",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        16
+      ],
+      "id": "c33c2403-19ab-4a96-a3ab-4f1073ae40aa",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "nodes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        16
+      ],
+      "id": "34da196e-6066-4655-bd80-8dd6ce428923",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "aiEnthusiast18",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-backup",
+          "mode": "list",
+          "cachedResultName": "n8n-backup",
+          "cachedResultUrl": "https://github.com/aiEnthusiast18/n8n-backup"
+        },
+        "filePath": "={{ $('Edit Fields').item.json.folderName }}/{{ $('Edit Fields1').item.json.fileName }}",
+        "binaryData": true,
+        "commitMessage": "={{ $now.setZone('America/Winnipeg').format('yyyy-MM-dd T') }} Backup completed"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        16
+      ],
+      "id": "b205a903-0d85-4f8c-b633-1cdeb54d7c00",
+      "name": "Create a file",
+      "webhookId": "244b66cb-7e87-4e02-958c-614af8764856",
+      "credentials": {
+        "githubApi": {
+          "id": "c7qczfovkxMa0gOC",
+          "name": "Rida GitHub account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1bHGz2YsHTNcOm-XNbtmHcAKLgShgvyzgwp2IAO6mwYQ",
+          "mode": "list",
+          "cachedResultName": "Daily backup n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bHGz2YsHTNcOm-XNbtmHcAKLgShgvyzgwp2IAO6mwYQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bHGz2YsHTNcOm-XNbtmHcAKLgShgvyzgwp2IAO6mwYQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date Time": "={{ $now.setZone('America/Winnipeg').format('yyyy-MM-dd T') }}",
+            "File name": "={{ $('Edit Fields1').item.json.fileName }}",
+            "Folder name": "={{ $('Edit Fields').item.json.folderName }}",
+            "Error Message": "={{ $json.error }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date Time",
+              "displayName": "Date Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Folder name",
+              "displayName": "Folder name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File name",
+              "displayName": "File name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1632,
+        64
+      ],
+      "id": "8405da91-fbf2-4273-962a-a9d94cc67796",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        64
+      ],
+      "id": "01c83712-3cd0-42d6-8f95-3780b70c842c",
+      "name": "Wait",
+      "webhookId": "1164d374-8c2f-4e2c-bb1c-ae0de252969d"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many workflows": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get many workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a file": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cee517d7-6206-40a2-85cf-38cdd3dc0fdd",
+  "activeVersionId": "b36403e1-2e00-40b9-96dd-8412f487f49d",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T22:28:20.790Z",
+      "createdAt": "2026-05-03T22:28:20.790Z",
+      "role": "workflow:owner",
+      "workflowId": "ABnglh3zsoVt4CJh",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-03T22:36:27.405Z",
+    "createdAt": "2026-05-03T22:36:19.947Z",
+    "versionId": "b36403e1-2e00-40b9-96dd-8412f487f49d",
+    "workflowId": "ABnglh3zsoVt4CJh",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "660bf086-d031-4458-84f8-6bb2e12b29ee",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "filters": {},
+          "requestOptions": {}
+        },
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "position": [
+          416,
+          0
+        ],
+        "id": "58c9d00d-2e58-48c5-a30d-fcaeb48e8341",
+        "name": "Get many workflows",
+        "credentials": {
+          "n8nApi": {
+            "id": "WkybEijDdgeV5sj3",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "281f6100-a25a-41a6-b055-5657fb3aec42",
+                "name": "folderName",
+                "value": "=Backup_{{ $now.format('yyyy-MM-dd') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          208,
+          0
+        ],
+        "id": "ee036a1f-ff46-453b-a4c8-9addfb84c46f",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          624,
+          0
+        ],
+        "id": "0b01f121-e45e-4146-9382-158af51f59bc",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "9803c2f8-ec9f-405c-970b-15c6f7dee386",
+                "name": "nodes",
+                "value": "={{ JSON.stringify($json, null, 2) }}",
+                "type": "string"
+              },
+              {
+                "id": "c6bce84e-b36f-4edb-b24a-0c4ae90b4314",
+                "name": "fileName",
+                "value": "={{ $json.name }}.json",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          832,
+          16
+        ],
+        "id": "c33c2403-19ab-4a96-a3ab-4f1073ae40aa",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "operation": "toText",
+          "sourceProperty": "nodes",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.convertToFile",
+        "typeVersion": 1.1,
+        "position": [
+          1040,
+          16
+        ],
+        "id": "34da196e-6066-4655-bd80-8dd6ce428923",
+        "name": "Convert to File"
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "owner": {
+            "__rl": true,
+            "value": "aiEnthusiast18",
+            "mode": "name"
+          },
+          "repository": {
+            "__rl": true,
+            "value": "n8n-backup",
+            "mode": "list",
+            "cachedResultName": "n8n-backup",
+            "cachedResultUrl": "https://github.com/aiEnthusiast18/n8n-backup"
+          },
+          "filePath": "={{ $('Edit Fields').item.json.folderName }}/{{ $('Edit Fields1').item.json.fileName }}",
+          "binaryData": true,
+          "commitMessage": "={{ $now.setZone('America/Winnipeg').format('yyyy-MM-dd T') }} Backup completed"
+        },
+        "type": "n8n-nodes-base.github",
+        "typeVersion": 1.1,
+        "position": [
+          1264,
+          16
+        ],
+        "id": "b205a903-0d85-4f8c-b633-1cdeb54d7c00",
+        "name": "Create a file",
+        "webhookId": "244b66cb-7e87-4e02-958c-614af8764856",
+        "credentials": {
+          "githubApi": {
+            "id": "c7qczfovkxMa0gOC",
+            "name": "Rida GitHub account"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1bHGz2YsHTNcOm-XNbtmHcAKLgShgvyzgwp2IAO6mwYQ",
+            "mode": "list",
+            "cachedResultName": "Daily backup n8n",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bHGz2YsHTNcOm-XNbtmHcAKLgShgvyzgwp2IAO6mwYQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bHGz2YsHTNcOm-XNbtmHcAKLgShgvyzgwp2IAO6mwYQ/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Date Time": "={{ $now.setZone('America/Winnipeg').format('yyyy-MM-dd T') }}",
+              "File name": "={{ $('Edit Fields1').item.json.fileName }}",
+              "Folder name": "={{ $('Edit Fields').item.json.folderName }}",
+              "Error Message": "={{ $json.error }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Date Time",
+                "displayName": "Date Time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Folder name",
+                "displayName": "Folder name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "File name",
+                "displayName": "File name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Error Message",
+                "displayName": "Error Message",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1632,
+          64
+        ],
+        "id": "8405da91-fbf2-4273-962a-a9d94cc67796",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "amount": 10
+        },
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          1472,
+          64
+        ],
+        "id": "01c83712-3cd0-42d6-8f95-3780b70c842c",
+        "name": "Wait",
+        "webhookId": "1164d374-8c2f-4e2c-bb1c-ae0de252969d"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many workflows": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Get many workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Convert to File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Convert to File": {
+        "main": [
+          [
+            {
+              "node": "Create a file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a file": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version b36403e1",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
