@@ -1,0 +1,658 @@
+{
+  "updatedAt": "2026-05-23T21:04:12.812Z",
+  "createdAt": "2026-05-23T20:52:22.522Z",
+  "id": "ay5wCjC3dPfLJ9at",
+  "name": "Google Business Review Automator — Multi-Business",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1760,
+        144
+      ],
+      "id": "badc135e-5ded-4d8e-a859-1ece76478cf2",
+      "name": "Schedule"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ── BUSINESS CONFIGURATION ────────────────────────────────────────────────\n// Fill in your real Location IDs from Google Business Profile.\n// GBP Dashboard → Business → Info → Location ID\n// Format: accounts/ACCOUNT_ID/locations/LOCATION_ID\n//\n// ✅ Start with 204 IT Solutions to test, then uncomment the live businesses.\n\nconst ALERT_EMAIL = 'your@email.com'; // ← Replace with your email address\n\nreturn [\n  {\n    json: {\n      businessName: '204 IT Solutions',\n      locationId: 'accounts/YOUR_ACCOUNT_ID/locations/YOUR_204IT_LOCATION_ID',\n      alertEmail: ALERT_EMAIL\n    }\n  },\n  {\n    json: {\n      businessName: 'Anago Cleaning Systems / Anago of Manitoba',\n      locationId: 'accounts/YOUR_ACCOUNT_ID/locations/YOUR_ANAGO_LOCATION_ID',\n      alertEmail: ALERT_EMAIL\n    }\n  },\n  {\n    json: {\n      businessName: 'Right At Home Winnipeg',\n      locationId: 'accounts/YOUR_ACCOUNT_ID/locations/YOUR_RIGHTATHOME_LOCATION_ID',\n      alertEmail: ALERT_EMAIL\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        144
+      ],
+      "id": "af3c77f5-66c7-4319-b17b-f946599de21e",
+      "name": "Business Configs"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1328,
+        144
+      ],
+      "id": "432685c8-6fb9-4edd-8aa5-3f2f581a7b3e",
+      "name": "Loop Businesses"
+    },
+    {
+      "parameters": {
+        "resource": "review",
+        "operation": "getAll",
+        "account": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "location": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleBusinessProfile",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        144
+      ],
+      "id": "d86e2778-ade8-4945-bd0e-a1cc3b54991d",
+      "name": "Get Reviews"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Attach business context to every review item.\n// Also normalises starRating from GBP's string enum (ONE/TWO/.../FIVE) to a number.\n// FIX: the original workflow compared star ratings to numbers — GBP returns strings.\n\nconst ratingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };\n\nconst businessName = $('Loop Businesses').first().json.businessName;\nconst locationId   = $('Loop Businesses').first().json.locationId;\nconst alertEmail   = $('Loop Businesses').first().json.alertEmail;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    businessName,\n    locationId,\n    alertEmail,\n    starRatingNum: ratingMap[item.json.starRating] ?? 0,\n    reviewerName:  item.json.reviewer?.displayName ?? 'A customer',\n    reviewText:    item.json.comment ?? '(no review text left)'\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        144
+      ],
+      "id": "3330f029-e094-4c55-b15c-65a8f116687a",
+      "name": "Tag Reviews"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "no-reply-check",
+              "leftValue": "={{ $json.reviewReply }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        144
+      ],
+      "id": "48ef3386-9499-471a-81dc-51c0555c5a80",
+      "name": "Unanswered Only?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ── DEDUPLICATION ─────────────────────────────────────────────────────────\n// Uses n8n static workflow data — no external database needed.\n// Tracks processed review IDs with timestamps.\n// Auto-prunes entries older than 90 days to prevent unbounded growth.\n//\n// WHY THIS IS NEEDED:\n// Negative/neutral reviews never get a reply posted, so reviewReply stays null.\n// Without this, the same negative review would trigger a new email every hour.\n\nconst staticData = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst PRUNE_AGE_MS = 90 * 24 * 60 * 60 * 1000;\n\nif (!staticData.processed) staticData.processed = {};\n\n// Prune stale entries\nfor (const id of Object.keys(staticData.processed)) {\n  if (now - staticData.processed[id] > PRUNE_AGE_MS) {\n    delete staticData.processed[id];\n  }\n}\n\nconst newItems = [];\nfor (const item of items) {\n  const reviewId = item.json.name; // GBP review resource name is the unique identifier\n  if (staticData.processed[reviewId]) {\n    continue; // Already processed — skip silently\n  }\n  staticData.processed[reviewId] = now;\n  newItems.push(item);\n}\n\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        144
+      ],
+      "id": "4f8eed99-302c-4d16-a814-786cb75193b7",
+      "name": "Dedup Check"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.starRatingNum }}",
+                    "rightValue": 4,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Positive"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.starRatingNum }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "NeutralNegative"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        144
+      ],
+      "id": "14edfe28-fd74-4a88-b8e8-7ae3fd3d4c73",
+      "name": "Rate Review"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "pos-prompt",
+              "name": "promptText",
+              "value": "={{ 'TASK: Write a warm, genuine reply to this Google review for ' + $json.businessName + '.\\n\\nRULES:\\n- 2 to 4 sentences only\\n- Thank the reviewer by first name if available\\n- Reference at least one specific detail from their review to show you read it\\n- End with a friendly invitation to return or use the service again\\n- Write in first-person plural (we / our)\\n- No hashtags, emojis, or hollow phrases like \"We value your feedback\"\\n- Sound like a real person, not a template\\n\\nREVIEW DETAILS:\\nBusiness: ' + $json.businessName + '\\nReviewer: ' + $json.reviewerName + '\\nRating: ' + $json.starRating + '\\nReview text: ' + $json.reviewText + '\\n\\nWrite the reply now. Reply text only — no labels, no quotation marks.' }}",
+              "type": "string"
+            },
+            {
+              "id": "pos-biz",
+              "name": "businessName",
+              "value": "={{ $json.businessName }}",
+              "type": "string"
+            },
+            {
+              "id": "pos-loc",
+              "name": "locationId",
+              "value": "={{ $json.locationId }}",
+              "type": "string"
+            },
+            {
+              "id": "pos-rid",
+              "name": "reviewId",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "pos-reviewer",
+              "name": "reviewerName",
+              "value": "={{ $json.reviewerName }}",
+              "type": "string"
+            },
+            {
+              "id": "pos-text",
+              "name": "reviewText",
+              "value": "={{ $json.reviewText }}",
+              "type": "string"
+            },
+            {
+              "id": "pos-rating",
+              "name": "starRatingNum",
+              "value": "={{ $json.starRatingNum }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f89b75e4-9a79-4b5d-9b22-6e4bc7dcdb81",
+      "name": "Set Positive Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.promptText }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "3c16e196-2723-40d3-98dc-32deae440187",
+      "name": "Gemini — Positive Reply"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        192
+      ],
+      "id": "685b2500-bd54-4aa3-95da-628aaf69368a",
+      "name": "Gemini Model (Positive)"
+    },
+    {
+      "parameters": {
+        "resource": "review",
+        "operation": "reply",
+        "account": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "location": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "review": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleBusinessProfile",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "c0d88f97-2027-4268-8e92-94a79d69d234",
+      "name": "Post Reply"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "neg-prompt",
+              "name": "promptText",
+              "value": "={{ 'TASK: Write an empathetic, professional reply DRAFT for a ' + ($json.starRatingNum <= 2 ? 'negative' : 'neutral') + ' Google review for ' + $json.businessName + '.\\n\\nRULES:\\n- 3 to 5 sentences\\n- Acknowledge the reviewer\\'s experience sincerely — do not be defensive\\n- Apologise where it is appropriate\\n- Invite the reviewer to contact the business directly to resolve the issue\\n- Do NOT include a phone number, email address, or URL — the owner will add contact details before posting\\n- Write in first-person plural (we / our)\\n- Professional, calm, and genuinely empathetic tone\\n- This is a DRAFT for the owner to review — it will not be auto-posted\\n\\nREVIEW DETAILS:\\nBusiness: ' + $json.businessName + '\\nReviewer: ' + $json.reviewerName + '\\nRating: ' + $json.starRatingNum + ' stars\\nReview text: ' + $json.reviewText + '\\n\\nWrite the draft reply now. Reply text only — no labels, no quotation marks.' }}",
+              "type": "string"
+            },
+            {
+              "id": "neg-biz",
+              "name": "businessName",
+              "value": "={{ $json.businessName }}",
+              "type": "string"
+            },
+            {
+              "id": "neg-alert",
+              "name": "alertEmail",
+              "value": "={{ $json.alertEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "neg-reviewer",
+              "name": "reviewerName",
+              "value": "={{ $json.reviewerName }}",
+              "type": "string"
+            },
+            {
+              "id": "neg-text",
+              "name": "reviewText",
+              "value": "={{ $json.reviewText }}",
+              "type": "string"
+            },
+            {
+              "id": "neg-rating",
+              "name": "starRatingNum",
+              "value": "={{ $json.starRatingNum }}",
+              "type": "number"
+            },
+            {
+              "id": "neg-create",
+              "name": "createTime",
+              "value": "={{ $json.createTime }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        320
+      ],
+      "id": "df97c449-9b16-4cb5-83e0-7576f6f3754d",
+      "name": "Set Draft Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.promptText }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        224,
+        320
+      ],
+      "id": "88d6eccd-7f3c-4d1c-8cfe-3bd53fc57901",
+      "name": "Gemini — Draft Reply"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        512
+      ],
+      "id": "971db08b-ef25-4ec0-aadc-5db15b81d1b5",
+      "name": "Gemini Model (Draft)"
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@yourdomain.com",
+        "toEmail": "={{ $('Set Draft Prompt').item.json.alertEmail }}",
+        "subject": "={{ ($('Set Draft Prompt').item.json.starRatingNum <= 2 ? '🔴 Negative' : '🟡 Neutral') + ' Review — ' + $('Set Draft Prompt').item.json.businessName + ' (' + $('Set Draft Prompt').item.json.starRatingNum + '★ from ' + $('Set Draft Prompt').item.json.reviewerName + ')' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        448,
+        320
+      ],
+      "id": "b1c16cce-4726-4a77-b6f9-fb024fe1dbcb",
+      "name": "Email Alert + Draft",
+      "webhookId": "e15459b6-be1c-482b-a7cd-294186ab02f8"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        512
+      ],
+      "id": "01ffb806-ba37-430e-83ef-1cb53d696482",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@yourdomain.com",
+        "toEmail": "your@email.com",
+        "subject": "🚨 Review Automator — Workflow Error",
+        "text": "={{ 'A workflow error occurred.\\n\\nTime: ' + new Date().toISOString() + '\\nLast node: ' + $json.execution.lastNodeExecuted + '\\nError: ' + $json.error.message + '\\nExecution ID: ' + $json.execution.id + '\\n\\nOpen n8n to inspect the full execution log.' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        512
+      ],
+      "id": "e20a1b13-3a5a-4086-8112-8063e800fdce",
+      "name": "Error Email",
+      "webhookId": "23ae8536-02bb-4a71-ba16-24d5c9df461c"
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Business Configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Business Configs": {
+      "main": [
+        [
+          {
+            "node": "Loop Businesses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Businesses": {
+      "main": [
+        [
+          {
+            "node": "Get Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Reviews": {
+      "main": [
+        [
+          {
+            "node": "Tag Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag Reviews": {
+      "main": [
+        [
+          {
+            "node": "Unanswered Only?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unanswered Only?": {
+      "main": [
+        [
+          {
+            "node": "Dedup Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedup Check": {
+      "main": [
+        [
+          {
+            "node": "Rate Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Review": {
+      "main": [
+        [
+          {
+            "node": "Set Positive Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Draft Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Positive Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini — Positive Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Model (Positive)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gemini — Positive Reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — Positive Reply": {
+      "main": [
+        [
+          {
+            "node": "Post Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Reply": {
+      "main": [
+        [
+          {
+            "node": "Loop Businesses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Draft Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini — Draft Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Model (Draft)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gemini — Draft Reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — Draft Reply": {
+      "main": [
+        [
+          {
+            "node": "Email Alert + Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Alert + Draft": {
+      "main": [
+        [
+          {
+            "node": "Loop Businesses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Error Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c16af1f7-99e2-4397-ac65-8b529ab353be",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-23T20:52:22.522Z",
+      "createdAt": "2026-05-23T20:52:22.522Z",
+      "role": "workflow:owner",
+      "workflowId": "ay5wCjC3dPfLJ9at",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
