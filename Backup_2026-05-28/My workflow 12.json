@@ -1,0 +1,816 @@
+{
+  "updatedAt": "2026-05-27T23:09:35.583Z",
+  "createdAt": "2026-05-27T22:03:15.073Z",
+  "id": "G3itDE8h7INfBzkJ",
+  "name": "My workflow 12",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        -32
+      ],
+      "id": "343e4322-ba63-46ec-9ead-0a9e3e29c150",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -528,
+        112
+      ],
+      "id": "5e5cee19-8ed0-4170-8fe0-1277ca816655",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        16
+      ],
+      "id": "f32f9700-7975-48e0-8063-b8ecb3b2158d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8a864a31-a551-4a8f-9da3-e1be6012095e",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        16
+      ],
+      "id": "7e770a32-b872-485c-89c0-be982e2d5014",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        16
+      ],
+      "id": "f0b1a529-c8c1-472a-a4b8-d8e0e78a4140",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        -160
+      ],
+      "id": "67500816-a243-40a1-9a6c-294a10dfe1cd",
+      "name": "Send a message",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "update",
+        "site": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -160
+      ],
+      "id": "3cab7ee2-be04-42a3-b4c2-7c786b59b61c",
+      "name": "Update item in a list",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e4c2b5e2-fae2-4066-b4c8-58c6957aa9ae"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7804f381-c54b-4635-8057-da11708a5da1",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "30923d32-7d7f-4ccb-a8c9-c742e5855df9",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "c40ef87a-4bf6-4b7a-a2f7-4cd911d2a7f1",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        16
+      ],
+      "id": "eeebc945-bfc6-441a-bb4a-e1a33bc12fe1",
+      "name": "Send a message1",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "update",
+        "site": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        16
+      ],
+      "id": "4e82e279-4307-4cd2-9ea1-26502f408e31",
+      "name": "Update item in a list1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        192
+      ],
+      "id": "976fbb05-c0a0-4b98-acf7-db8db29ef29c",
+      "name": "Send a message2",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "update",
+        "site": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        192
+      ],
+      "id": "596f9326-d82e-4f0c-8e7e-a3e9d781ccb7",
+      "name": "Update item in a list2",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "site": {
+          "__rl": true,
+          "value": "netorg10246608.sharepoint.com,db22d3c7-6232-476f-b2e5-b8ff70823c8b,1355f292-4bd9-4d1f-ae8a-40d8cc2aff89",
+          "mode": "list",
+          "cachedResultName": "RAH"
+        },
+        "list": {
+          "__rl": true,
+          "value": "77f0ac01-23db-4704-9f53-cea4aaee18c9",
+          "mode": "list",
+          "cachedResultName": "RAH Employee Data"
+        },
+        "returnAll": true,
+        "options": {
+          "fields": [
+            "fields"
+          ]
+        },
+        "simplify": false,
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        80,
+        224
+      ],
+      "id": "ea4a8091-aaba-404d-b85d-dfd44655bb8c",
+      "name": "Get many items",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://graph.microsoft.com/v1.0/sites/netorg10246608.sharepoint.com,db22d3c7-6232-476f-b2e5-b8ff70823c8b,1355f292-4bd9-4d1f-ae8a-40d8cc2aff89/lists/77f0ac01-23db-4704-9f53-cea4aaee18c9/items?$expand=fields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{$response.body[\"@odata.nextLink\"]}}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        368
+      ],
+      "id": "7a761f03-727c-4282-b8b4-5650230b2a6f",
+      "name": "HTTP Request",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://graph.microsoft.com/v1.0/sites/netorg10246608.sharepoint.com,db22d3c7-6232-476f-b2e5-b8ff70823c8b,1355f292-4bd9-4d1f-ae8a-40d8cc2aff89/lists/77f0ac01-23db-4704-9f53-cea4aaee18c9/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expand",
+              "value": "fields"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -288,
+        288
+      ],
+      "id": "b2a008e0-24a3-4e8b-8db7-50f3b4371b17",
+      "name": "Get SharePoint Items via Graph",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        480
+      ],
+      "id": "a696fcf9-00e5-4f98-98cb-380ebd00fde3",
+      "name": "Get SharePoint Items via REST",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Title,Status,Hire_x0020_Date"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        544
+      ],
+      "id": "eddc9fe9-6d8f-41ed-9541-4d29ec66c40a",
+      "name": "Get SharePoint Items via REST1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/fields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Title,InternalName,TypeAsString"
+            },
+            {
+              "name": "$filter",
+              "value": "Hidden eq false"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        -224
+      ],
+      "id": "09443d98-9930-4c8b-ab72-a1f39e888993",
+      "name": "List Column Internal Names",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Id,Title,Status,HireDate,StartDate,_x0033_0DayEmailSent,_x0036_0DayEmailSent,_x0039_0DayEmailSent"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        496
+      ],
+      "id": "e79a76d4-448b-4686-918e-f117962c98b5",
+      "name": "Get SharePoint Items via REST2",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Id,Title,Status,HireDate,StartDate,OData__x0033_0DayEmailSent,OData__x0036_0DayEmailSent,OData__x0039_0DayEmailSent"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        16
+      ],
+      "id": "85474cd3-e549-49d9-83f6-42b87d1365e6",
+      "name": "Get SharePoint Items via REST3",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get SharePoint Items via REST3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update item in a list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Update item in a list1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Update item in a list2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many items": {
+      "main": [
+        []
+      ]
+    },
+    "Get SharePoint Items via REST2": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-05-27T17:41:58.308-05:00",
+          "Readable date": "May 27th 2026, 5:41:58 pm",
+          "Readable time": "5:41:58 pm",
+          "Day of week": "Wednesday",
+          "Year": "2026",
+          "Month": "May",
+          "Day of month": "27",
+          "Hour": "17",
+          "Minute": "41",
+          "Second": "58",
+          "Timezone": "America/Winnipeg (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "c0b327b9-daa6-468b-bf40-72d2c77398a3",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-27T22:03:15.073Z",
+      "createdAt": "2026-05-27T22:03:15.073Z",
+      "role": "workflow:owner",
+      "workflowId": "G3itDE8h7INfBzkJ",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
