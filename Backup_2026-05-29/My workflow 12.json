@@ -1,0 +1,1501 @@
+{
+  "updatedAt": "2026-05-29T02:58:28.592Z",
+  "createdAt": "2026-05-27T22:03:15.073Z",
+  "id": "G3itDE8h7INfBzkJ",
+  "name": "My workflow 12",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        -32
+      ],
+      "id": "343e4322-ba63-46ec-9ead-0a9e3e29c150",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -528,
+        112
+      ],
+      "id": "5e5cee19-8ed0-4170-8fe0-1277ca816655",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        16
+      ],
+      "id": "f32f9700-7975-48e0-8063-b8ecb3b2158d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8a864a31-a551-4a8f-9da3-e1be6012095e",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "ACTIVE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        16
+      ],
+      "id": "7e770a32-b872-485c-89c0-be982e2d5014",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfunction daysBetween(date1, date2) {\n  const diff = new Date(date1).getTime() - new Date(date2).getTime();\n  return Math.floor(diff / (1000 * 60 * 60 * 24));\n}\n\nconst today = new Date();\nconst todayStr = today.toISOString().split('T')[0];\n\n// yesterday\nconst yesterday = new Date();\nyesterday.setDate(today.getDate() - 1);\nconst yesterdayStr = yesterday.toISOString().split('T')[0];\n\nfor (const item of items) {\n  const data = item.json;\n\n  const hireDate = data.HireDate ? data.HireDate.split('T')[0] : null;\n  const startDate = data.StartDate ? data.StartDate.split('T')[0] : null;\n\n  const daysSinceStart = startDate ? daysBetween(today, startDate) : null;\n\n  let trigger = null;\n\n  // ✅ 1. New Hire (today OR yesterday)\n  if (hireDate && (hireDate === todayStr || hireDate === yesterdayStr)) {\n    trigger = \"NEW_HIRE\";\n  }\n\n  // ✅ 2. First Shift (start date = yesterday)\n  else if (startDate && startDate === yesterdayStr) {\n    trigger = \"FIRST_SHIFT\";\n  }\n\n  // ✅ 3. 30-day\n  else if (\n    daysSinceStart >= 30 &&\n    daysSinceStart < 60 &&\n    !data._x0033_0DayEmailSent\n  ) {\n    trigger = \"30_DAY\";\n  }\n\n  // ✅ 4. 60-day\n  else if (\n    daysSinceStart >= 60 &&\n    daysSinceStart < 90 &&\n    !data._x0036_0DayEmailSent\n  ) {\n    trigger = \"60_DAY\";\n  }\n\n  // ✅ 5. 90-day\n  else if (\n    daysSinceStart >= 90 &&\n    !data._x0039_0DayEmailSent\n  ) {\n    trigger = \"90_DAY\";\n  }\n\n  if (trigger) {\n    results.push({\n      json: {\n        ...data,\n        trigger\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        464
+      ],
+      "id": "f0b1a529-c8c1-472a-a4b8-d8e0e78a4140",
+      "name": "Code in JavaScript",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        608
+      ],
+      "id": "67500816-a243-40a1-9a6c-294a10dfe1cd",
+      "name": "Send a message",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "update",
+        "site": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        608
+      ],
+      "id": "3cab7ee2-be04-42a3-b4c2-7c786b59b61c",
+      "name": "Update item in a list",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e4c2b5e2-fae2-4066-b4c8-58c6957aa9ae"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7804f381-c54b-4635-8057-da11708a5da1",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "30923d32-7d7f-4ccb-a8c9-c742e5855df9",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        768
+      ],
+      "id": "c40ef87a-4bf6-4b7a-a2f7-4cd911d2a7f1",
+      "name": "Switch",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        784
+      ],
+      "id": "eeebc945-bfc6-441a-bb4a-e1a33bc12fe1",
+      "name": "Send a message1",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "update",
+        "site": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        784
+      ],
+      "id": "4e82e279-4307-4cd2-9ea1-26502f408e31",
+      "name": "Update item in a list1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        960
+      ],
+      "id": "976fbb05-c0a0-4b98-acf7-db8db29ef29c",
+      "name": "Send a message2",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "update",
+        "site": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        960
+      ],
+      "id": "596f9326-d82e-4f0c-8e7e-a3e9d781ccb7",
+      "name": "Update item in a list2",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "site": {
+          "__rl": true,
+          "value": "netorg10246608.sharepoint.com,db22d3c7-6232-476f-b2e5-b8ff70823c8b,1355f292-4bd9-4d1f-ae8a-40d8cc2aff89",
+          "mode": "list",
+          "cachedResultName": "RAH"
+        },
+        "list": {
+          "__rl": true,
+          "value": "77f0ac01-23db-4704-9f53-cea4aaee18c9",
+          "mode": "list",
+          "cachedResultName": "RAH Employee Data"
+        },
+        "returnAll": true,
+        "options": {
+          "fields": [
+            "fields"
+          ]
+        },
+        "simplify": false,
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "typeVersion": 1,
+      "position": [
+        96,
+        304
+      ],
+      "id": "ea4a8091-aaba-404d-b85d-dfd44655bb8c",
+      "name": "Get many items",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://graph.microsoft.com/v1.0/sites/netorg10246608.sharepoint.com,db22d3c7-6232-476f-b2e5-b8ff70823c8b,1355f292-4bd9-4d1f-ae8a-40d8cc2aff89/lists/77f0ac01-23db-4704-9f53-cea4aaee18c9/items?$expand=fields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{$response.body[\"@odata.nextLink\"]}}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        368
+      ],
+      "id": "7a761f03-727c-4282-b8b4-5650230b2a6f",
+      "name": "HTTP Request",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://graph.microsoft.com/v1.0/sites/netorg10246608.sharepoint.com,db22d3c7-6232-476f-b2e5-b8ff70823c8b,1355f292-4bd9-4d1f-ae8a-40d8cc2aff89/lists/77f0ac01-23db-4704-9f53-cea4aaee18c9/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expand",
+              "value": "fields"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -288,
+        288
+      ],
+      "id": "b2a008e0-24a3-4e8b-8db7-50f3b4371b17",
+      "name": "Get SharePoint Items via Graph",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        480
+      ],
+      "id": "a696fcf9-00e5-4f98-98cb-380ebd00fde3",
+      "name": "Get SharePoint Items via REST",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Title,Status,Hire_x0020_Date"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        544
+      ],
+      "id": "eddc9fe9-6d8f-41ed-9541-4d29ec66c40a",
+      "name": "Get SharePoint Items via REST1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "Microsoft SharePoint account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/fields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Title,InternalName,TypeAsString"
+            },
+            {
+              "name": "$filter",
+              "value": "Hidden eq false"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        -304
+      ],
+      "id": "09443d98-9930-4c8b-ab72-a1f39e888993",
+      "name": "List Column Internal Names",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Id,Title,Status,HireDate,StartDate,_x0033_0DayEmailSent,_x0036_0DayEmailSent,_x0039_0DayEmailSent"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        496
+      ],
+      "id": "e79a76d4-448b-4686-918e-f117962c98b5",
+      "name": "Get SharePoint Items via REST2",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "Id,Title,Email,PhoneNumber,Status,HireDate,StartDate,OData__x0033_0DayEmailSent,OData__x0036_0DayEmailSent,OData__x0039_0DayEmailSent,NewHireEmailSent,StartDateEmailSent"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        16
+      ],
+      "id": "85474cd3-e549-49d9-83f6-42b87d1365e6",
+      "name": "Get SharePoint Items via REST3",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "value",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        432,
+        16
+      ],
+      "id": "1c708724-f6d1-4ea2-8266-eb7d9f08b26d",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "function daysBetween(date1, date2) {\n  const diff = new Date(date1).getTime() - new Date(date2).getTime();\n  return Math.floor(diff / (1000 * 60 * 60 * 24));\n}\n\nconst today = new Date();\nconst todayStr = today.toISOString().split('T')[0];\n\nconst yesterday = new Date();\nyesterday.setDate(today.getDate() - 1);\nconst yesterdayStr = yesterday.toISOString().split('T')[0];\n\nconst results = [];\n\nfor (const item of items) {\n  const data = item.json;\n\n  const hireDate = data.HireDate ? data.HireDate.split('T')[0] : null;\n  const startDate = data.StartDate ? data.StartDate.split('T')[0] : null;\n\n  const daysSinceStart = startDate ? daysBetween(today, startDate) : null;\n\n  let trigger = null;\n  let reason = '';\n\n  // 1. New Hire (HireDate is today or yesterday)\n  if (hireDate && (hireDate === todayStr || hireDate === yesterdayStr)) {\n    trigger = 'NEW_HIRE';\n  }\n  // 2. First Shift (StartDate = yesterday)\n  else if (startDate && startDate === yesterdayStr) {\n    trigger = 'FIRST_SHIFT';\n  }\n  // 3. 30-day check-in\n  else if (\n    daysSinceStart !== null &&\n    daysSinceStart >= 30 &&\n    daysSinceStart < 60 &&\n    !data.OData__x0033_0DayEmailSent\n  ) {\n    trigger = '30_DAY';\n  }\n  // 4. 60-day check-in\n  else if (\n    daysSinceStart !== null &&\n    daysSinceStart >= 60 &&\n    daysSinceStart < 90 &&\n    !data.OData__x0036_0DayEmailSent\n  ) {\n    trigger = '60_DAY';\n  }\n  // 5. 90-day check-in\n  else if (\n    daysSinceStart !== null &&\n    daysSinceStart >= 90 &&\n    !data.OData__x0039_0DayEmailSent\n  ) {\n    trigger = '90_DAY';\n  }\n  // No trigger matched — figure out why\n  else {\n    trigger = 'NONE';\n\n    if (!hireDate && !startDate) {\n      reason = 'No HireDate or StartDate on record';\n    } else if (!startDate) {\n      reason = 'No StartDate — cannot evaluate shift/day milestones';\n    } else if (daysSinceStart !== null && daysSinceStart < 30) {\n      reason = `Only ${daysSinceStart} days since StartDate — too early for 30-day milestone`;\n    } else if (\n      daysSinceStart >= 30 && daysSinceStart < 60 &&\n      data.OData__x0033_0DayEmailSent\n    ) {\n      reason = '30-day email already sent';\n    } else if (\n      daysSinceStart >= 60 && daysSinceStart < 90 &&\n      data.OData__x0036_0DayEmailSent\n    ) {\n      reason = '60-day email already sent';\n    } else if (\n      daysSinceStart >= 90 &&\n      data.OData__x0039_0DayEmailSent\n    ) {\n      reason = '90-day email already sent';\n    } else {\n      reason = 'Did not match any trigger condition';\n    }\n  }\n\n  results.push({\n    json: {\n      ...data,\n      trigger,\n      reason\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        784
+      ],
+      "id": "d8c96704-3e57-4dda-a151-85b62051479f",
+      "name": "Code in JavaScript1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "emailSubject",
+              "value": "=Welcome to RAH, {{ $json.Title }}!",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "emailBody",
+              "value": "=Hi {{ $json.Title }},\n\nWelcome aboard! We're thrilled to have you join the RAH team. This is a sample welcome email for new hires — official content coming soon.\n\nYour hire date on record: {{ $json.HireDate }}\n\nIf you have any questions before your first shift, please reach out.\n\nBest regards,\nRAH HR Team",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "flagToUpdate",
+              "value": "NewHireEmailSent",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        -416
+      ],
+      "id": "1438f7db-107c-424c-85c2-529fef9e1cf5",
+      "name": "Set Content: NEW_HIRE"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "emailSubject",
+              "value": "=How was your first shift, {{ $json.Title }}?",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "emailBody",
+              "value": "=Hi {{ $json.Title }},\n\nWe hope your first shift went well! This is a sample first-shift follow-up email — official content coming soon.\n\nYour start date on record: {{ $json.StartDate }}\n\nWe'd love to hear how things went. Please don't hesitate to reach out with any questions or feedback.\n\nBest regards,\nRAH HR Team",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "flagToUpdate",
+              "value": "StartDateEmailSent",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        -256
+      ],
+      "id": "b3451ef1-e166-49ee-b1fd-4c5d1811b4d9",
+      "name": "Set Content: FIRST_SHIFT"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "emailSubject",
+              "value": "=Your 30-Day Check-In, {{ $json.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "emailBody",
+              "value": "=Hi {{ $json.Title }},\n\nCongrats on completing 30 days with RAH! This is a sample 30-day check-in email — official content coming soon.\n\nWe'd love to hear how things are going. Please share any feedback, questions, or concerns.\n\nBest regards,\nRAH HR Team",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "flagToUpdate",
+              "value": "OData__x0033_0DayEmailSent",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        -80
+      ],
+      "id": "ffd60f68-e859-42a5-a7c0-394c631bc912",
+      "name": "Set Content: 30_DAY"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "emailSubject",
+              "value": "=Your 60-Day Check-In, {{ $json.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "emailBody",
+              "value": "=Hi {{ $json.Title }},\n\nYou've been with RAH for 60 days — fantastic! This is a sample 60-day check-in email — official content coming soon.\n\nWe'd love a quick update on how you're settling in. Any feedback is appreciated.\n\nBest regards,\nRAH HR Team",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "flagToUpdate",
+              "value": "OData__x0036_0DayEmailSent",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        80
+      ],
+      "id": "03a4635b-b0e5-4696-90ec-cc3d7491d59e",
+      "name": "Set Content: 60_DAY"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "emailSubject",
+              "value": "=Your 90-Day Check-In, {{ $json.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "emailBody",
+              "value": "=Hi {{ $json.Title }},\n\nYou've officially been with RAH for 90 days. This is a sample 90-day check-in email — official content coming soon.\n\nWe'd love to schedule a quick chat to see how things are going. Please reply with a time that works for you.\n\nBest regards,\nRAH HR Team",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "flagToUpdate",
+              "value": "OData__x0039_0DayEmailSent",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        240
+      ],
+      "id": "af7e7917-2c48-4f5f-9676-4fcdb656813c",
+      "name": "Set Content: 90_DAY"
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca, rlakhani@anagomb.ca",
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "text",
+        "message": "={{ $json.emailBody }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1808,
+        -80
+      ],
+      "id": "9c323cb3-ac06-465d-94d8-7943c81acd24",
+      "name": "Send Email to Employee",
+      "webhookId": "81548db2-3104-4a7e-8e88-fdfcc93ad74e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists(guid'77f0ac01-23db-4704-9f53-cea4aaee18c9')/items({{ $json.Id }})",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json;odata=nometadata"
+            },
+            {
+              "name": "X-HTTP-Method",
+              "value": "MERGE"
+            },
+            {
+              "name": "IF-MATCH",
+              "value": "*"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"{{ $json.flagToUpdate }}\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        -80
+      ],
+      "id": "946cb349-362a-4c94-a93a-0d97b2718e40",
+      "name": "Update SharePoint Flag",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "noneRows",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        400
+      ],
+      "id": "624bf2f0-eb1f-4c3c-bb03-85e9d4cf41ed",
+      "name": "Aggregate NONE Rows"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.first().json.noneRows || [];\n\nif (rows.length === 0) {\n  return [{ json: { skip: true } }];\n}\n\nconst tableRows = rows.map(r =>\n  `<tr><td style=\"padding:6px 12px;border:1px solid #ddd;\">${r.Id || ''}</td><td style=\"padding:6px 12px;border:1px solid #ddd;\">${r.Title || ''}</td><td style=\"padding:6px 12px;border:1px solid #ddd;\">${r.Email || ''}</td><td style=\"padding:6px 12px;border:1px solid #ddd;\">${r.HireDate ? r.HireDate.split('T')[0] : ''}</td><td style=\"padding:6px 12px;border:1px solid #ddd;\">${r.StartDate ? r.StartDate.split('T')[0] : ''}</td><td style=\"padding:6px 12px;border:1px solid #ddd;\">${r.reason || ''}</td></tr>`\n).join('');\n\nconst html = `<html><body style=\"font-family:Arial,sans-serif;\"><h2>Daily Onboarding Workflow Summary</h2><p>The following <b>${rows.length}</b> active employee(s) did not match any trigger condition in today's run:</p><table style=\"border-collapse:collapse;border:1px solid #ddd;\"><thead><tr style=\"background:#f4f4f4;\"><th style=\"padding:6px 12px;border:1px solid #ddd;text-align:left;\">ID</th><th style=\"padding:6px 12px;border:1px solid #ddd;text-align:left;\">Name</th><th style=\"padding:6px 12px;border:1px solid #ddd;text-align:left;\">Email</th><th style=\"padding:6px 12px;border:1px solid #ddd;text-align:left;\">Hire Date</th><th style=\"padding:6px 12px;border:1px solid #ddd;text-align:left;\">Start Date</th><th style=\"padding:6px 12px;border:1px solid #ddd;text-align:left;\">Reason</th></tr></thead><tbody>${tableRows}</tbody></table><p style=\"color:#888;font-size:12px;margin-top:24px;\">Automated message from the RAH onboarding workflow.</p></body></html>`;\n\nreturn [{ json: { summaryHtml: html, count: rows.length, skip: false } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        400
+      ],
+      "id": "9f04cdf4-60e1-48ce-b740-b18a03a1deff",
+      "name": "Build Summary HTML"
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca, rlakhani@anagomb.ca",
+        "subject": "=RAH Onboarding Workflow — Daily Summary ({{ $json.count }} unmatched)",
+        "message": "={{ $json.summaryHtml }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        400
+      ],
+      "id": "a62e62a5-54f4-4c8c-9f39-d1d6314e69ff",
+      "name": "Send Summary to HR",
+      "webhookId": "summary-webhook-id",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function daysBetween(date1, date2) {\n  const diff = new Date(date1).getTime() - new Date(date2).getTime();\n  return Math.floor(diff / (1000 * 60 * 60 * 24));\n}\n\nconst today = new Date();\nconst todayStr = today.toISOString().split('T')[0];\nconst yesterday = new Date();\nyesterday.setDate(today.getDate() - 1);\nconst yesterdayStr = yesterday.toISOString().split('T')[0];\n\nconst results = [];\n\nfor (const item of items) {\n  const data = item.json;\n  const hireDate = data.HireDate ? data.HireDate.split('T')[0] : null;\n  const startDate = data.StartDate ? data.StartDate.split('T')[0] : null;\n  const daysSinceStart = startDate ? daysBetween(today, startDate) : null;\n\n  let trigger = null;\n  let reason = '';\n\n  if (hireDate && (hireDate === todayStr || hireDate === yesterdayStr) && !data.NewHireEmailSent) {\n    trigger = 'NEW_HIRE';\n  }\n  else if (startDate && startDate === yesterdayStr && !data.StartDateEmailSent) {\n    trigger = 'FIRST_SHIFT';\n  }\n  else if (daysSinceStart !== null && daysSinceStart >= 30 && daysSinceStart < 60 && !data.OData__x0033_0DayEmailSent) {\n    trigger = '30_DAY';\n  }\n  else if (daysSinceStart !== null && daysSinceStart >= 60 && daysSinceStart < 90 && !data.OData__x0036_0DayEmailSent) {\n    trigger = '60_DAY';\n  }\n  else if (daysSinceStart !== null && daysSinceStart >= 90 && !data.OData__x0039_0DayEmailSent) {\n    trigger = '90_DAY';\n  }\n  else {\n    trigger = 'NONE';\n    if (!hireDate && !startDate) reason = 'No HireDate or StartDate on record';\n    else if (!startDate) reason = 'No StartDate \\u2014 cannot evaluate shift/day milestones';\n    else if (daysSinceStart !== null && daysSinceStart < 30) reason = `Only ${daysSinceStart} days since StartDate \\u2014 too early for 30-day milestone`;\n    else if (daysSinceStart >= 30 && daysSinceStart < 60 && data.OData__x0033_0DayEmailSent) reason = '30-day email already sent';\n    else if (daysSinceStart >= 60 && daysSinceStart < 90 && data.OData__x0036_0DayEmailSent) reason = '60-day email already sent';\n    else if (daysSinceStart >= 90 && data.OData__x0039_0DayEmailSent) reason = '90-day email already sent';\n    else reason = 'Did not match any trigger condition';\n  }\n\n  results.push({ json: { ...data, trigger, reason } });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        16
+      ],
+      "id": "d9acd7c3-882e-414a-82d6-7db8e81948e4",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.trigger }}",
+                    "rightValue": "NEW_HIRE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "NEW_HIRE"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.trigger }}",
+                    "rightValue": "FIRST_SHIFT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "FIRST_SHIFT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "r3",
+                    "leftValue": "={{ $json.trigger }}",
+                    "rightValue": "30_DAY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "30_DAY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "r4",
+                    "leftValue": "={{ $json.trigger }}",
+                    "rightValue": "60_DAY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "60_DAY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "r5",
+                    "leftValue": "={{ $json.trigger }}",
+                    "rightValue": "90_DAY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "90_DAY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "r6",
+                    "leftValue": "={{ $json.trigger }}",
+                    "rightValue": "NONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "NONE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        16
+      ],
+      "id": "4197b2de-e428-46ac-a2c1-7fc678658510",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        -80
+      ],
+      "id": "5d06a918-6a1c-489c-93a7-fb1c85869e5c",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get SharePoint Items via REST3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update item in a list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Update item in a list1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Update item in a list2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many items": {
+      "main": [
+        []
+      ]
+    },
+    "Get SharePoint Items via REST2": {
+      "main": [
+        []
+      ]
+    },
+    "Get SharePoint Items via REST3": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content: NEW_HIRE": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content: FIRST_SHIFT": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content: 30_DAY": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content: 60_DAY": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content: 90_DAY": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Employee": {
+      "main": [
+        [
+          {
+            "node": "Update SharePoint Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate NONE Rows": {
+      "main": [
+        [
+          {
+            "node": "Build Summary HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Summary HTML": {
+      "main": [
+        [
+          {
+            "node": "Send Summary to HR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Set Content: NEW_HIRE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Content: FIRST_SHIFT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Content: 30_DAY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Content: 60_DAY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Content: 90_DAY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate NONE Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1b0ba7a8-3fea-45b3-9b4f-d8a762b48a09",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-27T22:03:15.073Z",
+      "createdAt": "2026-05-27T22:03:15.073Z",
+      "role": "workflow:owner",
+      "workflowId": "G3itDE8h7INfBzkJ",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
