@@ -1,0 +1,1578 @@
+{
+  "updatedAt": "2026-06-07T20:51:31.071Z",
+  "createdAt": "2026-05-05T23:34:58.632Z",
+  "id": "8l17q77MlAW1o3YX",
+  "name": "Caregiver shift reminders daily report sub workflow pt.1",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        192
+      ],
+      "id": "d240fb2b-39e1-4d09-8f5f-d62c780c5c32",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -672,
+        800
+      ],
+      "id": "c85ccba2-ac3e-44a7-af08-399082175aae",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount1: rowCount,\n      message1: `Total number of shifts tomorrow: ${rowCount}`\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        208
+      ],
+      "id": "854fcf42-47d3-4828-a7e9-3149ee50d635",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3de02156-1865-4c91-9707-d840a5b92144",
+              "name": "message1",
+              "value": "={{ $json.message1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "93a03114-72c8-430c-9096-2d505ffa57d3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa165768-0959-4630-8455-93e87b00154f",
+              "name": "tomorrow",
+              "value": "={{ $json.tomorrow }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cc9ee571-a018-4f58-be33-8d6a3b39fe6e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 4,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        640,
+        208
+      ],
+      "id": "366dded5-fb3c-4390-82fc-fad9c777e60d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -928,
+        192
+      ],
+      "id": "eb4eb18c-9e55-4f90-8207-4801a61478b3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "Processed - Pending SMS Confirmation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -672,
+        1120
+      ],
+      "id": "e6ad1610-f5fc-40d3-8e67-a65171c3abee",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount2: rowCount,\n      message2: `Total number of shifts processed: ${rowCount}`\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        528
+      ],
+      "id": "ffc8fdba-df46-4918-baf2-26b3530d20c1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3de02156-1865-4c91-9707-d840a5b92144",
+              "name": "message2",
+              "value": "={{ $json.message2 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        528
+      ],
+      "id": "ab5744a4-5c23-45d0-a544-58eb06be49f6",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        848,
+        208
+      ],
+      "id": "79eba72d-b0e0-44d9-a84a-cd569e8fe8da",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "89b38379-8610-468f-aca2-18489a3ef3b2",
+              "name": "messagea",
+              "value": "={{ $json.messagea }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        368
+      ],
+      "id": "80ead4bf-1d29-4fea-8073-b00ae67ee88d",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCounta: rowCount,\n      messagea: `Total number of shifts missing caregiver or phone number: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        368
+      ],
+      "id": "fb6bacba-0d6d-498d-bd4d-34b82f360924",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -672,
+        960
+      ],
+      "id": "258e0153-f56c-4cd5-b453-9e18b48d5a21",
+      "name": "Get row(s) in sheet2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=VisitStartDate eq '{{$json.tomorrow}}'",
+        "options": {}
+      },
+      "id": "7aaefa3d-35d8-4920-9323-3b9f40024226",
+      "name": "Get All Tomorrow (SP API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -352,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "id": "ce9aa99d-3b06-46db-9015-253bc78d7835",
+      "name": "Expand Tomorrow",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=VisitStartDate eq '{{$json.tomorrow}}' and TextStatus eq 'Processed - Pending SMS Confirmation'",
+        "options": {}
+      },
+      "id": "65e457eb-dda9-4911-8bd9-e26b5c1640fa",
+      "name": "Get Pending SMS (SP API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -352,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "id": "517d3941-89a1-4f75-bd15-ad7e51576b03",
+      "name": "Expand Pending SMS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=VisitStartDate eq '{{$json.tomorrow}}' and TextStatus eq 'ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)'",
+        "options": {}
+      },
+      "id": "c423f484-38c5-4b04-98e9-42eb2032bf4c",
+      "name": "Get Error Missing Data (SP API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -352,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "id": "d6800572-7add-4df7-9e3c-fb59e19f7a84",
+      "name": "Expand Error Missing Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));\nconst end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 2, 0, 0, 0));\nconst pad = n => String(n).padStart(2, '0');\nconst dstr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;\nconst iso = d => `${dstr(d)}T00:00:00Z`;\nreturn [{ json: { tomorrow: dstr(start), tomorrowStart: iso(start), tomorrowEnd: iso(end) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        1504
+      ],
+      "id": "1afd222b-dcbc-4ab3-9540-275b3e723772",
+      "name": "Build tomorrow + bounds"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message1: 'Total number of shifts tomorrow: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1408
+      ],
+      "id": "f994f2c5-6acf-4e5f-915d-2001e8fb8910",
+      "name": "Count total"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { messagea: 'Total number of shifts missing caregiver or phone number: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1568
+      ],
+      "id": "1a85272c-c084-460a-bb61-5e7658dc9396",
+      "name": "Count missing"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message2: 'Total number of shifts processed: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1728
+      ],
+      "id": "0303cfd0-320e-4ec1-a085-22a39486c80b",
+      "name": "Count processed"
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        1408
+      ],
+      "id": "4902e272-b6d3-4291-bf73-8ebd93ef3200",
+      "name": "Get All Tomorrow (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=TextStatus eq 'ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        1568
+      ],
+      "id": "0b75f0e0-5b9b-4c64-9388-f594af28675d",
+      "name": "Get Error Missing Data (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=TextStatus eq 'Processed - Pending SMS Confirmation' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        1728
+      ],
+      "id": "f82635fb-0a64-4d2d-9889-19e1f9ad639e",
+      "name": "Get Pending SMS (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 4,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1584,
+        1504
+      ],
+      "id": "93673f88-f278-4d37-a44d-7eaaa0ed8d48",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        1504
+      ],
+      "id": "82916895-2a6f-43ae-b38d-fb7fa6ed4801",
+      "name": "No Operation, do nothing1"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Tomorrow (SP API)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Error Missing Data (SP API)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Pending SMS (SP API)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        []
+      ]
+    },
+    "Get All Tomorrow (SP API)": {
+      "main": [
+        [
+          {
+            "node": "Expand Tomorrow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending SMS (SP API)": {
+      "main": [
+        [
+          {
+            "node": "Expand Pending SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Error Missing Data (SP API)": {
+      "main": [
+        [
+          {
+            "node": "Expand Error Missing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Pending SMS": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Error Missing Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Tomorrow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build tomorrow + bounds": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Tomorrow (SP API)1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Error Missing Data (SP API)1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Pending SMS (SP API)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count total": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Count missing": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Count processed": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Get All Tomorrow (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count total",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Error Missing Data (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count missing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending SMS (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "55fa2914-c1f0-4db1-b67c-d90c25e3e5dd",
+  "activeVersionId": "41018265-cd07-447c-9679-35c015463d00",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-05T23:34:58.632Z",
+      "createdAt": "2026-05-05T23:34:58.632Z",
+      "role": "workflow:owner",
+      "workflowId": "8l17q77MlAW1o3YX",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-07T19:30:11.440Z",
+    "createdAt": "2026-06-07T19:29:00.857Z",
+    "versionId": "41018265-cd07-447c-9679-35c015463d00",
+    "workflowId": "8l17q77MlAW1o3YX",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -704,
+          192
+        ],
+        "id": "d240fb2b-39e1-4d09-8f5f-d62c780c5c32",
+        "name": "Code in JavaScript3"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -672,
+          800
+        ],
+        "id": "c85ccba2-ac3e-44a7-af08-399082175aae",
+        "name": "Get row(s) in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount1: rowCount,\n      message1: `Total number of shifts tomorrow: ${rowCount}`\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          16,
+          208
+        ],
+        "id": "854fcf42-47d3-4828-a7e9-3149ee50d635",
+        "name": "Code in JavaScript4"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3de02156-1865-4c91-9707-d840a5b92144",
+                "name": "message1",
+                "value": "={{ $json.message1 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          240,
+          208
+        ],
+        "id": "93a03114-72c8-430c-9096-2d505ffa57d3",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "fa165768-0959-4630-8455-93e87b00154f",
+                "name": "tomorrow",
+                "value": "={{ $json.tomorrow }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          0,
+          0
+        ],
+        "id": "cc9ee571-a018-4f58-be33-8d6a3b39fe6e",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "numberInputs": 4,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          640,
+          208
+        ],
+        "id": "366dded5-fb3c-4390-82fc-fad9c777e60d",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -928,
+          192
+        ],
+        "id": "eb4eb18c-9e55-4f90-8207-4801a61478b3",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "Processed - Pending SMS Confirmation"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -672,
+          1120
+        ],
+        "id": "e6ad1610-f5fc-40d3-8e67-a65171c3abee",
+        "name": "Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount2: rowCount,\n      message2: `Total number of shifts processed: ${rowCount}`\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          16,
+          528
+        ],
+        "id": "ffc8fdba-df46-4918-baf2-26b3530d20c1",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3de02156-1865-4c91-9707-d840a5b92144",
+                "name": "message2",
+                "value": "={{ $json.message2 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          240,
+          528
+        ],
+        "id": "ab5744a4-5c23-45d0-a544-58eb06be49f6",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          848,
+          208
+        ],
+        "id": "79eba72d-b0e0-44d9-a84a-cd569e8fe8da",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "89b38379-8610-468f-aca2-18489a3ef3b2",
+                "name": "messagea",
+                "value": "={{ $json.messagea }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          240,
+          368
+        ],
+        "id": "80ead4bf-1d29-4fea-8073-b00ae67ee88d",
+        "name": "Edit Fields3"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCounta: rowCount,\n      messagea: `Total number of shifts missing caregiver or phone number: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          16,
+          368
+        ],
+        "id": "fb6bacba-0d6d-498d-bd4d-34b82f360924",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -672,
+          960
+        ],
+        "id": "258e0153-f56c-4cd5-b453-9e18b48d5a21",
+        "name": "Get row(s) in sheet2",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=VisitStartDate eq '{{$json.tomorrow}}'",
+          "options": {}
+        },
+        "id": "7aaefa3d-35d8-4920-9323-3b9f40024226",
+        "name": "Get All Tomorrow (SP API)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -352,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "id": "ce9aa99d-3b06-46db-9015-253bc78d7835",
+        "name": "Expand Tomorrow",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -160,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=VisitStartDate eq '{{$json.tomorrow}}' and TextStatus eq 'Processed - Pending SMS Confirmation'",
+          "options": {}
+        },
+        "id": "65e457eb-dda9-4911-8bd9-e26b5c1640fa",
+        "name": "Get Pending SMS (SP API)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -352,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "id": "517d3941-89a1-4f75-bd15-ad7e51576b03",
+        "name": "Expand Pending SMS",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -160,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=VisitStartDate eq '{{$json.tomorrow}}' and TextStatus eq 'ERROR - Missing or undefined data (please check that shift is assigned and phone number is available for caregiver)'",
+          "options": {}
+        },
+        "id": "c423f484-38c5-4b04-98e9-42eb2032bf4c",
+        "name": "Get Error Missing Data (SP API)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -352,
+          368
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "id": "d6800572-7add-4df7-9e3c-fb59e19f7a84",
+        "name": "Expand Error Missing Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -160,
+          368
+        ]
+      }
+    ],
+    "connections": {
+      "Code in JavaScript3": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get All Tomorrow (SP API)",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get Error Missing Data (SP API)",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get Pending SMS (SP API)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          []
+        ]
+      },
+      "Code in JavaScript4": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet1": {
+        "main": [
+          []
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 3
+            }
+          ]
+        ]
+      },
+      "Edit Fields3": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet2": {
+        "main": [
+          []
+        ]
+      },
+      "Get All Tomorrow (SP API)": {
+        "main": [
+          [
+            {
+              "node": "Expand Tomorrow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Pending SMS (SP API)": {
+        "main": [
+          [
+            {
+              "node": "Expand Pending SMS",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Error Missing Data (SP API)": {
+        "main": [
+          [
+            {
+              "node": "Expand Error Missing Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Expand Pending SMS": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Expand Error Missing Data": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Expand Tomorrow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version 41018265",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
