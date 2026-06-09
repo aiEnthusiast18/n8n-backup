@@ -1,0 +1,1794 @@
+{
+  "updatedAt": "2026-06-09T00:24:49.411Z",
+  "createdAt": "2026-05-05T23:22:04.432Z",
+  "id": "tkBPXeynRo3M6Wbw",
+  "name": "Caregiver shift reminders daily report sub workflow pt.2",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "d935ae52-4262-4459-bd90-628db35ca65f",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "SENT"
+            },
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        0
+      ],
+      "id": "bd3c0f48-5ae3-46ad-944d-8b163446ac56",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "7e6e6c07-821c-49a8-b19f-4532ae6bd8b8",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message3",
+              "value": "={{ $json.message3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        0
+      ],
+      "id": "08995911-7787-40df-8d4a-7e66d0ce822f",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        96
+      ],
+      "id": "2d937ce4-fd5b-4eac-a1bf-006c7a1839f9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        96
+      ],
+      "id": "df5adff2-b774-408e-bd05-1a3ee8852aea",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        96
+      ],
+      "id": "7ca7a451-a0ad-4211-8a74-015c4f632a71",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "FAILED"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        192
+      ],
+      "id": "6f9c3135-0d3b-420a-babc-de2e33eac183",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        192
+      ],
+      "id": "3326cfbd-134b-4e13-b6c8-287730300bd5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message4",
+              "value": "={{ $json.message4 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        192
+      ],
+      "id": "efb2369b-01e9-49a7-95e5-0ebd881dd3a9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "4665a061-e5b7-49ab-ae0f-45d1cfddad02",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        192
+      ],
+      "id": "b6f8b7cb-8841-4abc-bead-edd011bec56f",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));\nconst end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 2, 0, 0, 0));\nconst pad = n => String(n).padStart(2, '0');\nconst dstr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;\nconst iso = d => `${dstr(d)}T00:00:00Z`;\nreturn [{ json: { tomorrow: dstr(start), tomorrowStart: iso(start), tomorrowEnd: iso(end) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1152
+      ],
+      "id": "d78fd5b7-2886-411c-ada4-314add9ceb3a",
+      "name": "Build tomorrow + bounds"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message3: 'Number of shift reminder messages successfully sent: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        1056
+      ],
+      "id": "fb1e307c-1111-4c85-9a72-74463dc538d2",
+      "name": "Count sent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message4: 'Number of shifts with failed messages: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        1248
+      ],
+      "id": "923e97d7-48b2-4bf4-b2d4-4107d6c6fcc9",
+      "name": "Count failed"
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=TextStatus eq 'SENT' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        1056
+      ],
+      "id": "c49afb21-fd60-4b19-bcc2-a181d88094c3",
+      "name": "Get SENT (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=TextStatus eq 'FAILED' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        1248
+      ],
+      "id": "00b1ccdb-e871-477e-9070-ebeb720a6cb7",
+      "name": "Get FAILED (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        912,
+        1152
+      ],
+      "id": "f49ebbe0-f94c-4f15-b935-f713d8665b64",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        1152
+      ],
+      "id": "cc9392b3-f023-4b72-8546-efbc476e45bd",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        592
+      ],
+      "id": "f7f554db-fa60-434d-a154-c85c2d07ff11",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        496
+      ],
+      "id": "dee62e87-b627-409c-988c-e7bae5247ee6",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message3",
+              "value": "={{ $json.message3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        496
+      ],
+      "id": "0bd3fa79-14c5-49f2-be84-738510c4428c",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1392,
+        592
+      ],
+      "id": "5c243c1d-8123-4d96-8275-0f73600958e8",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        592
+      ],
+      "id": "20d9a8c2-a7b8-43ad-8c25-0888f189d461",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        688
+      ],
+      "id": "fcaebe57-8044-4bc8-894f-378d45cf927e",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message4",
+              "value": "={{ $json.message4 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        688
+      ],
+      "id": "a0801560-0fa6-4c5c-ab74-1e8229959c93",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'SENT' and VisitStartDate eq '{{$json.tomorrow}}'",
+        "options": {}
+      },
+      "id": "a865ad52-9074-44f0-94bf-c05e13ffdcbb",
+      "name": "Get SENT (SP API)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        544,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'FAILED' and VisitStartDate eq '{{$json.tomorrow}}'",
+        "options": {}
+      },
+      "id": "ba56b66f-2a55-4b66-b9b0-213a09ae0c0f",
+      "name": "Get FAILED (SP API)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        544,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        496
+      ],
+      "id": "c9f9d507-8cac-491b-b172-1d44ade2e6e4",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        688
+      ],
+      "id": "54bd387b-384c-4bf6-9a1d-e51e5fe01994",
+      "name": "Code in JavaScript9"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build tomorrow + bounds": {
+      "main": [
+        [
+          {
+            "node": "Get SENT (SP API)1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get FAILED (SP API)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count sent": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count failed": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get SENT (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAILED (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Get SENT (SP API)2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get FAILED (SP API)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get SENT (SP API)2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAILED (SP API)2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e35c66de-3693-43d5-a7c3-08bbead24214",
+  "activeVersionId": "e35c66de-3693-43d5-a7c3-08bbead24214",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-05T23:22:04.432Z",
+      "createdAt": "2026-05-05T23:22:04.432Z",
+      "role": "workflow:owner",
+      "workflowId": "tkBPXeynRo3M6Wbw",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-09T00:24:50.731Z",
+    "createdAt": "2026-06-09T00:24:49.413Z",
+    "versionId": "e35c66de-3693-43d5-a7c3-08bbead24214",
+    "workflowId": "tkBPXeynRo3M6Wbw",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -208,
+          96
+        ],
+        "id": "d935ae52-4262-4459-bd90-628db35ca65f",
+        "name": "Code in JavaScript3"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "SENT"
+              },
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          48,
+          0
+        ],
+        "id": "bd3c0f48-5ae3-46ad-944d-8b163446ac56",
+        "name": "Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          0
+        ],
+        "id": "7e6e6c07-821c-49a8-b19f-4532ae6bd8b8",
+        "name": "Code in JavaScript5"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message3",
+                "value": "={{ $json.message3 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          656,
+          0
+        ],
+        "id": "08995911-7787-40df-8d4a-7e66d0ce822f",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          880,
+          96
+        ],
+        "id": "2d937ce4-fd5b-4eac-a1bf-006c7a1839f9",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -432,
+          96
+        ],
+        "id": "df5adff2-b774-408e-bd05-1a3ee8852aea",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1104,
+          96
+        ],
+        "id": "7ca7a451-a0ad-4211-8a74-015c4f632a71",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "FAILED"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          32,
+          192
+        ],
+        "id": "6f9c3135-0d3b-420a-babc-de2e33eac183",
+        "name": "Get row(s) in sheet",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          192
+        ],
+        "id": "3326cfbd-134b-4e13-b6c8-287730300bd5",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message4",
+                "value": "={{ $json.message4 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          656,
+          192
+        ],
+        "id": "efb2369b-01e9-49a7-95e5-0ebd881dd3a9",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          0
+        ],
+        "id": "4665a061-e5b7-49ab-ae0f-45d1cfddad02",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          192
+        ],
+        "id": "b6f8b7cb-8841-4abc-bead-edd011bec56f",
+        "name": "Code in JavaScript2"
+      },
+      {
+        "parameters": {
+          "jsCode": "const now = new Date();\nconst start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));\nconst end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 2, 0, 0, 0));\nconst pad = n => String(n).padStart(2, '0');\nconst dstr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;\nconst iso = d => `${dstr(d)}T00:00:00Z`;\nreturn [{ json: { tomorrow: dstr(start), tomorrowStart: iso(start), tomorrowEnd: iso(end) } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          1152
+        ],
+        "id": "d78fd5b7-2886-411c-ada4-314add9ceb3a",
+        "name": "Build tomorrow + bounds"
+      },
+      {
+        "parameters": {
+          "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message3: 'Number of shift reminder messages successfully sent: ' + n } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          688,
+          1056
+        ],
+        "id": "fb1e307c-1111-4c85-9a72-74463dc538d2",
+        "name": "Count sent"
+      },
+      {
+        "parameters": {
+          "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message4: 'Number of shifts with failed messages: ' + n } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          688,
+          1248
+        ],
+        "id": "923e97d7-48b2-4bf4-b2d4-4107d6c6fcc9",
+        "name": "Count failed"
+      },
+      {
+        "parameters": {
+          "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "microsoftSharePointOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$filter",
+                "value": "=TextStatus eq 'SENT' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+              },
+              {
+                "name": "$top",
+                "value": "5000"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json;odata=nometadata"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          464,
+          1056
+        ],
+        "id": "c49afb21-fd60-4b19-bcc2-a181d88094c3",
+        "name": "Get SENT (SP API)1",
+        "credentials": {
+          "microsoftSharePointOAuth2Api": {
+            "id": "rLiUei4DCQhgbGrV",
+            "name": "RAF Microsoft SharePoint account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "microsoftSharePointOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$filter",
+                "value": "=TextStatus eq 'FAILED' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+              },
+              {
+                "name": "$top",
+                "value": "5000"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json;odata=nometadata"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          464,
+          1248
+        ],
+        "id": "00b1ccdb-e871-477e-9070-ebeb720a6cb7",
+        "name": "Get FAILED (SP API)1",
+        "credentials": {
+          "microsoftSharePointOAuth2Api": {
+            "id": "rLiUei4DCQhgbGrV",
+            "name": "RAF Microsoft SharePoint account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          912,
+          1152
+        ],
+        "id": "f49ebbe0-f94c-4f15-b935-f713d8665b64",
+        "name": "Merge1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1136,
+          1152
+        ],
+        "id": "cc9392b3-f023-4b72-8546-efbc476e45bd",
+        "name": "No Operation, do nothing1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          304,
+          592
+        ],
+        "id": "f7f554db-fa60-434d-a154-c85c2d07ff11",
+        "name": "Code in JavaScript4"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          944,
+          496
+        ],
+        "id": "dee62e87-b627-409c-988c-e7bae5247ee6",
+        "name": "Code in JavaScript6"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message3",
+                "value": "={{ $json.message3 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1168,
+          496
+        ],
+        "id": "0bd3fa79-14c5-49f2-be84-738510c4428c",
+        "name": "Edit Fields3"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          1392,
+          592
+        ],
+        "id": "5c243c1d-8123-4d96-8275-0f73600958e8",
+        "name": "Merge2"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1616,
+          592
+        ],
+        "id": "20d9a8c2-a7b8-43ad-8c25-0888f189d461",
+        "name": "No Operation, do nothing2"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          944,
+          688
+        ],
+        "id": "fcaebe57-8044-4bc8-894f-378d45cf927e",
+        "name": "Code in JavaScript7"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message4",
+                "value": "={{ $json.message4 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1168,
+          688
+        ],
+        "id": "a0801560-0fa6-4c5c-ab74-1e8229959c93",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'SENT' and VisitStartDate eq '{{$json.tomorrow}}'",
+          "options": {}
+        },
+        "id": "a865ad52-9074-44f0-94bf-c05e13ffdcbb",
+        "name": "Get SENT (SP API)2",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          544,
+          496
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'FAILED' and VisitStartDate eq '{{$json.tomorrow}}'",
+          "options": {}
+        },
+        "id": "ba56b66f-2a55-4b66-b9b0-213a09ae0c0f",
+        "name": "Get FAILED (SP API)2",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          544,
+          688
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          752,
+          496
+        ],
+        "id": "c9f9d507-8cac-491b-b172-1d44ade2e6e4",
+        "name": "Code in JavaScript8"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          752,
+          688
+        ],
+        "id": "54bd387b-384c-4bf6-9a1d-e51e5fe01994",
+        "name": "Code in JavaScript9"
+      }
+    ],
+    "connections": {
+      "Code in JavaScript3": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get row(s) in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript5": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build tomorrow + bounds": {
+        "main": [
+          [
+            {
+              "node": "Get SENT (SP API)1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get FAILED (SP API)1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Count sent": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Count failed": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Get SENT (SP API)1": {
+        "main": [
+          [
+            {
+              "node": "Count sent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get FAILED (SP API)1": {
+        "main": [
+          [
+            {
+              "node": "Count failed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge1": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript4": {
+        "main": [
+          [
+            {
+              "node": "Get SENT (SP API)2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get FAILED (SP API)2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript6": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields3": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge2": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript7": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Get SENT (SP API)2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript8",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get FAILED (SP API)2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript9",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript8": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript9": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version e35c66de",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
