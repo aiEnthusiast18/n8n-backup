@@ -1,0 +1,3193 @@
+{
+  "updatedAt": "2026-06-09T17:48:37.536Z",
+  "createdAt": "2026-05-05T23:22:04.432Z",
+  "id": "tkBPXeynRo3M6Wbw",
+  "name": "Caregiver shift reminders daily report sub workflow pt.2",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "d935ae52-4262-4459-bd90-628db35ca65f",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "SENT"
+            },
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        0
+      ],
+      "id": "bd3c0f48-5ae3-46ad-944d-8b163446ac56",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "7e6e6c07-821c-49a8-b19f-4532ae6bd8b8",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message3",
+              "value": "={{ $json.message3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        0
+      ],
+      "id": "08995911-7787-40df-8d4a-7e66d0ce822f",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        96
+      ],
+      "id": "2d937ce4-fd5b-4eac-a1bf-006c7a1839f9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        96
+      ],
+      "id": "df5adff2-b774-408e-bd05-1a3ee8852aea",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        96
+      ],
+      "id": "7ca7a451-a0ad-4211-8a74-015c4f632a71",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Visit Start Date",
+              "lookupValue": "={{ $json.tomorrow }}"
+            },
+            {
+              "lookupColumn": "text status",
+              "lookupValue": "FAILED"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        192
+      ],
+      "id": "6f9c3135-0d3b-420a-babc-de2e33eac183",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        192
+      ],
+      "id": "3326cfbd-134b-4e13-b6c8-287730300bd5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message4",
+              "value": "={{ $json.message4 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        192
+      ],
+      "id": "efb2369b-01e9-49a7-95e5-0ebd881dd3a9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));\nconst end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 2, 0, 0, 0));\nconst pad = n => String(n).padStart(2, '0');\nconst dstr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;\nconst iso = d => `${dstr(d)}T00:00:00Z`;\nreturn [{ json: { tomorrow: dstr(start), tomorrowStart: iso(start), tomorrowEnd: iso(end) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1152
+      ],
+      "id": "d78fd5b7-2886-411c-ada4-314add9ceb3a",
+      "name": "Build tomorrow + bounds"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message3: 'Number of shift reminder messages successfully sent: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        1056
+      ],
+      "id": "fb1e307c-1111-4c85-9a72-74463dc538d2",
+      "name": "Count sent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message4: 'Number of shifts with failed messages: ' + n } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        1248
+      ],
+      "id": "923e97d7-48b2-4bf4-b2d4-4107d6c6fcc9",
+      "name": "Count failed"
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=TextStatus eq 'SENT' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        1056
+      ],
+      "id": "c49afb21-fd60-4b19-bcc2-a181d88094c3",
+      "name": "Get SENT (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftSharePointOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=TextStatus eq 'FAILED' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+            },
+            {
+              "name": "$top",
+              "value": "5000"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        1248
+      ],
+      "id": "00b1ccdb-e871-477e-9070-ebeb720a6cb7",
+      "name": "Get FAILED (SP API)1",
+      "credentials": {
+        "microsoftSharePointOAuth2Api": {
+          "id": "rLiUei4DCQhgbGrV",
+          "name": "RAF Microsoft SharePoint account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        912,
+        1152
+      ],
+      "id": "f49ebbe0-f94c-4f15-b935-f713d8665b64",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        1152
+      ],
+      "id": "cc9392b3-f023-4b72-8546-efbc476e45bd",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        592
+      ],
+      "id": "f7f554db-fa60-434d-a154-c85c2d07ff11",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        496
+      ],
+      "id": "dee62e87-b627-409c-988c-e7bae5247ee6",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message3",
+              "value": "={{ $json.message3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        496
+      ],
+      "id": "0bd3fa79-14c5-49f2-be84-738510c4428c",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1392,
+        592
+      ],
+      "id": "5c243c1d-8123-4d96-8275-0f73600958e8",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        592
+      ],
+      "id": "20d9a8c2-a7b8-43ad-8c25-0888f189d461",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        688
+      ],
+      "id": "fcaebe57-8044-4bc8-894f-378d45cf927e",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+              "name": "message4",
+              "value": "={{ $json.message4 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        688
+      ],
+      "id": "a0801560-0fa6-4c5c-ab74-1e8229959c93",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'SENT' and VisitStartDate eq '{{$json.tomorrow}}'",
+        "options": {}
+      },
+      "id": "a865ad52-9074-44f0-94bf-c05e13ffdcbb",
+      "name": "Get SENT (SP API)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        544,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'FAILED' and VisitStartDate eq '{{$json.tomorrow}}'",
+        "options": {}
+      },
+      "id": "ba56b66f-2a55-4b66-b9b0-213a09ae0c0f",
+      "name": "Get FAILED (SP API)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        544,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        496
+      ],
+      "id": "c9f9d507-8cac-491b-b172-1d44ade2e6e4",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        688
+      ],
+      "id": "54bd387b-384c-4bf6-9a1d-e51e5fe01994",
+      "name": "Code in JavaScript9"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Build tomorrow + bounds": {
+      "main": [
+        [
+          {
+            "node": "Get SENT (SP API)1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get FAILED (SP API)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count sent": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count failed": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get SENT (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAILED (SP API)1": {
+      "main": [
+        [
+          {
+            "node": "Count failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Get SENT (SP API)2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get FAILED (SP API)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get SENT (SP API)2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAILED (SP API)2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "row_number": 4032,
+          "text status": "SENT"
+        }
+      }
+    ],
+    "Code in JavaScript3": [
+      {
+        "json": {
+          "tomorrow": "2026-06-10"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Get row(s) in sheet1": [
+      {
+        "json": {
+          "row_number": 4032,
+          "text status": "SENT",
+          "Employee UID": "S10666",
+          "Employee Full Name": "Lana Hatid",
+          "Employee Email": "lhatid@yahoo.com",
+          "Employee Phone (Mobile)": "204-979-5383",
+          "Client Full Name": "(W) Tinh Tran",
+          "Client Address": "8 Dowhan Crescent",
+          "Visit Scheduled Duration": 9.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 05:30:00",
+          "Visit Start Time of Day": "5:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:00",
+          "Visit End Time": "2026-06-10 15:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4033,
+          "text status": "SENT",
+          "Employee UID": "S7545",
+          "Employee Full Name": "Sharanjeet Kaur Brar",
+          "Employee Email": "sharanjeetkaur2021@yahoo.com",
+          "Employee Phone (Mobile)": "204-990-8179",
+          "Client Full Name": "(W) Carmela Ianno",
+          "Client Address": "632 Sherbrook St,",
+          "Visit Scheduled Duration": 11.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 06:00:00",
+          "Visit Start Time of Day": "6:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:30",
+          "Visit End Time": "2026-06-10 17:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4034,
+          "text status": "SENT",
+          "Employee UID": "S7987",
+          "Employee Full Name": "Sandra Oliveira",
+          "Employee Email": "sandragroenig@gmail.com",
+          "Employee Phone (Mobile)": "431-388-1977",
+          "Client Full Name": "(W) Felicidad Villarin",
+          "Client Address": "19 Kowall Bay",
+          "Visit Scheduled Duration": 9.75,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 06:15:00",
+          "Visit Start Time of Day": "6:15",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4035,
+          "text status": "SENT",
+          "Employee UID": "S10272",
+          "Employee Full Name": "Rajpreet Kaur",
+          "Employee Email": "Krajpreet07@gmail.com",
+          "Employee Phone (Mobile)": "204-962-3597",
+          "Client Full Name": "(W) Pamela Hanuman",
+          "Client Address": "84 Tahoe Bay",
+          "Visit Scheduled Duration": 8.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 06:30:00",
+          "Visit Start Time of Day": "6:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:00",
+          "Visit End Time": "2026-06-10 15:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4036,
+          "text status": "SENT",
+          "Employee UID": "S9060",
+          "Employee Full Name": "Tara Giesbrecht",
+          "Employee Email": "tarag1975@gmail.com",
+          "Employee Phone (Mobile)": "204-290-7801",
+          "Client Full Name": "(W) Kathleen Cianflone",
+          "Client Address": "1023 Simpson Ave,",
+          "Visit Scheduled Duration": 5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "12:00",
+          "Visit End Time": "2026-06-10 12:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4037,
+          "text status": "SENT",
+          "Employee UID": "S9866",
+          "Employee Full Name": "Navdeep Bhutani",
+          "Employee Email": "navdeepbhutani@gmail.com",
+          "Employee Phone (Mobile)": "431-887-1331",
+          "Client Full Name": "(W) Maria Valentim",
+          "Client Address": "1205 Clifton St",
+          "Visit Scheduled Duration": 10,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4038,
+          "text status": "SENT",
+          "Employee UID": "S9162",
+          "Employee Full Name": "Manveet Kaur",
+          "Employee Email": "Veetmanveetk@gmail.com",
+          "Employee Phone (Mobile)": "431-277-9320",
+          "Client Full Name": "(W) Mary Domanski",
+          "Client Address": "223 Lansdowne Ave",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:00",
+          "Visit End Time": "2026-06-10 15:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4039,
+          "text status": "SENT",
+          "Employee UID": "S8912",
+          "Employee Full Name": "Jotham Walugembe",
+          "Employee Email": "jothamwalu@yahoo.com",
+          "Employee Phone (Mobile)": "204-588-8475",
+          "Client Full Name": "(W) St Boniface Home Care",
+          "Client Address": "",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "14:00",
+          "Visit End Time": "2026-06-10 14:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4040,
+          "text status": "SENT",
+          "Employee UID": "S10999",
+          "Employee Full Name": "Jaspreet DS Kaur",
+          "Employee Email": "kaurjass7270@gmail.com",
+          "Employee Phone (Mobile)": "437-286-2070",
+          "Client Full Name": "Irene Tetreault",
+          "Client Address": "703 - 50 Whellams Ln",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:00",
+          "Visit End Time": "2026-06-10 15:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4041,
+          "text status": "SENT",
+          "Employee UID": "S10466",
+          "Employee Full Name": "Navneet Brar",
+          "Employee Email": "neetbrar02@gmail.com",
+          "Employee Phone (Mobile)": "431-990-6364",
+          "Client Full Name": "Patricia (Pat) McGarva",
+          "Client Address": "3161 Grant Avenue, Suite #226",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "10:00",
+          "Visit End Time": "2026-06-10 10:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4042,
+          "text status": "SENT",
+          "Employee UID": "S2303",
+          "Employee Full Name": "Michelle Lecuyer",
+          "Employee Email": "michellelecuyer74@gmail.com",
+          "Employee Phone (Mobile)": "204-298-9769",
+          "Client Full Name": "Richard Topolnicki",
+          "Client Address": "6645 Roblin Blvd (Unit #29)",
+          "Visit Scheduled Duration": 9,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:00:00",
+          "Visit Start Time of Day": "7:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4043,
+          "text status": "SENT",
+          "Employee UID": "S10468",
+          "Employee Full Name": "Manpreet Kaur Sheemar",
+          "Employee Email": "manpreetkaursheemar123@gmail.com",
+          "Employee Phone (Mobile)": "204-698-6687",
+          "Client Full Name": "(W) Gail Fullerton",
+          "Client Address": "2600 Portage Ave.(Suite #513)",
+          "Visit Scheduled Duration": 10,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:30:00",
+          "Visit Start Time of Day": "7:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:30",
+          "Visit End Time": "2026-06-10 17:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4044,
+          "text status": "SENT",
+          "Employee UID": "S10685",
+          "Employee Full Name": "Gurmeet Grewal",
+          "Employee Email": "Grewalgurmeet1980@gmail.com",
+          "Employee Phone (Mobile)": 2045991715,
+          "Client Full Name": "(W) Modesta Arcilla",
+          "Client Address": "100 Abbotsford Cres",
+          "Visit Scheduled Duration": 9.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:30:00",
+          "Visit Start Time of Day": "7:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4045,
+          "text status": "SENT",
+          "Employee UID": "S7952",
+          "Employee Full Name": "Navreet Kaur(Dhillon)",
+          "Employee Email": "Navreet13112@gmail.com",
+          "Employee Phone (Mobile)": "204-963-0289",
+          "Client Full Name": "(W) Paul Kenneth Walker",
+          "Client Address": "2141 Pembina Hwy #311",
+          "Visit Scheduled Duration": 9,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 07:45:00",
+          "Visit Start Time of Day": "7:45",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:45",
+          "Visit End Time": "2026-06-10 16:45:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4046,
+          "text status": "SENT",
+          "Employee UID": "S10294",
+          "Employee Full Name": "Melinda Ingleton",
+          "Employee Email": "melindaali30@gmail.com",
+          "Employee Phone (Mobile)": "431-990-0053",
+          "Client Full Name": "(W) Gene Solmundson",
+          "Client Address": "2394 Portage Ave",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 08:00:00",
+          "Visit Start Time of Day": "8:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "12:00",
+          "Visit End Time": "2026-06-10 12:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4047,
+          "text status": "SENT",
+          "Employee UID": "S10372",
+          "Employee Full Name": "Harpreet Ls Gill",
+          "Employee Email": "Kirangill62@yahoo.com",
+          "Employee Phone (Mobile)": "204-599-6754",
+          "Client Full Name": "(W) Ranjit Bedi",
+          "Client Address": "131 Amberstone Rd",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 08:00:00",
+          "Visit Start Time of Day": "8:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4048,
+          "text status": "SENT",
+          "Employee UID": "S9810",
+          "Employee Full Name": "Mebrat Ketema",
+          "Employee Email": "mebketema@outlook.com",
+          "Employee Phone (Mobile)": "204-509-1935",
+          "Client Full Name": "(W) Salome Landagan",
+          "Client Address": "55 Daylan Marshall Gate Apt 402",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 08:30:00",
+          "Visit Start Time of Day": "8:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:30",
+          "Visit End Time": "2026-06-10 16:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4049,
+          "text status": "SENT",
+          "Employee UID": "S10665",
+          "Employee Full Name": "Henok Kimbato",
+          "Employee Email": "henokketsela.11@gmail.com",
+          "Employee Phone (Mobile)": "204-588-0393",
+          "Client Full Name": "(W) Allan P Dueck",
+          "Client Address": "1651 - 20 Fort St",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "12:00",
+          "Visit End Time": "2026-06-10 12:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4050,
+          "text status": "SENT",
+          "Employee UID": "S11060",
+          "Employee Full Name": "Kiran Bala",
+          "Employee Email": "kiranbala0126@gmail.com",
+          "Employee Phone (Mobile)": "604-206-5300",
+          "Client Full Name": "(W) Corazon Garcia",
+          "Client Address": "55 River Ridge Pl",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "12:00",
+          "Visit End Time": "2026-06-10 12:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4051,
+          "text status": "SENT",
+          "Employee UID": "S10918",
+          "Employee Full Name": "Aanuoluwa Osaloni",
+          "Employee Email": "Osaloniaanuoluwa@gmail.com",
+          "Employee Phone (Mobile)": "431-336-2949",
+          "Client Full Name": "(W) Emily Q Farraige",
+          "Client Address": "710 Westminster Ave (Suite# 406)",
+          "Visit Scheduled Duration": 10,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "19:00",
+          "Visit End Time": "2026-06-10 19:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4052,
+          "text status": "SENT",
+          "Employee UID": "S8680",
+          "Employee Full Name": "Christopher Joseph",
+          "Employee Email": "lloyd58946@gmail.com",
+          "Employee Phone (Mobile)": "204-218-5648",
+          "Client Full Name": "(W) Irikefe Uyovbukerhi",
+          "Client Address": "298 Beliveau Rd (Suite# C109)",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "12:00",
+          "Visit End Time": "2026-06-10 12:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4053,
+          "text status": "SENT",
+          "Employee UID": "S8824",
+          "Employee Full Name": "Rajdeep Kaur Mann",
+          "Employee Email": "rajdeepkaurmann1981@gmail.com",
+          "Employee Phone (Mobile)": "431-788-1981",
+          "Client Full Name": "(W) Parkash Kaur",
+          "Client Address": "86 Baltic Bay",
+          "Visit Scheduled Duration": 7.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:30",
+          "Visit End Time": "2026-06-10 16:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4054,
+          "text status": "SENT",
+          "Employee UID": "S11244",
+          "Employee Full Name": "Manwinder Kaur",
+          "Employee Email": "manwinder.kaur909@gmail.com",
+          "Employee Phone (Mobile)": "431-388-6992",
+          "Client Full Name": "(W) Sara Wiebe",
+          "Client Address": "658 Grierson Ave",
+          "Visit Scheduled Duration": 9,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "18:00",
+          "Visit End Time": "2026-06-10 18:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4055,
+          "text status": "SENT",
+          "Employee UID": "S5098",
+          "Employee Full Name": "Ayomide Ayoola",
+          "Employee Email": "ayoolaayomide0@gmail.com",
+          "Employee Phone (Mobile)": "204-698-2542",
+          "Client Full Name": "Guy Fitzmaurice",
+          "Client Address": "165 John Forsyth Road (#206)",
+          "Visit Scheduled Duration": 4.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 09:00:00",
+          "Visit Start Time of Day": "9:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "13:30",
+          "Visit End Time": "2026-06-10 13:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4056,
+          "text status": "SENT",
+          "Employee UID": "S10293",
+          "Employee Full Name": "Jitu Begidu",
+          "Employee Email": "Jitudegafe88@gmail.com",
+          "Employee Phone (Mobile)": "1 431-373-8755",
+          "Client Full Name": "(W) Debra L Grimshire",
+          "Client Address": "30 Honeywood St,",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "14:00",
+          "Visit End Time": "2026-06-10 14:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4057,
+          "text status": "SENT",
+          "Employee UID": "S9980",
+          "Employee Full Name": "Danilo Detera",
+          "Employee Email": "danilo_detera@yahoo.com",
+          "Employee Phone (Mobile)": "431-374-4785",
+          "Client Full Name": "(W) Emanuel \"Manny\" Sylvester",
+          "Client Address": "85 Paget St (Suite #417)",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "14:00",
+          "Visit End Time": "2026-06-10 14:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4058,
+          "text status": "SENT",
+          "Employee UID": "S10465",
+          "Employee Full Name": "Gurdeep Kaur (Malhi)",
+          "Employee Email": "gurdeepmalhi5@gmail.com",
+          "Employee Phone (Mobile)": "431-338-4356",
+          "Client Full Name": "(W) Guadalupe Rodriguez",
+          "Client Address": "574-A Beverley Street",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "13:00",
+          "Visit End Time": "2026-06-10 13:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4059,
+          "text status": "SENT",
+          "Employee UID": "S11370",
+          "Employee Full Name": "Vida Iris Addo",
+          "Employee Email": "addov71@gmail.com",
+          "Employee Phone (Mobile)": "431-542-1910",
+          "Client Full Name": "(W) Linda Miller",
+          "Client Address": "21 Clayton Dr. (Suite #603)",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "14:00",
+          "Visit End Time": "2026-06-10 14:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4060,
+          "text status": "SENT",
+          "Employee UID": "S11237",
+          "Employee Full Name": "Uzoamaka Juliet Ugwu",
+          "Employee Email": "Christabelamaka1@gmail.com",
+          "Employee Phone (Mobile)": "204-441-7645",
+          "Client Full Name": "(W) Marjorie Adams",
+          "Client Address": "74 Costello Dr",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4061,
+          "text status": "SENT",
+          "Employee UID": "S10374",
+          "Employee Full Name": "Christine Mitchell",
+          "Employee Email": "Christineleemitchell1972@gmail.com",
+          "Employee Phone (Mobile)": "204-887-6727",
+          "Client Full Name": "Georgina Sanford",
+          "Client Address": "455 Westwood Dr Unit #204",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "13:00",
+          "Visit End Time": "2026-06-10 13:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4062,
+          "text status": "SENT",
+          "Employee UID": "S10836",
+          "Employee Full Name": "Susan Loeppky",
+          "Employee Email": "bittersweetberries@gmail.com",
+          "Employee Phone (Mobile)": "204-807-7915",
+          "Client Full Name": "Jurgen Bauer",
+          "Client Address": "50053 Municipal Rd (Suite# 33 E)",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4063,
+          "text status": "SENT",
+          "Employee UID": "S5881",
+          "Employee Full Name": "Janice Balog-as",
+          "Employee Email": "jbalogas@outlook.com",
+          "Employee Phone (Mobile)": "1-204-915-6991",
+          "Client Full Name": "Margaret Morgan",
+          "Client Address": "323 Wellington Crescent (Suite #1902)",
+          "Visit Scheduled Duration": 5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:00",
+          "Visit End Time": "2026-06-10 15:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4064,
+          "text status": "SENT",
+          "Employee UID": "S782",
+          "Employee Full Name": "Jaspreet Marahar",
+          "Employee Email": "gurpreetmarahar15@gmail.com",
+          "Employee Phone (Mobile)": "431-276-7714",
+          "Client Full Name": "Patricia (Pat) McGarva",
+          "Client Address": "3161 Grant Avenue, Suite #226",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4065,
+          "text status": "SENT",
+          "Employee UID": "S10464",
+          "Employee Full Name": "Brooke Bardarson",
+          "Employee Email": "bardarsonbrooke@gmail.com",
+          "Employee Phone (Mobile)": "204-651-1154",
+          "Client Full Name": "Patricia Bullough",
+          "Client Address": "390 Oak Forest Cres #7",
+          "Visit Scheduled Duration": 4.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 10:00:00",
+          "Visit Start Time of Day": "10:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "14:30",
+          "Visit End Time": "2026-06-10 14:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4069,
+          "text status": "SENT",
+          "Employee UID": "S10580",
+          "Employee Full Name": "Hafsa Umar",
+          "Employee Email": "siyaumar25@gmail.com",
+          "Employee Phone (Mobile)": "(431) 334-3269",
+          "Client Full Name": "(W) Gesualda Signorello",
+          "Client Address": "645 Holland Blvd",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 11:00:00",
+          "Visit Start Time of Day": "11:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:00",
+          "Visit End Time": "2026-06-10 15:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4070,
+          "text status": "SENT",
+          "Employee UID": "S10834",
+          "Employee Full Name": "Kambembo Mukanzo",
+          "Employee Email": "Allainkambs@yahoo.com",
+          "Employee Phone (Mobile)": "204-995-9538",
+          "Client Full Name": "(W) Larry Watson",
+          "Client Address": "1025 Templeton Ave (Suite #105)",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 11:30:00",
+          "Visit Start Time of Day": "11:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "15:30",
+          "Visit End Time": "2026-06-10 15:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4071,
+          "text status": "SENT",
+          "Employee UID": "S8313",
+          "Employee Full Name": "Ursula Contreras",
+          "Employee Email": "ursulacontreras12345@gmail.com",
+          "Employee Phone (Mobile)": "431-778-5335",
+          "Client Full Name": "(W) William G. Campbell",
+          "Client Address": "761 Stewart St,",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 11:30:00",
+          "Visit Start Time of Day": "11:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "18:30",
+          "Visit End Time": "2026-06-10 18:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4072,
+          "text status": "SENT",
+          "Employee UID": "S5771",
+          "Employee Full Name": "Gurjit Mundi",
+          "Employee Email": "gurjitmundi8@gmail.com",
+          "Employee Phone (Mobile)": "204-291-1513",
+          "Client Full Name": "(W) Kathleen Cianflone",
+          "Client Address": "1023 Simpson Ave,",
+          "Visit Scheduled Duration": 5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 12:00:00",
+          "Visit Start Time of Day": "12:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4073,
+          "text status": "SENT",
+          "Employee UID": "S11058",
+          "Employee Full Name": "Semira Ahmed",
+          "Employee Email": "Semiraromodan04@gmail.com",
+          "Employee Phone (Mobile)": "204-295-7196",
+          "Client Full Name": "(W) Kathleen Smith",
+          "Client Address": "499 Lindsay St",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 12:00:00",
+          "Visit Start Time of Day": "12:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4074,
+          "text status": "SENT",
+          "Employee UID": "S11062",
+          "Employee Full Name": "Rachel Mutoni",
+          "Employee Email": "rachelmutoni38@gmail.com",
+          "Employee Phone (Mobile)": "431-276-3379",
+          "Client Full Name": "(W) Lorraine Ormonde",
+          "Client Address": "1083 Clifton St",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 12:00:00",
+          "Visit Start Time of Day": "12:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4075,
+          "text status": "SENT",
+          "Employee UID": "S8645",
+          "Employee Full Name": "Roda Abrha",
+          "Employee Email": "Rodaweldu5@gmail.com",
+          "Employee Phone (Mobile)": "431-588-2171",
+          "Client Full Name": "(W) Susan Fair",
+          "Client Address": "67 Rupertsland Blvd",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 12:00:00",
+          "Visit Start Time of Day": "12:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4076,
+          "text status": "SENT",
+          "Employee UID": "S7078",
+          "Employee Full Name": "Tess Murray",
+          "Employee Email": "tessmurray63@gmail.com",
+          "Employee Phone (Mobile)": "204 712 7517",
+          "Client Full Name": "Helen Yonda",
+          "Client Address": "68 Blackwood Bay",
+          "Visit Scheduled Duration": 4.5,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 12:00:00",
+          "Visit Start Time of Day": "12:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:30",
+          "Visit End Time": "2026-06-10 16:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4077,
+          "text status": "SENT",
+          "Employee UID": "S8507",
+          "Employee Full Name": "Aderinola Fola-Bolumole",
+          "Employee Email": "afolabolumole@ymail.com",
+          "Employee Phone (Mobile)": "204-223-3738",
+          "Client Full Name": "(W) Ronald LaPointe",
+          "Client Address": "165 Sage Creek Blvd (Suite #317)",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 12:30:00",
+          "Visit Start Time of Day": "12:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:30",
+          "Visit End Time": "2026-06-10 16:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4079,
+          "text status": "SENT",
+          "Employee UID": "S8729",
+          "Employee Full Name": "Annick Birgirimana",
+          "Employee Email": "annick_big2@yahoo.com",
+          "Employee Phone (Mobile)": "431-588-1674",
+          "Client Full Name": "(W) Paul Perchaluk",
+          "Client Address": "90 Arden Ave",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4080,
+          "text status": "SENT",
+          "Employee UID": "S7810",
+          "Employee Full Name": "Ekwi Frances Oligbo",
+          "Employee Email": "Francesoligbo@yahoo.com",
+          "Employee Phone (Mobile)": "431-777-9166",
+          "Client Full Name": "(W) Robert D'Andrea",
+          "Client Address": "68 Witham Road",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4081,
+          "text status": "SENT",
+          "Employee UID": "S10847",
+          "Employee Full Name": "Maria Liza Cajilog",
+          "Employee Email": "mcajilog@yahoo.com",
+          "Employee Phone (Mobile)": "431-556-7494",
+          "Client Full Name": "(W) Rosita Mangune",
+          "Client Address": "417 Semple Ave",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4082,
+          "text status": "SENT",
+          "Employee UID": "S8550",
+          "Employee Full Name": "Gbemisola Adeniji",
+          "Employee Email": "Gbemisolaraimot583@gmail.com",
+          "Employee Phone (Mobile)": "1-431-371-5775",
+          "Client Full Name": "Ivy Young",
+          "Client Address": "87 Shier Dr.",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4083,
+          "text status": "SENT",
+          "Employee UID": "S11247",
+          "Employee Full Name": "Mitchel Aviles",
+          "Employee Email": "mlaviles@live.com",
+          "Employee Phone (Mobile)": "431-337-2374",
+          "Client Full Name": "Jason Jankovich",
+          "Client Address": "437 Summerlands Blvd,",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4084,
+          "text status": "SENT",
+          "Employee UID": "S10846",
+          "Employee Full Name": "Gladys Adu-Gyamfi Agyemang",
+          "Employee Email": "gladabokmama4443@gmail.com",
+          "Employee Phone (Mobile)": "289-788-9039",
+          "Client Full Name": "Roger Prairie",
+          "Client Address": "321 De La Cathedrale Ave #226",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4085,
+          "text status": "SENT",
+          "Employee UID": "S11352",
+          "Employee Full Name": "Shamsheer Bains",
+          "Employee Email": "bains.shamsheer@gmail.com",
+          "Employee Phone (Mobile)": "250-552-0580",
+          "Client Full Name": "Sylvia Phelan",
+          "Client Address": "One Morley Ave (3rd floor C10)",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 13:00:00",
+          "Visit Start Time of Day": "13:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "16:00",
+          "Visit End Time": "2026-06-10 16:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4086,
+          "text status": "SENT",
+          "Employee UID": "S11060",
+          "Employee Full Name": "Kiran Bala",
+          "Employee Email": "kiranbala0126@gmail.com",
+          "Employee Phone (Mobile)": "604-206-5300",
+          "Client Full Name": "(W) Ma Theresa Madrid Quintos",
+          "Client Address": "11 Bloomfield Path",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 14:00:00",
+          "Visit Start Time of Day": "14:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4087,
+          "text status": "SENT",
+          "Employee UID": "S10374",
+          "Employee Full Name": "Christine Mitchell",
+          "Employee Email": "Christineleemitchell1972@gmail.com",
+          "Employee Phone (Mobile)": "204-887-6727",
+          "Client Full Name": "Peter Farkas",
+          "Client Address": "1247 Loudoun Rd",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 14:00:00",
+          "Visit Start Time of Day": "14:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "17:00",
+          "Visit End Time": "2026-06-10 17:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4088,
+          "text status": "SENT",
+          "Employee UID": "S9261",
+          "Employee Full Name": "Percival Layao",
+          "Employee Email": "percylayao@gmail.com",
+          "Employee Phone (Mobile)": "204-290-6377",
+          "Client Full Name": "(W) Thakur Persaud",
+          "Client Address": "18 Monaco Bay",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 15:00:00",
+          "Visit Start Time of Day": "15:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "22:00",
+          "Visit End Time": "2026-06-10 22:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4089,
+          "text status": "SENT",
+          "Employee UID": "S11243",
+          "Employee Full Name": "Shadia Abdelgalil",
+          "Employee Email": "Shadiaabdelgalil5@gmail.com",
+          "Employee Phone (Mobile)": "431-294- 1633",
+          "Client Full Name": "Irene Tetreault",
+          "Client Address": "703 - 50 Whellams Ln",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 15:00:00",
+          "Visit Start Time of Day": "15:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "23:00",
+          "Visit End Time": "2026-06-10 23:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4090,
+          "text status": "SENT",
+          "Employee UID": "S8780",
+          "Employee Full Name": "Jocelyn Lizardo",
+          "Employee Email": "j.gapit@live.com",
+          "Employee Phone (Mobile)": "431-998-6114",
+          "Client Full Name": "(W) St Boniface Home Care",
+          "Client Address": "",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 15:30:00",
+          "Visit Start Time of Day": "15:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "23:30",
+          "Visit End Time": "2026-06-10 23:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4091,
+          "text status": "SENT",
+          "Employee UID": "S9131",
+          "Employee Full Name": "Tedy M. Osan",
+          "Employee Email": "tedy_osan@yahoo.com.ph",
+          "Employee Phone (Mobile)": "204-881-7209",
+          "Client Full Name": "Richard Topolnicki",
+          "Client Address": "6645 Roblin Blvd (Unit #29)",
+          "Visit Scheduled Duration": 7,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 16:00:00",
+          "Visit Start Time of Day": "16:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "23:00",
+          "Visit End Time": "2026-06-10 23:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4092,
+          "text status": "SENT",
+          "Employee UID": "S10101",
+          "Employee Full Name": "Navneet Kaur",
+          "Employee Email": "Navneetrandhawa1109@gmail.com",
+          "Employee Phone (Mobile)": "431-278-8086",
+          "Client Full Name": "Shamim Peerwani",
+          "Client Address": "177 Victor Lewis Dr #6306",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 16:00:00",
+          "Visit Start Time of Day": "16:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "19:00",
+          "Visit End Time": "2026-06-10 19:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4093,
+          "text status": "SENT",
+          "Employee UID": "S9378",
+          "Employee Full Name": "Awo Osei-Assibey",
+          "Employee Email": "Awo_fs@yahoo.com",
+          "Employee Phone (Mobile)": "204-804-9951",
+          "Client Full Name": "Pauline Fidelak",
+          "Client Address": "920 Chancellor Dr (The Melody, #306)",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 16:30:00",
+          "Visit Start Time of Day": "16:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "19:30",
+          "Visit End Time": "2026-06-10 19:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4094,
+          "text status": "SENT",
+          "Employee UID": "S2813",
+          "Employee Full Name": "Taylor Dreger",
+          "Employee Email": "taylorashleydreger@gmail.com",
+          "Employee Phone (Mobile)": "431-997-3403",
+          "Client Full Name": "Patricia (Pat) McGarva",
+          "Client Address": "3161 Grant Avenue, Suite #226",
+          "Visit Scheduled Duration": 4,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 17:00:00",
+          "Visit Start Time of Day": "17:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "21:00",
+          "Visit End Time": "2026-06-10 21:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4095,
+          "text status": "SENT",
+          "Employee UID": "S10683",
+          "Employee Full Name": "Johann Einarson",
+          "Employee Email": "johanneinar1einarson@gmail.com",
+          "Employee Phone (Mobile)": 2046411993,
+          "Client Full Name": "Laurence Brownell",
+          "Client Address": "One Morley Ave - Wing A2 Second floor Room 16",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 17:30:00",
+          "Visit Start Time of Day": "17:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "20:30",
+          "Visit End Time": "2026-06-10 20:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4096,
+          "text status": "SENT",
+          "Employee UID": "S9799",
+          "Employee Full Name": "Shirly Slobodzian",
+          "Employee Email": "goodnightiloveyou25@gmail.com",
+          "Employee Phone (Mobile)": "204 557 9514",
+          "Client Full Name": "Georgina Sanford",
+          "Client Address": "455 Westwood Dr Unit #204",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 18:30:00",
+          "Visit Start Time of Day": "18:30",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "21:30",
+          "Visit End Time": "2026-06-10 21:30:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4097,
+          "text status": "SENT",
+          "Employee UID": "S8313",
+          "Employee Full Name": "Ursula Contreras",
+          "Employee Email": "ursulacontreras12345@gmail.com",
+          "Employee Phone (Mobile)": "431-778-5335",
+          "Client Full Name": "(W) Brian Kaleta",
+          "Client Address": "3189 Assiniboine Ave",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 19:00:00",
+          "Visit Start Time of Day": "19:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "22:00",
+          "Visit End Time": "2026-06-10 22:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4098,
+          "text status": "SENT",
+          "Employee UID": "S9061",
+          "Employee Full Name": "Hardip kaur Sidhu",
+          "Employee Email": "Hardipsidhu63@gmail.com",
+          "Employee Phone (Mobile)": "204-396-1181",
+          "Client Full Name": "(W) Janis Lukie",
+          "Client Address": "34 Maynard Close",
+          "Visit Scheduled Duration": 3,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 19:00:00",
+          "Visit Start Time of Day": "19:00",
+          "Visit End Date": "2026-06-10",
+          "Visit End Time of Day": "22:00",
+          "Visit End Time": "2026-06-10 22:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4099,
+          "text status": "SENT",
+          "Employee UID": "S11279",
+          "Employee Full Name": "Beti Mohamad",
+          "Employee Email": "mohamadbeti91@gmail.com",
+          "Employee Phone (Mobile)": "431-998-2443",
+          "Client Full Name": "Margaret Morgan",
+          "Client Address": "323 Wellington Crescent (Suite #1902)",
+          "Visit Scheduled Duration": 12,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 21:00:00",
+          "Visit Start Time of Day": "21:00",
+          "Visit End Date": "2026-06-11",
+          "Visit End Time of Day": "9:00",
+          "Visit End Time": "2026-06-11 09:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4100,
+          "text status": "SENT",
+          "Employee UID": "S10573",
+          "Employee Full Name": "Anuoluwa Abigail Gbabijo",
+          "Employee Email": "Anuoluwagbabijo2@gmail.com",
+          "Employee Phone (Mobile)": "(204) 807-6435",
+          "Client Full Name": "Patricia (Pat) McGarva",
+          "Client Address": "3161 Grant Avenue, Suite #226",
+          "Visit Scheduled Duration": 10,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 21:00:00",
+          "Visit Start Time of Day": "21:00",
+          "Visit End Date": "2026-06-11",
+          "Visit End Time of Day": "7:00",
+          "Visit End Time": "2026-06-11 07:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4101,
+          "text status": "SENT",
+          "Employee UID": "S5905",
+          "Employee Full Name": "Manpreet Kour",
+          "Employee Email": "mpreet35gg@gmail.com",
+          "Employee Phone (Mobile)": "1-807-357-6285",
+          "Client Full Name": "Irene Tetreault",
+          "Client Address": "703 - 50 Whellams Ln",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 23:00:00",
+          "Visit Start Time of Day": "23:00",
+          "Visit End Date": "2026-06-11",
+          "Visit End Time of Day": "7:00",
+          "Visit End Time": "2026-06-11 07:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4102,
+          "text status": "SENT",
+          "Employee UID": "S9801",
+          "Employee Full Name": "Nasser Sharif",
+          "Employee Email": "Nasser_sharif@hotmail.com",
+          "Employee Phone (Mobile)": "204-887-4865",
+          "Client Full Name": "Richard Topolnicki",
+          "Client Address": "6645 Roblin Blvd (Unit #29)",
+          "Visit Scheduled Duration": 8,
+          "Visit Start Date": "2026-06-10",
+          "Visit Start Time": "2026-06-10 23:00:00",
+          "Visit Start Time of Day": "23:00",
+          "Visit End Date": "2026-06-11",
+          "Visit End Time of Day": "7:00",
+          "Visit End Time": "2026-06-11 07:00:00"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "bf715cc4-674a-425a-946b-e05f1ff52360",
+  "activeVersionId": "bf715cc4-674a-425a-946b-e05f1ff52360",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-05T23:22:04.432Z",
+      "createdAt": "2026-05-05T23:22:04.432Z",
+      "role": "workflow:owner",
+      "workflowId": "tkBPXeynRo3M6Wbw",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-09T17:48:46.133Z",
+    "createdAt": "2026-06-09T17:48:31.175Z",
+    "versionId": "bf715cc4-674a-425a-946b-e05f1ff52360",
+    "workflowId": "tkBPXeynRo3M6Wbw",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -208,
+          96
+        ],
+        "id": "d935ae52-4262-4459-bd90-628db35ca65f",
+        "name": "Code in JavaScript3"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "SENT"
+              },
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          48,
+          0
+        ],
+        "id": "bd3c0f48-5ae3-46ad-944d-8b163446ac56",
+        "name": "Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          0
+        ],
+        "id": "7e6e6c07-821c-49a8-b19f-4532ae6bd8b8",
+        "name": "Code in JavaScript5"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message3",
+                "value": "={{ $json.message3 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          656,
+          0
+        ],
+        "id": "08995911-7787-40df-8d4a-7e66d0ce822f",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          880,
+          96
+        ],
+        "id": "2d937ce4-fd5b-4eac-a1bf-006c7a1839f9",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -432,
+          96
+        ],
+        "id": "df5adff2-b774-408e-bd05-1a3ee8852aea",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1104,
+          96
+        ],
+        "id": "7ca7a451-a0ad-4211-8a74-015c4f632a71",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI/edit#gid=1474171429"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Visit Start Date",
+                "lookupValue": "={{ $json.tomorrow }}"
+              },
+              {
+                "lookupColumn": "text status",
+                "lookupValue": "FAILED"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          32,
+          192
+        ],
+        "id": "6f9c3135-0d3b-420a-babc-de2e33eac183",
+        "name": "Get row(s) in sheet",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          192
+        ],
+        "id": "3326cfbd-134b-4e13-b6c8-287730300bd5",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message4",
+                "value": "={{ $json.message4 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          656,
+          192
+        ],
+        "id": "efb2369b-01e9-49a7-95e5-0ebd881dd3a9",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "jsCode": "const now = new Date();\nconst start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));\nconst end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 2, 0, 0, 0));\nconst pad = n => String(n).padStart(2, '0');\nconst dstr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;\nconst iso = d => `${dstr(d)}T00:00:00Z`;\nreturn [{ json: { tomorrow: dstr(start), tomorrowStart: iso(start), tomorrowEnd: iso(end) } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          1152
+        ],
+        "id": "d78fd5b7-2886-411c-ada4-314add9ceb3a",
+        "name": "Build tomorrow + bounds"
+      },
+      {
+        "parameters": {
+          "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message3: 'Number of shift reminder messages successfully sent: ' + n } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          688,
+          1056
+        ],
+        "id": "fb1e307c-1111-4c85-9a72-74463dc538d2",
+        "name": "Count sent"
+      },
+      {
+        "parameters": {
+          "jsCode": "const n = ($json.value || []).length;\nreturn [{ json: { message4: 'Number of shifts with failed messages: ' + n } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          688,
+          1248
+        ],
+        "id": "923e97d7-48b2-4bf4-b2d4-4107d6c6fcc9",
+        "name": "Count failed"
+      },
+      {
+        "parameters": {
+          "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "microsoftSharePointOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$filter",
+                "value": "=TextStatus eq 'SENT' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+              },
+              {
+                "name": "$top",
+                "value": "5000"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json;odata=nometadata"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          464,
+          1056
+        ],
+        "id": "c49afb21-fd60-4b19-bcc2-a181d88094c3",
+        "name": "Get SENT (SP API)1",
+        "credentials": {
+          "microsoftSharePointOAuth2Api": {
+            "id": "rLiUei4DCQhgbGrV",
+            "name": "RAF Microsoft SharePoint account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "microsoftSharePointOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$filter",
+                "value": "=TextStatus eq 'FAILED' and VisitStartDate ge datetime'{{$json.tomorrowStart}}' and VisitStartDate lt datetime'{{$json.tomorrowEnd}}'"
+              },
+              {
+                "name": "$top",
+                "value": "5000"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json;odata=nometadata"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          464,
+          1248
+        ],
+        "id": "00b1ccdb-e871-477e-9070-ebeb720a6cb7",
+        "name": "Get FAILED (SP API)1",
+        "credentials": {
+          "microsoftSharePointOAuth2Api": {
+            "id": "rLiUei4DCQhgbGrV",
+            "name": "RAF Microsoft SharePoint account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          912,
+          1152
+        ],
+        "id": "f49ebbe0-f94c-4f15-b935-f713d8665b64",
+        "name": "Merge1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1136,
+          1152
+        ],
+        "id": "cc9392b3-f023-4b72-8546-efbc476e45bd",
+        "name": "No Operation, do nothing1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get tomorrow's date\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Format as yyyy-mm-dd\nconst yyyy = tomorrow.getFullYear();\nconst mm = String(tomorrow.getMonth() + 1).padStart(2, '0');\nconst dd = String(tomorrow.getDate()).padStart(2, '0');\nconst formattedDate = `${yyyy}-${mm}-${dd}`;\n\n// Return as a single item (required by n8n)\nreturn [\n  {\n    json: {\n      tomorrow: formattedDate\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          304,
+          592
+        ],
+        "id": "f7f554db-fa60-434d-a154-c85c2d07ff11",
+        "name": "Code in JavaScript4"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all input items from the previous node (Google Sheets)\nconst allRows = $input.all();\n\n// Count the number of rows\nconst rowCount = allRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount3: rowCount,\n      message3: `Number of shifts messages successfull sent for: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          944,
+          496
+        ],
+        "id": "dee62e87-b627-409c-988c-e7bae5247ee6",
+        "name": "Code in JavaScript6"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message3",
+                "value": "={{ $json.message3 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1168,
+          496
+        ],
+        "id": "0bd3fa79-14c5-49f2-be84-738510c4428c",
+        "name": "Edit Fields3"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          1392,
+          592
+        ],
+        "id": "5c243c1d-8123-4d96-8275-0f73600958e8",
+        "name": "Merge2"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1616,
+          592
+        ],
+        "id": "20d9a8c2-a7b8-43ad-8c25-0888f189d461",
+        "name": "No Operation, do nothing2"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\n// Count only items that actually contain data\nconst realRows = allItems.filter(item =>\n  item.json &&\n  Object.keys(item.json).length > 0\n);\n\nconst rowCount = realRows.length;\n\nreturn [\n  {\n    json: {\n      rowCount4: rowCount,\n      message4: `Number of shifts with failed messages: ${rowCount}`\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          944,
+          688
+        ],
+        "id": "fcaebe57-8044-4bc8-894f-378d45cf927e",
+        "name": "Code in JavaScript7"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5fb23ad8-9b75-40d6-80eb-81a0a16a915d",
+                "name": "message4",
+                "value": "={{ $json.message4 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1168,
+          688
+        ],
+        "id": "a0801560-0fa6-4c5c-ab74-1e8229959c93",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'SENT' and VisitStartDate eq '{{$json.tomorrow}}'",
+          "options": {}
+        },
+        "id": "a865ad52-9074-44f0-94bf-c05e13ffdcbb",
+        "name": "Get SENT (SP API)2",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          544,
+          496
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://netorg10246608.sharepoint.com/sites/RAH/_api/web/lists/GetByTitle('Caregiver Shift Reminder')/items?$filter=TextStatus eq 'FAILED' and VisitStartDate eq '{{$json.tomorrow}}'",
+          "options": {}
+        },
+        "id": "ba56b66f-2a55-4b66-b9b0-213a09ae0c0f",
+        "name": "Get FAILED (SP API)2",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          544,
+          688
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          752,
+          496
+        ],
+        "id": "c9f9d507-8cac-491b-b172-1d44ade2e6e4",
+        "name": "Code in JavaScript8"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $json.d.results.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          752,
+          688
+        ],
+        "id": "54bd387b-384c-4bf6-9a1d-e51e5fe01994",
+        "name": "Code in JavaScript9"
+      }
+    ],
+    "connections": {
+      "Code in JavaScript3": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get row(s) in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript5": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Build tomorrow + bounds": {
+        "main": [
+          [
+            {
+              "node": "Get SENT (SP API)1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get FAILED (SP API)1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Count sent": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Count failed": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Get SENT (SP API)1": {
+        "main": [
+          [
+            {
+              "node": "Count sent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get FAILED (SP API)1": {
+        "main": [
+          [
+            {
+              "node": "Count failed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge1": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript4": {
+        "main": [
+          [
+            {
+              "node": "Get SENT (SP API)2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get FAILED (SP API)2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript6": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields3": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge2": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript7": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Get SENT (SP API)2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript8",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get FAILED (SP API)2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript9",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript8": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript9": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version bf715cc4",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
