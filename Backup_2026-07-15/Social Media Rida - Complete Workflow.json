@@ -1,0 +1,4601 @@
+{
+  "updatedAt": "2026-05-09T15:47:56.670Z",
+  "createdAt": "2026-05-03T21:46:01.832Z",
+  "id": "YubKY5KOcRKeXrfk",
+  "name": "Social Media Rida - Complete Workflow",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        736
+      ],
+      "id": "5d13d3b1-9294-4a0e-8c85-21d656bd3d10",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "qRR4vWsInqKRmVUL",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/qRR4vWsInqKRmVUL",
+          "cachedResultName": "Social Media Rida Subworkflows - Weekly Topic Generation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $json['Readable date'] }}"
+          },
+          "matchingColumns": [
+            "date"
+          ],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        736
+      ],
+      "id": "46c61037-b0ab-46e8-9b8c-11ac7fee3367",
+      "name": "Call 'Social Media Rida Subworkflows - Weekly Topic Generation'"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        1424
+      ],
+      "id": "0d803106-f87b-41a5-976f-a423afb079a4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        1040
+      ],
+      "id": "652632e1-51ea-4bdd-b1d3-9580dbe858eb",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are an information extraction assistant for event and observance calendars.\n\nYou will receive input text through this variable:\n{{ $json.calendar }}\n\nExample input:\nCalendar: November 6, November 7, November 8, November 9, November 10, November 11, November 12, 2025\n\nEvents and observances within this date range:\n- November 1–7: Canadian Patient Safety Week\n- November 7: Inuit Day\n- November 8: Indigenous Veterans Day\n- November (month-long): Lung Cancer Awareness Month, Fall Prevention Month, Diabetes Awareness Month\n\nSuggested focus for Right at Home Winnipeg:\nThe most suitable observance for seniors, caregivers, and community health in this week is **Canadian Patient Safety Week (Nov 1–7)**. This aligns well with promoting safe healthcare practices and raising awareness about patient safety, which is critical for seniors and those who support them. Additionally, the ongoing **Fall Prevention Month** and **Diabetes Awareness Month** are relevant themes to integrate into educational materials or activities throughout the week.\n\nYour task:\n1. Extract and structure the observance or event information into the following variables:\n   - Topic\n   - Type\n   - Resources/Links\n   - Please specify what kind of resource this is\n   - Inspo/Links\n   - Any additional notes or information\n\n2. Always set **Type** to “Calendar Day”.\n\n3. If multiple observances are mentioned, choose **one** that is most relevant to the provided text (usually the one explicitly highlighted or described in more detail).\n\n4. For **Resources/Links**:\n   - Include any links found in the text.\n   - Separate multiple links with “; ”.\n\n5. For **Please specify what kind of resource this is**:\n   - If any link contains “rightathomecanada.com/winnipeg”, classify as “Company”.\n   - All others default to “External”, unless explicitly stated otherwise.\n\n6. Include additional context, relevance, or reasoning under **Any additional notes or information**.\n\n7. If no data exists for a variable, leave it blank (do not write “N/A”).\n\nExample output:\nTopic: Canadian Patient Safety Week  \nType: Calendar Day  \nResources/Links:  \nPlease specify what kind of resource this is: External  \nInspo/Links:  \nAny additional notes or information: Focuses on promoting safe healthcare practices for seniors and caregivers; aligns with awareness for Fall Prevention Month and Diabetes Awareness Month.",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Topic",
+              "description": "The main focus, theme, or event identified in the text.",
+              "required": true
+            },
+            {
+              "name": "Type",
+              "description": "The classification of the entry. Default is “Calendar Day”.",
+              "required": true
+            },
+            {
+              "name": "Resources/Links",
+              "description": "URLs or main resource links. Separate multiple with “; ”."
+            },
+            {
+              "name": "Please specify what kind of resource this is",
+              "description": "Classify based on the link: “Company” if it contains “rightathomecanada.com/winnipeg”; otherwise “External” unless explicitly specified."
+            },
+            {
+              "name": "Inspo/Links",
+              "description": "Links for inspiration, reference, or similar campaigns (if any). Separate with “; ”."
+            },
+            {
+              "name": "Any additional notes or information",
+              "description": "Any extra context, ideas, or background info related to the entry."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        880
+      ],
+      "id": "91f4f278-b343-442a-8d89-659c39f27937",
+      "name": "Calendar Information Extractor1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 876787574,
+          "mode": "list",
+          "cachedResultName": "automated topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date range": "={{ $('Call \\'Social Media Rida Subworkflows - Weekly Topic Generation\\'').item.json.week }}",
+            "context": "={{ $json.context }}",
+            "Topic": "={{ $json.output.Topic }}",
+            "Type": "={{ $json.output.Type }}",
+            "Resources/Links": "={{ $json.output['Resources/Links'] }}",
+            "Resource Type": "={{ $json.output['Please specify what kind of resource this is'] }}",
+            "Inspo/Links": "={{ $json.output['Inspo/Links'] }}",
+            "Any additional notes or information": "={{ $json.output['Any additional notes or information'] }}",
+            "status": "pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date range",
+              "displayName": "date range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "context",
+              "displayName": "context",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Resources/Links",
+              "displayName": "Resources/Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Resource Type",
+              "displayName": "Resource Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inspo/Links",
+              "displayName": "Inspo/Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Any additional notes or information",
+              "displayName": "Any additional notes or information",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "post text",
+              "displayName": "post text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image link",
+              "displayName": "image link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "when to post - date (mm/dd/yyyy)",
+              "displayName": "when to post - date (mm/dd/yyyy)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "when to post - time (ex: 17:30)",
+              "displayName": "when to post - time (ex: 17:30)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        704,
+        720
+      ],
+      "id": "445a735b-0dfe-4aac-8f69-d75a853cbc6a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        256,
+        512
+      ],
+      "id": "40ad879e-0ea3-402a-b530-c57984be6407",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+              "name": "context",
+              "value": "={{ $json.marketing2 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        416
+      ],
+      "id": "2d8463a2-fe2f-42cc-9488-980704128748",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+              "name": "context",
+              "value": "={{ $json.calendar }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        1072
+      ],
+      "id": "76bcb616-bcd4-44b5-a24d-61102a014f7b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        496,
+        720
+      ],
+      "id": "ac8f13c5-bf69-4979-b756-e4251c05b921",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        240,
+        960
+      ],
+      "id": "9db49845-abf8-4acc-9858-7d1e6cc61dda",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 876787574,
+          "mode": "list",
+          "cachedResultName": "automated topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date range",
+              "lookupValue": "={{ $('Append row in sheet').item.json['date range'] }}"
+            },
+            {
+              "lookupColumn": "Topic",
+              "lookupValue": "={{ $json.Topic }}"
+            },
+            {
+              "lookupColumn": "context",
+              "lookupValue": "={{ $json.context }}"
+            },
+            {
+              "lookupColumn": "Type",
+              "lookupValue": "={{ $json.Type }}"
+            },
+            {
+              "lookupColumn": "Resources/Links",
+              "lookupValue": "={{ $json['Resources/Links'] }}"
+            },
+            {
+              "lookupColumn": "Resource Type",
+              "lookupValue": "={{ $json['Resource Type'] }}"
+            },
+            {
+              "lookupColumn": "Inspo/Links",
+              "lookupValue": "={{ $json['Inspo/Links'] }}"
+            },
+            {
+              "lookupColumn": "Any additional notes or information",
+              "lookupValue": "={{ $json['Any additional notes or information'] }}"
+            },
+            {
+              "lookupColumn": "status",
+              "lookupValue": "={{ $json.status }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        720
+      ],
+      "id": "81c2d5e5-22e6-4f43-8028-cf21c0b52143",
+      "name": "Get row(s) in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 876787574,
+          "mode": "list",
+          "cachedResultName": "automated topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "post text": "={{ $json.output.postText }}",
+            "image link": "={{ $json.image }}",
+            "status": "Awaiting Approval"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "date range",
+              "displayName": "date range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "context",
+              "displayName": "context",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Resources/Links",
+              "displayName": "Resources/Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Resource Type",
+              "displayName": "Resource Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Inspo/Links",
+              "displayName": "Inspo/Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Any additional notes or information",
+              "displayName": "Any additional notes or information",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post text",
+              "displayName": "post text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image link",
+              "displayName": "image link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "when to post - date (mm/dd/yyyy)",
+              "displayName": "when to post - date (mm/dd/yyyy)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "when to post - time (ex: 17:30)",
+              "displayName": "when to post - time (ex: 17:30)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3808,
+        704
+      ],
+      "id": "bbcc0d4f-33f4-42ae-afb5-9eb07468b54e",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nQSYaOOxx2BSUYPe",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nQSYaOOxx2BSUYPe",
+          "cachedResultName": "Social Media Rida Subworkflows - Post Generation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1632,
+        704
+      ],
+      "id": "2055fb8b-103a-4162-b3e0-e1d41107a2ec",
+      "name": "Call 'Social Media Rida Subworkflows - Post Generation'"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        720
+      ],
+      "id": "115ae28b-99e6-49e8-a1f3-aac7a93c40dc",
+      "name": "Wait",
+      "webhookId": "e60bac28-319e-4929-ab34-5a00de2cb0b3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        688
+      ],
+      "id": "1cca105a-1985-41f7-83e6-1c848619fb32",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a detailed image-generation prompt for a social media photo based on the following post text and goal:\nPost Text: {{ $json.output.postText }}\n\nPost Goal: {{ $json.output.postGoal }}\n_____________________\nThe prompt should:\n- Follow the system guidelines.\n- Reflect the theme of the post clearly.\n- Ensure caregivers (if shown) wear teal scrubs with the Right at Home logo.",
+        "options": {
+          "systemMessage": "You are an AI assistant that creates detailed, high-quality prompts for an image generation model. These prompts will be used to design social media photos for Right at Home Winnipeg. Follow these guidelines:\n\n1. **Brand Identity**\n   - If caregivers are shown, they must wear teal scrubs with the Right at Home logo.\n\n2. **Prompt Structure**\n   - Begin with the overall theme and mood (e.g., festive, informative, awareness).\n\n3. **Tone and Style**\n   - Compassionate, trustworthy, and community-focused.\n   - Avoid clutter; keep visuals simple yet eye-catching.\n   - Use realistic photography or stylized illustrations that feel authentic.\n\n4. **Image Composition**\n   - Photos should show depict seniors/older adults in different scenarios to match the text of the corresponding post. (examples (not limited to): older adults struggling to conduct daily tasks themselves, right at home caregiver(s) supporting older adults, older adults enjoying themselves looking happy, older adults depicted in a heartfelt scene interacting with family and loved ones, right at home caregiver talking to a family with older adults, older adult sneezing to promote caution around flu season, etc)\n\nYour output should be a single, detailed prompt that an image generation model can use directly to create the visual."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        2080,
+        848
+      ],
+      "id": "9f5a40b2-3ecb-4667-a4b4-abace1ca918c",
+      "name": "great photo, visual needs work"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2032,
+        1040
+      ],
+      "id": "126c4236-79d9-4a59-a276-17c4f682039c",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2640,
+        784
+      ],
+      "id": "536f7dc8-a9a3-4595-a468-723bd2701f2f",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node\n// Merges all incoming items into a single item\n\nconst merged = {};\n\nfor (const item of $input.all()) {\n  Object.assign(merged, item.json);\n}\n\nreturn [\n  {\n    json: merged\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        784
+      ],
+      "id": "3facbfcd-3a97-498a-93a6-10b06562be09",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3472,
+        704
+      ],
+      "id": "e1484124-0ce7-49a4-b707-6fa77674d903",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node\n// Merges all incoming items into a single item\n\nconst merged = {};\n\nfor (const item of $input.all()) {\n  Object.assign(merged, item.json);\n}\n\nreturn [\n  {\n    json: merged\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3648,
+        704
+      ],
+      "id": "3e79815a-a6c3-430c-9df6-401f4c7618fd",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "khaharnQFAyotlXS",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/khaharnQFAyotlXS",
+          "cachedResultName": "Social Media Rida Subworkflows - Image Generation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "prompt": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "prompt"
+          ],
+          "schema": [
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2432,
+        848
+      ],
+      "id": "88c4c130-c5b2-45bc-bc7c-749c7892424d",
+      "name": "Call 'Social Media Rida Subworkflows - Image Generation'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "9Df0DDtlvoejwdgG",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9Df0DDtlvoejwdgG",
+          "cachedResultName": "Social Media Rida Subworkflows - Post Visual Generation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3264,
+        784
+      ],
+      "id": "00b1814f-f861-4eed-ae00-9252f64f3f4c",
+      "name": "Call 'Social Media Rida Subworkflows - Post Visual Generation'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5adf71a-f23b-4e5e-886b-431fc9ff232f",
+              "name": "Image Prompt",
+              "value": "=Create a high-quality, professional ‘Canva-style’ Instagram post (square 1080×1080 px) that uses the provided photo as the hero image and the provided company logo as the brand mark. Do not edit, retouch, crop, recolor, filter, or otherwise change the photo or the logo in any way.\nThis image is to accompany the following post: {{ $json.output.postText }}\n\nInclude the company name Right At Home Winnipeg, phone (204) 318-5554, and website rightathomecanada.com/winnipeg in a clear footer or badge near the logo; ensure legibility at mobile size. Use soft warm neutrals with one subtle accent, rounded sans-serif type, generous negative space, and an optional small CTA pill only if it doesn’t clutter the layout. If needed for legibility, place a low-opacity translucent panel behind text — do not change the photo’s colors.\nConstraints: no extra logos or watermarks, no generated logo replacements, no long paragraphs of text, and no edits to faces or the photo.\nDeliverables: 1080×1080 PNG (high quality), mobile-safe crop preview (center ±10%), and one-line alt-text suggestion.",
+              "type": "string"
+            },
+            {
+              "id": "231ac13a-b16c-4ccb-b182-34dee878c2bd",
+              "name": "Image 1",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "a0a3ac17-907a-4b45-8849-e9b0e3753641",
+              "name": "Image 2",
+              "value": "https://i.ibb.co/7d0jv7T5/logo-canada.png",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3056,
+        784
+      ],
+      "id": "b524e26e-4229-4db8-9170-d68092989648",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['image link'] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "1d9d9c8d-18ea-4d3e-8d3b-8d987e178962",
+      "name": "Download Temp Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        1712
+      ],
+      "notesInFlow": true,
+      "notes": "Gets binary from temp URL"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 876787574,
+          "mode": "list",
+          "cachedResultName": "automated topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post text": "={{ $json.row_number }}",
+            "status": "={{ $json.status }} (facebook_post_id: {{ $json.facebook_post_id }} | instagram_post_id: {{ $json.instagram_post_id }})"
+          },
+          "matchingColumns": [
+            "post text"
+          ],
+          "schema": [
+            {
+              "id": "date range",
+              "displayName": "date range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "context",
+              "displayName": "context",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Resources/Links",
+              "displayName": "Resources/Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Resource Type",
+              "displayName": "Resource Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Inspo/Links",
+              "displayName": "Inspo/Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Any additional notes or information",
+              "displayName": "Any additional notes or information",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post text",
+              "displayName": "post text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image link",
+              "displayName": "image link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "when to post - date (mm/dd/yyyy)",
+              "displayName": "when to post - date (mm/dd/yyyy)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "when to post - time (ex: 17:30)",
+              "displayName": "when to post - time (ex: 17:30)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "15ea0fbc-9e7e-47fb-8e1e-8808b5d2e1ab",
+      "name": "Update Sheet - Posted",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3008,
+        1360
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1411457215666535/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "EAAbeWpvhl1QBRR1dPEuehLuL0eZAIJCIaTHdpH7BYsy2ssY9VQYtIvNxVO0u6NgCu9VOX8WeUKQG7UZALOA7ksTHznuRGgp9F9ESs2coOzMnH3JNiOZBmF5OmiB0QFWrx9VxvxJGVgjAUXlVjwZAC9mhJnzMMmQbjatSjxvvPiuqYqct5yWHDu20mIQr3tSSMZB2KOrypAQfJkbBZCIZBJcCQZDZD"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json['post text'] }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json['image link'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "11756680-0af4-47ff-9ecd-ee63457805bd",
+      "name": "Post to Facebook (Binary Upload)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        1488
+      ],
+      "notesInFlow": true,
+      "notes": "Uploads binary directly - no URL needed!"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        1568
+      ],
+      "id": "36498232-7bf4-46fd-9c7b-5512ebebc563",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+          "mode": "list",
+          "cachedResultName": "RAH social media posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 876787574,
+          "mode": "list",
+          "cachedResultName": "automated topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "Approved"
+            },
+            {
+              "lookupColumn": "when to post - date (mm/dd/yyyy)",
+              "lookupValue": "={{ new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }}"
+            },
+            {
+              "lookupColumn": "when to post - time (ex: 17:30)",
+              "lookupValue": "={{ (() => { const d = new Date(); return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); })() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        704,
+        1568
+      ],
+      "id": "353ce692-5595-465b-9f0a-bf3eae783c2f",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        320
+      ],
+      "id": "2092c144-161f-4837-9277-5904c9233a7c",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        256,
+        96
+      ],
+      "id": "e10a2052-01ba-4c3f-8c69-ffbf7dd50cb9",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+              "name": "context",
+              "value": "={{ $json.marketing1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5e41dc4a-d652-4a1b-b864-586246799e84",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+              "name": "context",
+              "value": "={{ $json.resource }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        1440
+      ],
+      "id": "76d78958-bca4-4569-9879-af638224a866",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        240,
+        1328
+      ],
+      "id": "8b5d9605-47f8-4146-be81-b5b8aee6be81",
+      "name": "Merge6"
+    },
+    {
+      "parameters": {
+        "text": "=You are an information extraction assistant for marketing planning.\n\nYou will receive input text through this variable:\n{{ $json.marketing1 }}\n\nExample input:\nMarketing: Week of November 6 to November 12, 2025  \nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nURL: https://www.rightathomecanada.com/winnipeg/services/in-home-care/\n\nYour task:\n1. Extract and structure the marketing information into the following variables:\n   - Topic\n   - Type\n   - Resources/Links\n   - Please specify what kind of resource this is\n   - Inspo/Links\n   - Any additional notes or information\n\n2. Always set **Type** to “Marketing/Promotion”.\n\n3. If multiple potential topics are mentioned, choose **one** that best fits the main marketing focus or subject.\n\n4. For **Resources/Links**:\n   - Extract any URLs found in the text.\n   - Separate multiple links with “; ”.\n\n5. For **Please specify what kind of resource this is**:\n   - If the URL contains “rightathomecanada.com/winnipeg”, classify it as “Company”.\n   - Otherwise, classify it as “External”, unless the text explicitly states otherwise.\n\n6. Place any extra context, explanation, or notes under **Any additional notes or information**.\n\n7. If no data exists for a variable, leave it blank (do not write “N/A”).\n\nExample output:\nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nType: Marketing/Promotion  \nResources/Links: https://www.rightathomecanada.com/winnipeg/services/in-home-care/  \nPlease specify what kind of resource this is: Company  \nInspo/Links:  \nAny additional notes or information: Weekly marketing content focused on promoting senior care services tailored for Winnipeg clients.",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Topic",
+              "description": "The main focus, theme, or event identified in the text.",
+              "required": true
+            },
+            {
+              "name": "Type",
+              "description": "The classification of the entry. Default is “Marketing/Promotion”.",
+              "required": true
+            },
+            {
+              "name": "Resources/Links",
+              "description": "URLs or main resource links. Separate multiple with “; ”."
+            },
+            {
+              "name": "Please specify what kind of resource this is",
+              "description": "Classify based on the link: “Company” if it contains “rightathomecanada.com/winnipeg”; otherwise “External” unless explicitly specified."
+            },
+            {
+              "name": "Inspo/Links",
+              "description": "Links for inspiration, reference, or similar campaigns (if any). Separate with “; ”."
+            },
+            {
+              "name": "Any additional notes or information",
+              "description": "Any extra context, ideas, or background info related to the entry."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        160
+      ],
+      "id": "1700476c-88a9-4203-94d8-2d641b5ee822",
+      "name": "Marketing1 Information Extractor"
+    },
+    {
+      "parameters": {
+        "text": "=You are an information extraction assistant for company resource planning.\n\nYou will receive input text through this variable:\n{{ $json.resource }}\n\nExample input:\nWeek of\nTopic: Understanding Parkinson’s Disease: Essential Care Tips for Families and Caregivers\nURL: https://www.rightathomecanada.com/winnipeg/resources/understanding-parkinsons-disease-care-tips/\n\nYour task:\n\nExtract and structure the resource information into the following variables:\n\nTopic\n\nType\n\nResources/Links\n\nPlease specify what kind of resource this is\n\nInspo/Links\n\nAny additional notes or information\n\nAlways set Type to “Company Resource”.\n\nUse the Topic line as the primary subject. If multiple topics appear, select the clearest main one.\n\nFor Resources/Links:\n\nExtract any URLs found in the text.\n\nSeparate multiple links with “; ”.\n\nFor Please specify what kind of resource this is:\n\nIf the URL includes /resources/, classify it as “Educational / Blog”.\n\nIf the URL includes /guides/ or downloadable content, classify it as “Guide”.\n\nOtherwise, classify it as “Company Resource”.\n\nFor Inspo/Links:\n\nLeave blank unless the text explicitly references inspiration sources or related materials.\n\nPlace any extra context, seasonal relevance, or usage ideas under Any additional notes or information.\n\nIf no data exists for a variable, leave it blank (do not write “N/A”).\n\nOutput only the extracted fields, each on its own line, matching the variable names exactly.",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Topic",
+              "description": "The main educational theme or subject of the company resource.",
+              "required": true
+            },
+            {
+              "name": "Type",
+              "description": "The classification of the entry. Always “Company Resource”.",
+              "required": true
+            },
+            {
+              "name": "Resources/Links",
+              "description": "Direct URL(s) to the resource. Separate multiple links with “; ”."
+            },
+            {
+              "name": "Please specify what kind of resource this is",
+              "description": "The format of the resource (e.g., Educational / Blog, Guide, Company Resource)."
+            },
+            {
+              "name": "Inspo/Links",
+              "description": "Optional inspiration or related reference links, if explicitly mentioned."
+            },
+            {
+              "name": "Any additional notes or information",
+              "description": "Extra context such as intended audience, caregiver focus, or seasonal relevance."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        1264
+      ],
+      "id": "121893f6-39fd-4040-a788-8f5517ee1a4d",
+      "name": "Resource Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        736
+      ],
+      "id": "11781216-d23f-490f-975e-00c29cb73f1b",
+      "name": "OpenAI Chat Model8",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are an information extraction assistant for marketing planning.\n\nYou will receive input text through this variable:\n{{ $json.marketing2 }}\n\nExample input:\nMarketing: Week of November 6 to November 12, 2025  \nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nURL: https://www.rightathomecanada.com/winnipeg/services/in-home-care/\n\nYour task:\n1. Extract and structure the marketing information into the following variables:\n   - Topic\n   - Type\n   - Resources/Links\n   - Please specify what kind of resource this is\n   - Inspo/Links\n   - Any additional notes or information\n\n2. Always set **Type** to “Marketing/Promotion”.\n\n3. If multiple potential topics are mentioned, choose **one** that best fits the main marketing focus or subject.\n\n4. For **Resources/Links**:\n   - Extract any URLs found in the text.\n   - Separate multiple links with “; ”.\n\n5. For **Please specify what kind of resource this is**:\n   - If the URL contains “rightathomecanada.com/winnipeg”, classify it as “Company”.\n   - Otherwise, classify it as “External”, unless the text explicitly states otherwise.\n\n6. Place any extra context, explanation, or notes under **Any additional notes or information**.\n\n7. If no data exists for a variable, leave it blank (do not write “N/A”).\n\nExample output:\nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nType: Marketing/Promotion  \nResources/Links: https://www.rightathomecanada.com/winnipeg/services/in-home-care/  \nPlease specify what kind of resource this is: Company  \nInspo/Links:  \nAny additional notes or information: Weekly marketing content focused on promoting senior care services tailored for Winnipeg clients.",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Topic",
+              "description": "The main focus, theme, or event identified in the text.",
+              "required": true
+            },
+            {
+              "name": "Type",
+              "description": "The classification of the entry. Default is “Marketing/Promotion”.",
+              "required": true
+            },
+            {
+              "name": "Resources/Links",
+              "description": "URLs or main resource links. Separate multiple with “; ”."
+            },
+            {
+              "name": "Please specify what kind of resource this is",
+              "description": "Classify based on the link: “Company” if it contains “rightathomecanada.com/winnipeg”; otherwise “External” unless explicitly specified."
+            },
+            {
+              "name": "Inspo/Links",
+              "description": "Links for inspiration, reference, or similar campaigns (if any). Separate with “; ”."
+            },
+            {
+              "name": "Any additional notes or information",
+              "description": "Any extra context, ideas, or background info related to the entry."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        576
+      ],
+      "id": "c34800f4-8de1-4172-b0d6-1e158a099f91",
+      "name": "Marketing2 Information Extractor"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        464
+      ],
+      "id": "cefed4f8-12d9-4d20-b945-f59d712de1b1",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0/17841413927220859/media",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "caption",
+              "value": "={{ $json['post text'] }}"
+            },
+            {
+              "name": "image_url",
+              "value": "={{ $json['image link'] }}"
+            },
+            {
+              "name": "access_token",
+              "value": "EAAbeWpvhl1QBRR1dPEuehLuL0eZAIJCIaTHdpH7BYsy2ssY9VQYtIvNxVO0u6NgCu9VOX8WeUKQG7UZALOA7ksTHznuRGgp9F9ESs2coOzMnH3JNiOZBmF5OmiB0QFWrx9VxvxJGVgjAUXlVjwZAC9mhJnzMMmQbjatSjxvvPiuqYqct5yWHDu20mIQr3tSSMZB2KOrypAQfJkbBZCIZBJcCQZDZD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ebe23cbe-0f8d-4e18-a931-fe9345f6a5d6",
+      "name": "Post to Instagram (ImageUrl Upload)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2112,
+        1728
+      ],
+      "notesInFlow": true,
+      "notes": "Uploads binary directly - no URL needed!"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0/17841413927220859/media_publish",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "EAAbeWpvhl1QBRR1dPEuehLuL0eZAIJCIaTHdpH7BYsy2ssY9VQYtIvNxVO0u6NgCu9VOX8WeUKQG7UZALOA7ksTHznuRGgp9F9ESs2coOzMnH3JNiOZBmF5OmiB0QFWrx9VxvxJGVgjAUXlVjwZAC9mhJnzMMmQbjatSjxvvPiuqYqct5yWHDu20mIQr3tSSMZB2KOrypAQfJkbBZCIZBJcCQZDZD"
+            },
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a0686752-ca33-41d1-af51-ec038b97a3ce",
+      "name": "Post to Instagram (ImageUrl Upload)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2352,
+        1696
+      ],
+      "notesInFlow": true,
+      "notes": "Uploads binary directly - no URL needed!"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2512,
+        1376
+      ],
+      "id": "55160930-b3ce-4b99-b06a-990cbcc638d7",
+      "name": "Merge14"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1680,
+        1616
+      ],
+      "id": "c6d4e5f7-95dc-4d51-b042-788001ecee78",
+      "name": "Merge15"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\nconst originalData = allItems[0].json;\nconst fileUUID = allItems[1].json.file;\n\nreturn {\n  json: {\n    ...originalData,\n    \"image link\": `https://qtlvukgz39.ucarecd.net/${fileUUID}/-/format/jpeg/image.jpg`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        1744
+      ],
+      "id": "c7eaed23-ecea-46e2-9253-94233b96299c",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://upload.uploadcare.com/base/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "UPLOADCARE_PUB_KEY",
+              "value": "3fed1ec23aba005141f7"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1440,
+        1712
+      ],
+      "id": "233d4af8-ccf5-454a-8ddd-c22917978d25",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\n\nconst originalData = allItems[0].json;\nconst facebookPost = allItems[1].json;\nconst instagramPost = allItems[2].json;\n\n// Check both posts succeeded\nconst facebookSuccess = facebookPost.post_id !== undefined;\nconst instagramSuccess = instagramPost.id !== undefined && facebookPost.post_id === undefined ? false : instagramPost.id !== undefined;\n\n// Facebook has both id and post_id, Instagram only has id\nconst bothSucceeded = facebookPost.post_id !== undefined && instagramPost.id !== undefined;\n\nif (!bothSucceeded) {\n  throw new Error(`Posting failed! Facebook: ${facebookSuccess ? 'OK' : 'FAILED'}, Instagram: ${instagramSuccess ? 'OK' : 'FAILED'}`);\n}\n\nreturn {\n  json: {\n    row_number: originalData.row_number,\n    facebook_post_id: facebookPost.post_id,\n    instagram_post_id: instagramPost.id,\n    status: \"posted successfully\"\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        1376
+      ],
+      "id": "dd911633-49db-41c4-ad57-2fa10103ad66",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 1080,
+        "height": 1080,
+        "options": {
+          "format": "jpeg"
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        1712
+      ],
+      "id": "2f752a95-6e2f-4a19-aa57-9531f04974de",
+      "name": "Edit Image"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'Social Media Rida Subworkflows - Weekly Topic Generation'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Social Media Rida Subworkflows - Weekly Topic Generation'": {
+      "main": [
+        [
+          {
+            "node": "Calendar Information Extractor1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marketing1 Information Extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resource Information Extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marketing2 Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resource Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Social Media Rida Subworkflows - Post Generation'": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "great photo, visual needs work",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Social Media Rida Subworkflows - Post Generation'",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "great photo, visual needs work",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "great photo, visual needs work": {
+      "main": [
+        [
+          {
+            "node": "Call 'Social Media Rida Subworkflows - Image Generation'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Social Media Rida Subworkflows - Image Generation'": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call 'Social Media Rida Subworkflows - Post Visual Generation'": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Call 'Social Media Rida Subworkflows - Post Visual Generation'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Temp Image": {
+      "main": [
+        [
+          {
+            "node": "Edit Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook (Binary Upload)": {
+      "main": [
+        [
+          {
+            "node": "Merge14",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Download Temp Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge15",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Marketing1 Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge6": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Marketing1 Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Resource Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Marketing2 Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing2 Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Post to Instagram (ImageUrl Upload)": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram (ImageUrl Upload)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge14": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Instagram (ImageUrl Upload)1": {
+      "main": [
+        [
+          {
+            "node": "Merge14",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge15": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram (ImageUrl Upload)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Facebook (Binary Upload)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Merge15",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet - Posted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Image": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    },
+    "node:Schedule Trigger2": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5bd2c478-e3cc-4a5c-bab0-09c00eafc654",
+  "activeVersionId": "5bd2c478-e3cc-4a5c-bab0-09c00eafc654",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T21:46:01.832Z",
+      "createdAt": "2026-05-03T21:46:01.832Z",
+      "role": "workflow:owner",
+      "workflowId": "YubKY5KOcRKeXrfk",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-09T15:47:59.377Z",
+    "createdAt": "2026-05-09T15:47:17.722Z",
+    "versionId": "5bd2c478-e3cc-4a5c-bab0-09c00eafc654",
+    "workflowId": "YubKY5KOcRKeXrfk",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "triggerAtHour": 9
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -528,
+          736
+        ],
+        "id": "5d13d3b1-9294-4a0e-8c85-21d656bd3d10",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "qRR4vWsInqKRmVUL",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/qRR4vWsInqKRmVUL",
+            "cachedResultName": "Social Media Rida Subworkflows - Weekly Topic Generation"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "date": "={{ $json['Readable date'] }}"
+            },
+            "matchingColumns": [
+              "date"
+            ],
+            "schema": [
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -320,
+          736
+        ],
+        "id": "46c61037-b0ab-46e8-9b8c-11ac7fee3367",
+        "name": "Call 'Social Media Rida Subworkflows - Weekly Topic Generation'"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -80,
+          1424
+        ],
+        "id": "0d803106-f87b-41a5-976f-a423afb079a4",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -80,
+          1040
+        ],
+        "id": "652632e1-51ea-4bdd-b1d3-9580dbe858eb",
+        "name": "OpenAI Chat Model1",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "text": "=You are an information extraction assistant for event and observance calendars.\n\nYou will receive input text through this variable:\n{{ $json.calendar }}\n\nExample input:\nCalendar: November 6, November 7, November 8, November 9, November 10, November 11, November 12, 2025\n\nEvents and observances within this date range:\n- November 1–7: Canadian Patient Safety Week\n- November 7: Inuit Day\n- November 8: Indigenous Veterans Day\n- November (month-long): Lung Cancer Awareness Month, Fall Prevention Month, Diabetes Awareness Month\n\nSuggested focus for Right at Home Winnipeg:\nThe most suitable observance for seniors, caregivers, and community health in this week is **Canadian Patient Safety Week (Nov 1–7)**. This aligns well with promoting safe healthcare practices and raising awareness about patient safety, which is critical for seniors and those who support them. Additionally, the ongoing **Fall Prevention Month** and **Diabetes Awareness Month** are relevant themes to integrate into educational materials or activities throughout the week.\n\nYour task:\n1. Extract and structure the observance or event information into the following variables:\n   - Topic\n   - Type\n   - Resources/Links\n   - Please specify what kind of resource this is\n   - Inspo/Links\n   - Any additional notes or information\n\n2. Always set **Type** to “Calendar Day”.\n\n3. If multiple observances are mentioned, choose **one** that is most relevant to the provided text (usually the one explicitly highlighted or described in more detail).\n\n4. For **Resources/Links**:\n   - Include any links found in the text.\n   - Separate multiple links with “; ”.\n\n5. For **Please specify what kind of resource this is**:\n   - If any link contains “rightathomecanada.com/winnipeg”, classify as “Company”.\n   - All others default to “External”, unless explicitly stated otherwise.\n\n6. Include additional context, relevance, or reasoning under **Any additional notes or information**.\n\n7. If no data exists for a variable, leave it blank (do not write “N/A”).\n\nExample output:\nTopic: Canadian Patient Safety Week  \nType: Calendar Day  \nResources/Links:  \nPlease specify what kind of resource this is: External  \nInspo/Links:  \nAny additional notes or information: Focuses on promoting safe healthcare practices for seniors and caregivers; aligns with awareness for Fall Prevention Month and Diabetes Awareness Month.",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "Topic",
+                "description": "The main focus, theme, or event identified in the text.",
+                "required": true
+              },
+              {
+                "name": "Type",
+                "description": "The classification of the entry. Default is “Calendar Day”.",
+                "required": true
+              },
+              {
+                "name": "Resources/Links",
+                "description": "URLs or main resource links. Separate multiple with “; ”."
+              },
+              {
+                "name": "Please specify what kind of resource this is",
+                "description": "Classify based on the link: “Company” if it contains “rightathomecanada.com/winnipeg”; otherwise “External” unless explicitly specified."
+              },
+              {
+                "name": "Inspo/Links",
+                "description": "Links for inspiration, reference, or similar campaigns (if any). Separate with “; ”."
+              },
+              {
+                "name": "Any additional notes or information",
+                "description": "Any extra context, ideas, or background info related to the entry."
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          -64,
+          880
+        ],
+        "id": "91f4f278-b343-442a-8d89-659c39f27937",
+        "name": "Calendar Information Extractor1"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+            "mode": "list",
+            "cachedResultName": "RAH social media posts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 876787574,
+            "mode": "list",
+            "cachedResultName": "automated topics",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "date range": "={{ $('Call \\'Social Media Rida Subworkflows - Weekly Topic Generation\\'').item.json.week }}",
+              "context": "={{ $json.context }}",
+              "Topic": "={{ $json.output.Topic }}",
+              "Type": "={{ $json.output.Type }}",
+              "Resources/Links": "={{ $json.output['Resources/Links'] }}",
+              "Resource Type": "={{ $json.output['Please specify what kind of resource this is'] }}",
+              "Inspo/Links": "={{ $json.output['Inspo/Links'] }}",
+              "Any additional notes or information": "={{ $json.output['Any additional notes or information'] }}",
+              "status": "pending"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "date range",
+                "displayName": "date range",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "context",
+                "displayName": "context",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Topic",
+                "displayName": "Topic",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Type",
+                "displayName": "Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Resources/Links",
+                "displayName": "Resources/Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Resource Type",
+                "displayName": "Resource Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Inspo/Links",
+                "displayName": "Inspo/Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Any additional notes or information",
+                "displayName": "Any additional notes or information",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "post text",
+                "displayName": "post text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "image link",
+                "displayName": "image link",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "when to post - date (mm/dd/yyyy)",
+                "displayName": "when to post - date (mm/dd/yyyy)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "when to post - time (ex: 17:30)",
+                "displayName": "when to post - time (ex: 17:30)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          704,
+          720
+        ],
+        "id": "445a735b-0dfe-4aac-8f69-d75a853cbc6a",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          256,
+          512
+        ],
+        "id": "40ad879e-0ea3-402a-b530-c57984be6407",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+                "name": "context",
+                "value": "={{ $json.marketing2 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          0,
+          416
+        ],
+        "id": "2d8463a2-fe2f-42cc-9488-980704128748",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+                "name": "context",
+                "value": "={{ $json.calendar }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          32,
+          1072
+        ],
+        "id": "76bcb616-bcd4-44b5-a24d-61102a014f7b",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "numberInputs": 4
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          496,
+          720
+        ],
+        "id": "ac8f13c5-bf69-4979-b756-e4251c05b921",
+        "name": "Merge1"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          240,
+          960
+        ],
+        "id": "9db49845-abf8-4acc-9858-7d1e6cc61dda",
+        "name": "Merge3"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+            "mode": "list",
+            "cachedResultName": "RAH social media posts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 876787574,
+            "mode": "list",
+            "cachedResultName": "automated topics",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "date range",
+                "lookupValue": "={{ $('Append row in sheet').item.json['date range'] }}"
+              },
+              {
+                "lookupColumn": "Topic",
+                "lookupValue": "={{ $json.Topic }}"
+              },
+              {
+                "lookupColumn": "context",
+                "lookupValue": "={{ $json.context }}"
+              },
+              {
+                "lookupColumn": "Type",
+                "lookupValue": "={{ $json.Type }}"
+              },
+              {
+                "lookupColumn": "Resources/Links",
+                "lookupValue": "={{ $json['Resources/Links'] }}"
+              },
+              {
+                "lookupColumn": "Resource Type",
+                "lookupValue": "={{ $json['Resource Type'] }}"
+              },
+              {
+                "lookupColumn": "Inspo/Links",
+                "lookupValue": "={{ $json['Inspo/Links'] }}"
+              },
+              {
+                "lookupColumn": "Any additional notes or information",
+                "lookupValue": "={{ $json['Any additional notes or information'] }}"
+              },
+              {
+                "lookupColumn": "status",
+                "lookupValue": "={{ $json.status }}"
+              }
+            ]
+          },
+          "options": {
+            "returnFirstMatch": false
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1136,
+          720
+        ],
+        "id": "81c2d5e5-22e6-4f43-8028-cf21c0b52143",
+        "name": "Get row(s) in sheet",
+        "executeOnce": false,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+            "mode": "list",
+            "cachedResultName": "RAH social media posts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 876787574,
+            "mode": "list",
+            "cachedResultName": "automated topics",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "row_number": "={{ $json.row_number }}",
+              "post text": "={{ $json.output.postText }}",
+              "image link": "={{ $json.image }}",
+              "status": "Awaiting Approval"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "date range",
+                "displayName": "date range",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "context",
+                "displayName": "context",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Topic",
+                "displayName": "Topic",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Type",
+                "displayName": "Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Resources/Links",
+                "displayName": "Resources/Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Resource Type",
+                "displayName": "Resource Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Inspo/Links",
+                "displayName": "Inspo/Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Any additional notes or information",
+                "displayName": "Any additional notes or information",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "post text",
+                "displayName": "post text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "image link",
+                "displayName": "image link",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "when to post - date (mm/dd/yyyy)",
+                "displayName": "when to post - date (mm/dd/yyyy)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "when to post - time (ex: 17:30)",
+                "displayName": "when to post - time (ex: 17:30)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          3808,
+          704
+        ],
+        "id": "bbcc0d4f-33f4-42ae-afb5-9eb07468b54e",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "nQSYaOOxx2BSUYPe",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/nQSYaOOxx2BSUYPe",
+            "cachedResultName": "Social Media Rida Subworkflows - Post Generation"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1632,
+          704
+        ],
+        "id": "2055fb8b-103a-4162-b3e0-e1d41107a2ec",
+        "name": "Call 'Social Media Rida Subworkflows - Post Generation'"
+      },
+      {
+        "parameters": {
+          "amount": 30
+        },
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          912,
+          720
+        ],
+        "id": "115ae28b-99e6-49e8-a1f3-aac7a93c40dc",
+        "name": "Wait",
+        "webhookId": "e60bac28-319e-4929-ab34-5a00de2cb0b3"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1376,
+          688
+        ],
+        "id": "1cca105a-1985-41f7-83e6-1c848619fb32",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Generate a detailed image-generation prompt for a social media photo based on the following post text and goal:\nPost Text: {{ $json.output.postText }}\n\nPost Goal: {{ $json.output.postGoal }}\n_____________________\nThe prompt should:\n- Follow the system guidelines.\n- Reflect the theme of the post clearly.\n- Ensure caregivers (if shown) wear teal scrubs with the Right at Home logo.",
+          "options": {
+            "systemMessage": "You are an AI assistant that creates detailed, high-quality prompts for an image generation model. These prompts will be used to design social media photos for Right at Home Winnipeg. Follow these guidelines:\n\n1. **Brand Identity**\n   - If caregivers are shown, they must wear teal scrubs with the Right at Home logo.\n\n2. **Prompt Structure**\n   - Begin with the overall theme and mood (e.g., festive, informative, awareness).\n\n3. **Tone and Style**\n   - Compassionate, trustworthy, and community-focused.\n   - Avoid clutter; keep visuals simple yet eye-catching.\n   - Use realistic photography or stylized illustrations that feel authentic.\n\n4. **Image Composition**\n   - Photos should show depict seniors/older adults in different scenarios to match the text of the corresponding post. (examples (not limited to): older adults struggling to conduct daily tasks themselves, right at home caregiver(s) supporting older adults, older adults enjoying themselves looking happy, older adults depicted in a heartfelt scene interacting with family and loved ones, right at home caregiver talking to a family with older adults, older adult sneezing to promote caution around flu season, etc)\n\nYour output should be a single, detailed prompt that an image generation model can use directly to create the visual."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3,
+        "position": [
+          2080,
+          848
+        ],
+        "id": "9f5a40b2-3ecb-4667-a4b4-abace1ca918c",
+        "name": "great photo, visual needs work"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-5-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          2032,
+          1040
+        ],
+        "id": "126c4236-79d9-4a59-a276-17c4f682039c",
+        "name": "OpenAI Chat Model2",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          2640,
+          784
+        ],
+        "id": "536f7dc8-a9a3-4595-a468-723bd2701f2f",
+        "name": "Merge2"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node\n// Merges all incoming items into a single item\n\nconst merged = {};\n\nfor (const item of $input.all()) {\n  Object.assign(merged, item.json);\n}\n\nreturn [\n  {\n    json: merged\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2848,
+          784
+        ],
+        "id": "3facbfcd-3a97-498a-93a6-10b06562be09",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "numberInputs": 3
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          3472,
+          704
+        ],
+        "id": "e1484124-0ce7-49a4-b707-6fa77674d903",
+        "name": "Merge4"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node\n// Merges all incoming items into a single item\n\nconst merged = {};\n\nfor (const item of $input.all()) {\n  Object.assign(merged, item.json);\n}\n\nreturn [\n  {\n    json: merged\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3648,
+          704
+        ],
+        "id": "3e79815a-a6c3-430c-9df6-401f4c7618fd",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "khaharnQFAyotlXS",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/khaharnQFAyotlXS",
+            "cachedResultName": "Social Media Rida Subworkflows - Image Generation"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "prompt": "={{ $json.output }}"
+            },
+            "matchingColumns": [
+              "prompt"
+            ],
+            "schema": [
+              {
+                "id": "prompt",
+                "displayName": "prompt",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2432,
+          848
+        ],
+        "id": "88c4c130-c5b2-45bc-bc7c-749c7892424d",
+        "name": "Call 'Social Media Rida Subworkflows - Image Generation'"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "9Df0DDtlvoejwdgG",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/9Df0DDtlvoejwdgG",
+            "cachedResultName": "Social Media Rida Subworkflows - Post Visual Generation"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          3264,
+          784
+        ],
+        "id": "00b1814f-f861-4eed-ae00-9252f64f3f4c",
+        "name": "Call 'Social Media Rida Subworkflows - Post Visual Generation'"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b5adf71a-f23b-4e5e-886b-431fc9ff232f",
+                "name": "Image Prompt",
+                "value": "=Create a high-quality, professional ‘Canva-style’ Instagram post (square 1080×1080 px) that uses the provided photo as the hero image and the provided company logo as the brand mark. Do not edit, retouch, crop, recolor, filter, or otherwise change the photo or the logo in any way.\nThis image is to accompany the following post: {{ $json.output.postText }}\n\nInclude the company name Right At Home Winnipeg, phone (204) 318-5554, and website rightathomecanada.com/winnipeg in a clear footer or badge near the logo; ensure legibility at mobile size. Use soft warm neutrals with one subtle accent, rounded sans-serif type, generous negative space, and an optional small CTA pill only if it doesn’t clutter the layout. If needed for legibility, place a low-opacity translucent panel behind text — do not change the photo’s colors.\nConstraints: no extra logos or watermarks, no generated logo replacements, no long paragraphs of text, and no edits to faces or the photo.\nDeliverables: 1080×1080 PNG (high quality), mobile-safe crop preview (center ±10%), and one-line alt-text suggestion.",
+                "type": "string"
+              },
+              {
+                "id": "231ac13a-b16c-4ccb-b182-34dee878c2bd",
+                "name": "Image 1",
+                "value": "={{ $json.image }}",
+                "type": "string"
+              },
+              {
+                "id": "a0a3ac17-907a-4b45-8849-e9b0e3753641",
+                "name": "Image 2",
+                "value": "https://i.ibb.co/7d0jv7T5/logo-canada.png",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3056,
+          784
+        ],
+        "id": "b524e26e-4229-4db8-9170-d68092989648",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {
+          "url": "={{ $json['image link'] }}",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "file"
+              }
+            }
+          }
+        },
+        "id": "1d9d9c8d-18ea-4d3e-8d3b-8d987e178962",
+        "name": "Download Temp Image",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1040,
+          1712
+        ],
+        "notesInFlow": true,
+        "notes": "Gets binary from temp URL"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+            "mode": "list",
+            "cachedResultName": "RAH social media posts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 876787574,
+            "mode": "list",
+            "cachedResultName": "automated topics",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "post text": "={{ $json.row_number }}",
+              "status": "={{ $json.status }} (facebook_post_id: {{ $json.facebook_post_id }} | instagram_post_id: {{ $json.instagram_post_id }})"
+            },
+            "matchingColumns": [
+              "post text"
+            ],
+            "schema": [
+              {
+                "id": "date range",
+                "displayName": "date range",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "context",
+                "displayName": "context",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Topic",
+                "displayName": "Topic",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Type",
+                "displayName": "Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Resources/Links",
+                "displayName": "Resources/Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Resource Type",
+                "displayName": "Resource Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Inspo/Links",
+                "displayName": "Inspo/Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Any additional notes or information",
+                "displayName": "Any additional notes or information",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "post text",
+                "displayName": "post text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "image link",
+                "displayName": "image link",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "when to post - date (mm/dd/yyyy)",
+                "displayName": "when to post - date (mm/dd/yyyy)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "when to post - time (ex: 17:30)",
+                "displayName": "when to post - time (ex: 17:30)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "15ea0fbc-9e7e-47fb-8e1e-8808b5d2e1ab",
+        "name": "Update Sheet - Posted",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          3008,
+          1360
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://graph.facebook.com/v19.0/1411457215666535/photos",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "access_token",
+                "value": "EAAbeWpvhl1QBRR1dPEuehLuL0eZAIJCIaTHdpH7BYsy2ssY9VQYtIvNxVO0u6NgCu9VOX8WeUKQG7UZALOA7ksTHznuRGgp9F9ESs2coOzMnH3JNiOZBmF5OmiB0QFWrx9VxvxJGVgjAUXlVjwZAC9mhJnzMMmQbjatSjxvvPiuqYqct5yWHDu20mIQr3tSSMZB2KOrypAQfJkbBZCIZBJcCQZDZD"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $json['post text'] }}"
+              },
+              {
+                "name": "url",
+                "value": "={{ $json['image link'] }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {}
+            ]
+          },
+          "options": {}
+        },
+        "id": "11756680-0af4-47ff-9ecd-ee63457805bd",
+        "name": "Post to Facebook (Binary Upload)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2160,
+          1488
+        ],
+        "notesInFlow": true,
+        "notes": "Uploads binary directly - no URL needed!"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 30
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          496,
+          1568
+        ],
+        "id": "36498232-7bf4-46fd-9c7b-5512ebebc563",
+        "name": "Schedule Trigger2"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM",
+            "mode": "list",
+            "cachedResultName": "RAH social media posts",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 876787574,
+            "mode": "list",
+            "cachedResultName": "automated topics",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z1dXOatrjl3hz7vDZm6cfm5FA2nLTSNOfb2r5tKoFzM/edit#gid=876787574"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "status",
+                "lookupValue": "Approved"
+              },
+              {
+                "lookupColumn": "when to post - date (mm/dd/yyyy)",
+                "lookupValue": "={{ new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }}"
+              },
+              {
+                "lookupColumn": "when to post - time (ex: 17:30)",
+                "lookupValue": "={{ (() => { const d = new Date(); return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); })() }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          704,
+          1568
+        ],
+        "id": "353ce692-5595-465b-9f0a-bf3eae783c2f",
+        "name": "Get row(s) in sheet2",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -48,
+          320
+        ],
+        "id": "2092c144-161f-4837-9277-5904c9233a7c",
+        "name": "OpenAI Chat Model3",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          256,
+          96
+        ],
+        "id": "e10a2052-01ba-4c3f-8c69-ffbf7dd50cb9",
+        "name": "Merge5"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+                "name": "context",
+                "value": "={{ $json.marketing1 }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          0,
+          0
+        ],
+        "id": "5e41dc4a-d652-4a1b-b864-586246799e84",
+        "name": "Edit Fields7"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "78d7ab7e-b5bb-4c31-ab2b-6fe6f7b8c477",
+                "name": "context",
+                "value": "={{ $json.resource }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          32,
+          1440
+        ],
+        "id": "76d78958-bca4-4569-9879-af638224a866",
+        "name": "Edit Fields8"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          240,
+          1328
+        ],
+        "id": "8b5d9605-47f8-4146-be81-b5b8aee6be81",
+        "name": "Merge6"
+      },
+      {
+        "parameters": {
+          "text": "=You are an information extraction assistant for marketing planning.\n\nYou will receive input text through this variable:\n{{ $json.marketing1 }}\n\nExample input:\nMarketing: Week of November 6 to November 12, 2025  \nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nURL: https://www.rightathomecanada.com/winnipeg/services/in-home-care/\n\nYour task:\n1. Extract and structure the marketing information into the following variables:\n   - Topic\n   - Type\n   - Resources/Links\n   - Please specify what kind of resource this is\n   - Inspo/Links\n   - Any additional notes or information\n\n2. Always set **Type** to “Marketing/Promotion”.\n\n3. If multiple potential topics are mentioned, choose **one** that best fits the main marketing focus or subject.\n\n4. For **Resources/Links**:\n   - Extract any URLs found in the text.\n   - Separate multiple links with “; ”.\n\n5. For **Please specify what kind of resource this is**:\n   - If the URL contains “rightathomecanada.com/winnipeg”, classify it as “Company”.\n   - Otherwise, classify it as “External”, unless the text explicitly states otherwise.\n\n6. Place any extra context, explanation, or notes under **Any additional notes or information**.\n\n7. If no data exists for a variable, leave it blank (do not write “N/A”).\n\nExample output:\nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nType: Marketing/Promotion  \nResources/Links: https://www.rightathomecanada.com/winnipeg/services/in-home-care/  \nPlease specify what kind of resource this is: Company  \nInspo/Links:  \nAny additional notes or information: Weekly marketing content focused on promoting senior care services tailored for Winnipeg clients.",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "Topic",
+                "description": "The main focus, theme, or event identified in the text.",
+                "required": true
+              },
+              {
+                "name": "Type",
+                "description": "The classification of the entry. Default is “Marketing/Promotion”.",
+                "required": true
+              },
+              {
+                "name": "Resources/Links",
+                "description": "URLs or main resource links. Separate multiple with “; ”."
+              },
+              {
+                "name": "Please specify what kind of resource this is",
+                "description": "Classify based on the link: “Company” if it contains “rightathomecanada.com/winnipeg”; otherwise “External” unless explicitly specified."
+              },
+              {
+                "name": "Inspo/Links",
+                "description": "Links for inspiration, reference, or similar campaigns (if any). Separate with “; ”."
+              },
+              {
+                "name": "Any additional notes or information",
+                "description": "Any extra context, ideas, or background info related to the entry."
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          -48,
+          160
+        ],
+        "id": "1700476c-88a9-4203-94d8-2d641b5ee822",
+        "name": "Marketing1 Information Extractor"
+      },
+      {
+        "parameters": {
+          "text": "=You are an information extraction assistant for company resource planning.\n\nYou will receive input text through this variable:\n{{ $json.resource }}\n\nExample input:\nWeek of\nTopic: Understanding Parkinson’s Disease: Essential Care Tips for Families and Caregivers\nURL: https://www.rightathomecanada.com/winnipeg/resources/understanding-parkinsons-disease-care-tips/\n\nYour task:\n\nExtract and structure the resource information into the following variables:\n\nTopic\n\nType\n\nResources/Links\n\nPlease specify what kind of resource this is\n\nInspo/Links\n\nAny additional notes or information\n\nAlways set Type to “Company Resource”.\n\nUse the Topic line as the primary subject. If multiple topics appear, select the clearest main one.\n\nFor Resources/Links:\n\nExtract any URLs found in the text.\n\nSeparate multiple links with “; ”.\n\nFor Please specify what kind of resource this is:\n\nIf the URL includes /resources/, classify it as “Educational / Blog”.\n\nIf the URL includes /guides/ or downloadable content, classify it as “Guide”.\n\nOtherwise, classify it as “Company Resource”.\n\nFor Inspo/Links:\n\nLeave blank unless the text explicitly references inspiration sources or related materials.\n\nPlace any extra context, seasonal relevance, or usage ideas under Any additional notes or information.\n\nIf no data exists for a variable, leave it blank (do not write “N/A”).\n\nOutput only the extracted fields, each on its own line, matching the variable names exactly.",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "Topic",
+                "description": "The main educational theme or subject of the company resource.",
+                "required": true
+              },
+              {
+                "name": "Type",
+                "description": "The classification of the entry. Always “Company Resource”.",
+                "required": true
+              },
+              {
+                "name": "Resources/Links",
+                "description": "Direct URL(s) to the resource. Separate multiple links with “; ”."
+              },
+              {
+                "name": "Please specify what kind of resource this is",
+                "description": "The format of the resource (e.g., Educational / Blog, Guide, Company Resource)."
+              },
+              {
+                "name": "Inspo/Links",
+                "description": "Optional inspiration or related reference links, if explicitly mentioned."
+              },
+              {
+                "name": "Any additional notes or information",
+                "description": "Extra context such as intended audience, caregiver focus, or seasonal relevance."
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          -80,
+          1264
+        ],
+        "id": "121893f6-39fd-4040-a788-8f5517ee1a4d",
+        "name": "Resource Information Extractor"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -48,
+          736
+        ],
+        "id": "11781216-d23f-490f-975e-00c29cb73f1b",
+        "name": "OpenAI Chat Model8",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "text": "=You are an information extraction assistant for marketing planning.\n\nYou will receive input text through this variable:\n{{ $json.marketing2 }}\n\nExample input:\nMarketing: Week of November 6 to November 12, 2025  \nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nURL: https://www.rightathomecanada.com/winnipeg/services/in-home-care/\n\nYour task:\n1. Extract and structure the marketing information into the following variables:\n   - Topic\n   - Type\n   - Resources/Links\n   - Please specify what kind of resource this is\n   - Inspo/Links\n   - Any additional notes or information\n\n2. Always set **Type** to “Marketing/Promotion”.\n\n3. If multiple potential topics are mentioned, choose **one** that best fits the main marketing focus or subject.\n\n4. For **Resources/Links**:\n   - Extract any URLs found in the text.\n   - Separate multiple links with “; ”.\n\n5. For **Please specify what kind of resource this is**:\n   - If the URL contains “rightathomecanada.com/winnipeg”, classify it as “Company”.\n   - Otherwise, classify it as “External”, unless the text explicitly states otherwise.\n\n6. Place any extra context, explanation, or notes under **Any additional notes or information**.\n\n7. If no data exists for a variable, leave it blank (do not write “N/A”).\n\nExample output:\nTopic: Personalized In-Home Care Services Tailored to Winnipeg Seniors  \nType: Marketing/Promotion  \nResources/Links: https://www.rightathomecanada.com/winnipeg/services/in-home-care/  \nPlease specify what kind of resource this is: Company  \nInspo/Links:  \nAny additional notes or information: Weekly marketing content focused on promoting senior care services tailored for Winnipeg clients.",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "Topic",
+                "description": "The main focus, theme, or event identified in the text.",
+                "required": true
+              },
+              {
+                "name": "Type",
+                "description": "The classification of the entry. Default is “Marketing/Promotion”.",
+                "required": true
+              },
+              {
+                "name": "Resources/Links",
+                "description": "URLs or main resource links. Separate multiple with “; ”."
+              },
+              {
+                "name": "Please specify what kind of resource this is",
+                "description": "Classify based on the link: “Company” if it contains “rightathomecanada.com/winnipeg”; otherwise “External” unless explicitly specified."
+              },
+              {
+                "name": "Inspo/Links",
+                "description": "Links for inspiration, reference, or similar campaigns (if any). Separate with “; ”."
+              },
+              {
+                "name": "Any additional notes or information",
+                "description": "Any extra context, ideas, or background info related to the entry."
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          -48,
+          576
+        ],
+        "id": "c34800f4-8de1-4172-b0d6-1e158a099f91",
+        "name": "Marketing2 Information Extractor"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1600,
+          464
+        ],
+        "id": "cefed4f8-12d9-4d20-b945-f59d712de1b1",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://graph.facebook.com/v23.0/17841413927220859/media",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "caption",
+                "value": "={{ $json['post text'] }}"
+              },
+              {
+                "name": "image_url",
+                "value": "={{ $json['image link'] }}"
+              },
+              {
+                "name": "access_token",
+                "value": "EAAbeWpvhl1QBRR1dPEuehLuL0eZAIJCIaTHdpH7BYsy2ssY9VQYtIvNxVO0u6NgCu9VOX8WeUKQG7UZALOA7ksTHznuRGgp9F9ESs2coOzMnH3JNiOZBmF5OmiB0QFWrx9VxvxJGVgjAUXlVjwZAC9mhJnzMMmQbjatSjxvvPiuqYqct5yWHDu20mIQr3tSSMZB2KOrypAQfJkbBZCIZBJcCQZDZD"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "ebe23cbe-0f8d-4e18-a931-fe9345f6a5d6",
+        "name": "Post to Instagram (ImageUrl Upload)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2112,
+          1728
+        ],
+        "notesInFlow": true,
+        "notes": "Uploads binary directly - no URL needed!"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://graph.facebook.com/v23.0/17841413927220859/media_publish",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "access_token",
+                "value": "EAAbeWpvhl1QBRR1dPEuehLuL0eZAIJCIaTHdpH7BYsy2ssY9VQYtIvNxVO0u6NgCu9VOX8WeUKQG7UZALOA7ksTHznuRGgp9F9ESs2coOzMnH3JNiOZBmF5OmiB0QFWrx9VxvxJGVgjAUXlVjwZAC9mhJnzMMmQbjatSjxvvPiuqYqct5yWHDu20mIQr3tSSMZB2KOrypAQfJkbBZCIZBJcCQZDZD"
+              },
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "a0686752-ca33-41d1-af51-ec038b97a3ce",
+        "name": "Post to Instagram (ImageUrl Upload)1",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2352,
+          1696
+        ],
+        "notesInFlow": true,
+        "notes": "Uploads binary directly - no URL needed!"
+      },
+      {
+        "parameters": {
+          "numberInputs": 3
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          2512,
+          1376
+        ],
+        "id": "55160930-b3ce-4b99-b06a-990cbcc638d7",
+        "name": "Merge14"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          1680,
+          1616
+        ],
+        "id": "c6d4e5f7-95dc-4d51-b042-788001ecee78",
+        "name": "Merge15"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\nconst originalData = allItems[0].json;\nconst fileUUID = allItems[1].json.file;\n\nreturn {\n  json: {\n    ...originalData,\n    \"image link\": `https://qtlvukgz39.ucarecd.net/${fileUUID}/-/format/jpeg/image.jpg`\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1888,
+          1744
+        ],
+        "id": "c7eaed23-ecea-46e2-9253-94233b96299c",
+        "name": "Code in JavaScript2"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://upload.uploadcare.com/base/",
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "UPLOADCARE_PUB_KEY",
+                "value": "3fed1ec23aba005141f7"
+              },
+              {
+                "parameterType": "formBinaryData",
+                "name": "file",
+                "inputDataFieldName": "data"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1440,
+          1712
+        ],
+        "id": "233d4af8-ccf5-454a-8ddd-c22917978d25",
+        "name": "HTTP Request3"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allItems = $input.all();\n\nconst originalData = allItems[0].json;\nconst facebookPost = allItems[1].json;\nconst instagramPost = allItems[2].json;\n\n// Check both posts succeeded\nconst facebookSuccess = facebookPost.post_id !== undefined;\nconst instagramSuccess = instagramPost.id !== undefined && facebookPost.post_id === undefined ? false : instagramPost.id !== undefined;\n\n// Facebook has both id and post_id, Instagram only has id\nconst bothSucceeded = facebookPost.post_id !== undefined && instagramPost.id !== undefined;\n\nif (!bothSucceeded) {\n  throw new Error(`Posting failed! Facebook: ${facebookSuccess ? 'OK' : 'FAILED'}, Instagram: ${instagramSuccess ? 'OK' : 'FAILED'}`);\n}\n\nreturn {\n  json: {\n    row_number: originalData.row_number,\n    facebook_post_id: facebookPost.post_id,\n    instagram_post_id: instagramPost.id,\n    status: \"posted successfully\"\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2720,
+          1376
+        ],
+        "id": "dd911633-49db-41c4-ad57-2fa10103ad66",
+        "name": "Code in JavaScript4"
+      },
+      {
+        "parameters": {
+          "operation": "resize",
+          "width": 1080,
+          "height": 1080,
+          "options": {
+            "format": "jpeg"
+          }
+        },
+        "type": "n8n-nodes-base.editImage",
+        "typeVersion": 1,
+        "position": [
+          1248,
+          1712
+        ],
+        "id": "2f752a95-6e2f-4a19-aa57-9531f04974de",
+        "name": "Edit Image"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Call 'Social Media Rida Subworkflows - Weekly Topic Generation'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Social Media Rida Subworkflows - Weekly Topic Generation'": {
+        "main": [
+          [
+            {
+              "node": "Calendar Information Extractor1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Edit Fields7",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Marketing1 Information Extractor",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Edit Fields8",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Resource Information Extractor",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Marketing2 Information Extractor",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Resource Information Extractor",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Calendar Information Extractor1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calendar Information Extractor1": {
+        "main": [
+          [
+            {
+              "node": "Merge3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Merge3",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge1": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge3": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Social Media Rida Subworkflows - Post Generation'": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge4",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "great photo, visual needs work",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Call 'Social Media Rida Subworkflows - Post Generation'",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge4",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "great photo, visual needs work",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "great photo, visual needs work": {
+        "main": [
+          [
+            {
+              "node": "Call 'Social Media Rida Subworkflows - Image Generation'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge2": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge4": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Social Media Rida Subworkflows - Image Generation'": {
+        "main": [
+          [
+            {
+              "node": "Merge2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Call 'Social Media Rida Subworkflows - Post Visual Generation'": {
+        "main": [
+          [
+            {
+              "node": "Merge4",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Call 'Social Media Rida Subworkflows - Post Visual Generation'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download Temp Image": {
+        "main": [
+          [
+            {
+              "node": "Edit Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post to Facebook (Binary Upload)": {
+        "main": [
+          [
+            {
+              "node": "Merge14",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger2": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet2": {
+        "main": [
+          [
+            {
+              "node": "Download Temp Image",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge15",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge14",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Marketing1 Information Extractor",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields7": {
+        "main": [
+          [
+            {
+              "node": "Merge5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge5": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields8": {
+        "main": [
+          [
+            {
+              "node": "Merge6",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge6": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 3
+            }
+          ]
+        ]
+      },
+      "Marketing1 Information Extractor": {
+        "main": [
+          [
+            {
+              "node": "Merge5",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Resource Information Extractor": {
+        "main": [
+          [
+            {
+              "node": "Merge6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model8": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Marketing2 Information Extractor",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Marketing2 Information Extractor": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Post to Instagram (ImageUrl Upload)": {
+        "main": [
+          [
+            {
+              "node": "Post to Instagram (ImageUrl Upload)1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge14": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post to Instagram (ImageUrl Upload)1": {
+        "main": [
+          [
+            {
+              "node": "Merge14",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Merge15": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript2": {
+        "main": [
+          [
+            {
+              "node": "Post to Instagram (ImageUrl Upload)",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Post to Facebook (Binary Upload)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          [
+            {
+              "node": "Merge15",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript4": {
+        "main": [
+          [
+            {
+              "node": "Update Sheet - Posted",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Image": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version 5bd2c478",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
