@@ -1,0 +1,948 @@
+{
+  "updatedAt": "2026-05-03T22:15:58.480Z",
+  "createdAt": "2026-05-03T21:47:34.761Z",
+  "id": "qRR4vWsInqKRmVUL",
+  "name": "Social Media Rida Subworkflows - Weekly Topic Generation",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=user:\nStart date: {{ $json.output.startDate }}\nEnd date: {{ $json.output.endDate }}\n\nWebsite to reference:\nhttps://www.rightathomecanada.com/winnipeg\n\nTask:\nGenerate two marketing topic ideas for the week that help promote Right at Home Winnipeg.\n\nRequirements:\n\nEach topic should focus on a specific service, resource, or company highlight found on the website.\n\nInclude the valid URL to the relevant webpage (or the main URL if general).\n\nDo not include explanations, captions, or summaries — output must be JSON only (see format).\n\nMake the two topics distinct from each other.\n\nTone: compassionate, community-centered, aimed at seniors, caregivers, and families.\n\nOutput format (JSON only — exact keys and structure):\n\n{\n\"marketing1\": {\n\"Week\": \"{{ $json.output.week }}\",\n\"Topic\": \"[Insert concise topic idea]\",\n\"URL\": \"[Insert matching URL]\"\n},\n\"marketing2\": {\n\"Week\": \"{{ $json.output.week }}\",\n\"Topic\": \"[Insert concise topic idea]\",\n\"URL\": \"[Insert matching URL]\"\n}\n}\n\nNotes:\n\nWeek should use the provided {{ $json.output.week }} variable exactly.\n\nTopic should be a one-line, concise idea.\n\nURL must be a fully qualified, valid URL.",
+        "options": {
+          "systemMessage": "You are a professional marketing strategist and content planner for Right at Home Winnipeg, a trusted in-home senior care agency.\n\nYou are provided with:\n\nThe start and end date for a specific week.\n\nThe company website: https://www.rightathomecanada.com/winnipeg\n\nYour job:\n\nReview the Right at Home Winnipeg website and find items (services, resources, pages, or company highlights) to promote.\n\nGenerate two distinct weekly marketing topic ideas that promote the company’s services, programs, or brand. The two ideas must be different from each other.\n\nFor each idea include a concise Topic title/idea and the exact URL of the relevant page (or the main URL if the topic is general).\n\nOutput only valid JSON (no extra text, no explanation, no markdown). The JSON must have exactly two top-level keys: marketing1 and marketing2. Each of those must be an object with the fields Week, Topic, and URL (see format below).\n\nEnsure content is relevant and appealing to seniors, caregivers, and families, and aligns with a compassionate, community-centered brand tone.\n\nPrefer linking directly to the most specific page that supports the topic. If a topic is general, use https://www.rightathomecanada.com/winnipeg.\n\nIf you cannot find a page that matches an idea, still produce a distinct idea and use the main URL. Do not output anything except the required JSON structure."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        6432,
+        1248
+      ],
+      "id": "e7631436-3a7e-4471-8289-f6560f779542",
+      "name": "Marketing"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Start date: {{ $('Information Extractor').item.json.output.startDate }}\nEnd date: {{ $('Information Extractor').item.json.output.endDate }}\n\nMaster event list:\nOCTOBER 2025\nOct 1: National Seniors Day (Canada/Manitoba)\nOct 1: International Day of Older Persons (UN)\nOct 4: National Cinnamon Bun Day – Community baking activity\nOct 6–12: Mental Illness Awareness Week\nOct (Month): Healthy Workplace Month, Breast Cancer Awareness Month, Occupational Therapy Month\nOct 10: World Mental Health Day\nOct 10: World Hospice/Palliative Care Day\nOct 13: Thanksgiving (Canada)\nOct 15: Pregnancy and Infant Loss Awareness Day\nOct 16 onwards: Manitoba Fall Prevention & Active Aging programs\nOct 20: Diwali (multicultural celebration)\nOct 23: Birth of Bahá'u'lláh (Bahá’í)\nOct 24: Brain Cancer Awareness Day\nOct 31: Halloween — crafts, baking\nOctober: Manitoba Healthy Aging Awards\n\nNOVEMBER 2025\nNovember: Lung Cancer Awareness Month, Fall Prevention Month, Diabetes Awareness Month\nNov 1–7: Canadian Patient Safety Week\nNov 7: Inuit Day\nNov 8: Indigenous Veterans Day\nNov 13: World Kindness Day — card-making, crafts\nNov 14: World Diabetes Day\nNov 20: Transgender Day of Remembrance\nNov 17: National Homemade Bread Day — baking or sharing recipes\n\nDECEMBER 2025\nDec 1: World AIDS Day\nDec 3: International Day of Persons with Disabilities\nDec 4: National Cookie Day — group baking\nDec 14–22: Hanukkah — crafts, food-themed events\nDec 21: Winter Solstice\nDec 25: Christmas Day\nDec 26–Jan 1: Kwanzaa\n\nJANUARY 2026\nJanuary: Alzheimer’s Awareness Month\nJan 4: World Braille Day\nJan 18: Museum Selfie Day — virtual or local museum visits\nJan 21: National Squirrel Appreciation Day — nature watching\nJan 24: National Fun at Work Day — team games\nJan 25: Family Literacy Day — book clubs/reading\n\nFEBRUARY 2026\nFebruary: Heart Health Month, Black History Month, Psychology Month\nFeb 4: World Cancer Day\nFeb 13: Wear Red Canada (Women’s Heart Health)\nFeb 15: International Childhood Cancer Day\nFeb 20: National Love Your Pet Day — share pet photos, stories\nLast Day: Rare Disease Day\n\nMARCH 2026\nMarch: Kidney Health Month, Nutrition Month\nMar 8: International Women’s Day\nMar 14: Pi Day — bake pies, math fun\nMar 21: World Down Syndrome Day\nMar 22: World Water Day — gardening, nature themed events\nMar 31: Transgender Day of Visibility\n\nAPRIL 2026\nApril: Parkinson’s Awareness Month\nApr 2: World Autism Awareness Day\nApr 7: World Health Day — cooking/nutrition\nApr 11: World Parkinson’s Day\nApr 16: National Advance Care Planning Day\nApr 18: National Haiku Poetry Day — creative writing workshop\nApr 20–26: National Organ & Tissue Donation Awareness Week\n\nMAY 2026\nMay: Brain Tumor Awareness Month, Speech and Hearing Month, Mental Health Awareness Month, Bladder Cancer Awareness Month, Asian Heritage Month\nMay 6–12: National Nursing Week\nMay 8: World Ovarian Cancer Day\nMay 12: International Nurses Day\nMay 17: World Baking Day — staff/client bake-off\nMay 24: Victoria Day\nMay 25: National Scavenger Hunt Day — group activity\nMay 31: World No Tobacco Day\n\nJUNE 2026\nJune: ALS Awareness Month, National Indigenous History Month, Stroke Awareness Month, Canadian Men’s Health Month\nJun 1: Intergenerational Day\nJun 5: World Environment Day — gardening, sustainability projects\nJun 13–15: Garden Days Canada — garden visits, crafts\nJun 15: World Elder Abuse Awareness Day\nJun 21: National Indigenous Peoples Day, Summer Solstice\nJun 21: International Yoga Day — wellness activity\n\nJULY 2026\nJuly: UV Safety Month\nJul 7: National Chocolate Day — cooking/baking\nJul 11: National Cheer Up the Lonely Day — outreach, crafts\nJul 24: International Self-Care Day — relaxation activities\nJul 26: Disability Independence Day\n\nAUGUST 2026\nAug 8: International Cat Day — pet events\nAug 12: International Youth Day — youth crafts\nAug 30: National Toasted Marshmallow Day — treats\nAug 31: International Overdose Awareness Day\n\nSEPTEMBER 2026\nSeptember: World Alzheimer’s Month, Arthritis Awareness Month, Prostate Cancer Awareness Month, Childhood Cancer Awareness Month\nSep 8: International Literacy Day — reading club\nSep 10: World Suicide Prevention Day\nSep 13: National Grandparents Day — intergenerational events\nSep 15–21: National Dementia Awareness Week\nSep 21: World Alzheimer’s Day\nSep 30: National Day for Truth and Reconciliation\n\n---\n\nPlease identify which of these dates or awareness observances fall from **{{ $('Information Extractor').item.json.output.week }}**, including anything being observed that month, list all the days of that week (e.g. October 6, October 7, …), and then suggest the **most suitable one** for the senior care audience that week.",
+        "options": {
+          "systemMessage": "You are an expert content and event-planning assistant for Right at Home Winnipeg, a trusted in-home senior care agency serving older adults in Manitoba.\n\nYou are given:\n- A start and end date for a specific week (e.g. October 6–12, 2025)\n- A master list of awareness days, holidays, and observances between October 2025 and September 2026.\n\nYour job:\n1. Identify all events, holidays, or observances from the list that fall within the given date range.\n2. Write out the days of the week (e.g. October 6, October 7, October 8, …) separated by commas.\n3. Suggest **which event or day that week** is most relevant or suitable for Right at Home Winnipeg’s audience (primarily seniors, caregivers, and community health & wellness).\n4. Keep your tone professional, warm, and concise — the output will be used for automated scheduling and planning.\n\nIf there are no direct matches, identify the **closest relevant ongoing awareness month or week** that overlaps with the given dates."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        7584,
+        1248
+      ],
+      "id": "4079b522-086a-45a3-983a-b585a62cabde",
+      "name": "Calendar"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "87158930-7e73-4954-837d-b94b65307f85",
+              "name": "week",
+              "value": "={{ $('Information Extractor').item.json.output.week }}",
+              "type": "string"
+            },
+            {
+              "id": "dda3fcb0-2d76-48de-be7c-7834b3b9dc02",
+              "name": "marketing1",
+              "value": "={{ $('Information Extractor1').item.json.output.marketing1 }}",
+              "type": "string"
+            },
+            {
+              "id": "e426ee14-bca3-42d0-8722-b8cc8f4c139d",
+              "name": "marketing2",
+              "value": "={{ $('Information Extractor1').item.json.output.marketing2 }}",
+              "type": "string"
+            },
+            {
+              "id": "83c6b975-5ddb-49fe-af79-c78f31a879fe",
+              "name": "calendar",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "f03ca860-ea69-4603-aab6-78b0f7136936",
+              "name": "resource",
+              "value": "={{ $('Resource').item.json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7920,
+        1248
+      ],
+      "id": "d377eac6-b55a-481e-917e-5170ad5985ea",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        7536,
+        1504
+      ],
+      "id": "42a6c248-fc0e-41b1-8983-21a773bda98f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        6368,
+        1472
+      ],
+      "id": "a99573c6-845e-49af-96c7-69849a41c769",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are a date range formatter.\n\nYou will receive a date input through the variable below:\n{{ $json.date }}\n\nExample format: “November 6th 2025, 8:04:37 pm”\n\nYour task:\n1. Parse this date.\n2. Calculate the 7-day range (the given date plus the next 6 calendar days).\n3. Output all results in the following exact structure:\n\nweek(Full sentence summarizing the week range, including both start and end dates, month(s), and year.): <Month> <StartDay> to <EndDay>, <Year>\ndateRange(Short range format without the year or the word “to”, using a dash between dates.): <Month> <StartDay> - <EndDay>\nstartDate(Start date of the 7-day range in Month Day, Year format.): <Month> <StartDay>, <Year>\nendDate(End date (6 days after start) in Month Day, Year format.): <Month> <EndDay>, <Year>\n\nFormatting rules:\n- Month must be the full month name (e.g., “November”).\n- Do NOT include ordinal suffixes (“st”, “nd”, “th”).\n- StartDay = the date of the input.\n- EndDay = six days after StartDay (total of 7 days).\n- Year = the same as the input year.\n- If the week crosses into a new month, show both months (e.g., “November 29 to December 5, 2025”).\n\nExample:\nInput: November 6th 2025, 8:04:37 pm  \nOutput:\nweek: November 6 to November 12, 2025  \ndateRange: November 6 - November 12  \nstartDate: November 6, 2025  \nendDate: November 12, 2025\n",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "week",
+              "description": "Full sentence summarizing the week range, including both start and end dates, month(s), and year.",
+              "required": true
+            },
+            {
+              "name": "dateRange",
+              "description": "Short range format without the year or the word “to”, using a dash between dates.",
+              "required": true
+            },
+            {
+              "name": "startDate",
+              "description": "Start date of the 7-day range in Month Day, Year format.",
+              "required": true
+            },
+            {
+              "name": "endDate",
+              "description": "End date (6 days after start) in Month Day, Year format.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        6048,
+        1248
+      ],
+      "id": "927ce2ca-3efc-4bdf-b647-b5890d68c4d6",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "date",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        5760,
+        1248
+      ],
+      "id": "a686899b-d6e5-4a93-9ee3-f221c6e2d574",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        6000,
+        1424
+      ],
+      "id": "14392077-9834-42c9-897e-186742c12f24",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        8160,
+        1248
+      ],
+      "id": "b275242a-1fb5-4fb3-b24f-c0f894f3dae6",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        7168,
+        1440
+      ],
+      "id": "51e6d57f-1130-474d-817b-d739291de0c4",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=user:\nStart date: {{ $json.output.startDate }}\nEnd date: {{ $json.output.endDate }}\n\nWebsite to reference:\nhttps://www.rightathomecanada.com/winnipeg\n\nTask:\nGenerate one marketing topic idea for the week that promotes Right at Home Winnipeg by highlighting a company resource (guide, blog post, educational article, downloadable, seasonal content, recently posted material, etc.).\n\nRequirements:\n\nThe topic must focus on a specific resource found on the website.\n\nInclude the valid, fully qualified URL to that resource (or the main URL if general).\n\nPrefer resources that are time-relevant (seasonal, recently posted, or otherwise timely for the provided week).\n\nOutput only the three lines in this exact format (no extra text, no JSON, no explanation):\nWeek of {{ $json.output.week }}\nTopic: [Insert concise resource-focused topic idea]\nURL: [Insert matching URL]\n\nKeep Topic to one concise line suitable for a social/weekly content brief.",
+        "options": {
+          "systemMessage": "You are a professional marketing strategist and content planner for Right at Home Winnipeg, a trusted in-home senior care agency.\n\nYou are provided with:\n\nThe start and end date for a specific week.\n\nThe company website: https://www.rightathomecanada.com/winnipeg\n\nYour task:\n\nReview the Right at Home Winnipeg website and locate a company resource that can be promoted that week. Resources include blog posts, guides, downloadable PDFs, educational pages, seasonal/holiday posts, news items, or any time-relevant content posted on the site.\n\nPrefer resources that are directly relevant to the week’s timing (seasonal content, recently posted blogs, or timely guides). If multiple applicable resources exist, choose the clearest, most actionable one.\n\nProduce one concise marketing topic idea that highlights that resource and include the exact, valid URL to the resource page. If no specific resource exists, still produce a distinct resource-focused topic and use the main URL: https://www.rightathomecanada.com/winnipeg\n.\n\nOutput only the three lines in this exact format (no JSON, no extra explanation, no markdown, no captions):\nWeek of {{ $json.output.week }}\nTopic: [Insert concise resource-focused topic idea — one line]\nURL: [Insert matching, fully qualified URL]\n\nEnsure the topic is relevant and appealing to seniors, caregivers, and families, and matches Right at Home Winnipeg’s compassionate, community-centered brand tone.\n\nPrefer linking to the most specific page that supports the topic (blog post, guide, resource page). Do not output anything other than the three required lines."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        7216,
+        1248
+      ],
+      "id": "fde1b183-d760-4e15-ab13-c9b63b65a725",
+      "name": "Resource"
+    },
+    {
+      "parameters": {
+        "text": "=Extract the JSON string from the following input;\n{{ $json.output }}\n\nFor each of marketing1 and marketing2, combine the Week, Topic, and URL fields into a single formatted text block using this exact structure and punctuation:\n\nWeek of {Week}\nTopic: {Topic}\nURL: {URL}\n\nReturn only two variables: marketing1 and marketing2. Do not include explanations, labels, JSON wrappers, or any additional text.",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "marketing1",
+              "description": "Formatted three-line marketing block for the first topic (Week, Topic, URL)",
+              "required": true
+            },
+            {
+              "name": "marketing2",
+              "description": "Formatted three-line marketing block for the second topic (Week, Topic, URL)",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        6784,
+        1248
+      ],
+      "id": "0e9869b2-0607-4f8c-8d4b-933fddb584f9",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        6720,
+        1456
+      ],
+      "id": "0389e8c3-7669-4a25-949c-d39ddb035508",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Marketing": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Marketing",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Marketing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resource",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resource": {
+      "main": [
+        [
+          {
+            "node": "Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Resource",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7449e554-891d-4610-a0a7-8857f6c1f215",
+  "activeVersionId": "7449e554-891d-4610-a0a7-8857f6c1f215",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T21:47:34.761Z",
+      "createdAt": "2026-05-03T21:47:34.761Z",
+      "role": "workflow:owner",
+      "workflowId": "qRR4vWsInqKRmVUL",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-03T22:15:51.807Z",
+    "createdAt": "2026-05-03T21:52:44.614Z",
+    "versionId": "7449e554-891d-4610-a0a7-8857f6c1f215",
+    "workflowId": "qRR4vWsInqKRmVUL",
+    "nodes": [
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=user:\nStart date: {{ $json.output.startDate }}\nEnd date: {{ $json.output.endDate }}\n\nWebsite to reference:\nhttps://www.rightathomecanada.com/winnipeg\n\nTask:\nGenerate two marketing topic ideas for the week that help promote Right at Home Winnipeg.\n\nRequirements:\n\nEach topic should focus on a specific service, resource, or company highlight found on the website.\n\nInclude the valid URL to the relevant webpage (or the main URL if general).\n\nDo not include explanations, captions, or summaries — output must be JSON only (see format).\n\nMake the two topics distinct from each other.\n\nTone: compassionate, community-centered, aimed at seniors, caregivers, and families.\n\nOutput format (JSON only — exact keys and structure):\n\n{\n\"marketing1\": {\n\"Week\": \"{{ $json.output.week }}\",\n\"Topic\": \"[Insert concise topic idea]\",\n\"URL\": \"[Insert matching URL]\"\n},\n\"marketing2\": {\n\"Week\": \"{{ $json.output.week }}\",\n\"Topic\": \"[Insert concise topic idea]\",\n\"URL\": \"[Insert matching URL]\"\n}\n}\n\nNotes:\n\nWeek should use the provided {{ $json.output.week }} variable exactly.\n\nTopic should be a one-line, concise idea.\n\nURL must be a fully qualified, valid URL.",
+          "options": {
+            "systemMessage": "You are a professional marketing strategist and content planner for Right at Home Winnipeg, a trusted in-home senior care agency.\n\nYou are provided with:\n\nThe start and end date for a specific week.\n\nThe company website: https://www.rightathomecanada.com/winnipeg\n\nYour job:\n\nReview the Right at Home Winnipeg website and find items (services, resources, pages, or company highlights) to promote.\n\nGenerate two distinct weekly marketing topic ideas that promote the company’s services, programs, or brand. The two ideas must be different from each other.\n\nFor each idea include a concise Topic title/idea and the exact URL of the relevant page (or the main URL if the topic is general).\n\nOutput only valid JSON (no extra text, no explanation, no markdown). The JSON must have exactly two top-level keys: marketing1 and marketing2. Each of those must be an object with the fields Week, Topic, and URL (see format below).\n\nEnsure content is relevant and appealing to seniors, caregivers, and families, and aligns with a compassionate, community-centered brand tone.\n\nPrefer linking directly to the most specific page that supports the topic. If a topic is general, use https://www.rightathomecanada.com/winnipeg.\n\nIf you cannot find a page that matches an idea, still produce a distinct idea and use the main URL. Do not output anything except the required JSON structure."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          6432,
+          1248
+        ],
+        "id": "e7631436-3a7e-4471-8289-f6560f779542",
+        "name": "Marketing"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Start date: {{ $('Information Extractor').item.json.output.startDate }}\nEnd date: {{ $('Information Extractor').item.json.output.endDate }}\n\nMaster event list:\nOCTOBER 2025\nOct 1: National Seniors Day (Canada/Manitoba)\nOct 1: International Day of Older Persons (UN)\nOct 4: National Cinnamon Bun Day – Community baking activity\nOct 6–12: Mental Illness Awareness Week\nOct (Month): Healthy Workplace Month, Breast Cancer Awareness Month, Occupational Therapy Month\nOct 10: World Mental Health Day\nOct 10: World Hospice/Palliative Care Day\nOct 13: Thanksgiving (Canada)\nOct 15: Pregnancy and Infant Loss Awareness Day\nOct 16 onwards: Manitoba Fall Prevention & Active Aging programs\nOct 20: Diwali (multicultural celebration)\nOct 23: Birth of Bahá'u'lláh (Bahá’í)\nOct 24: Brain Cancer Awareness Day\nOct 31: Halloween — crafts, baking\nOctober: Manitoba Healthy Aging Awards\n\nNOVEMBER 2025\nNovember: Lung Cancer Awareness Month, Fall Prevention Month, Diabetes Awareness Month\nNov 1–7: Canadian Patient Safety Week\nNov 7: Inuit Day\nNov 8: Indigenous Veterans Day\nNov 13: World Kindness Day — card-making, crafts\nNov 14: World Diabetes Day\nNov 20: Transgender Day of Remembrance\nNov 17: National Homemade Bread Day — baking or sharing recipes\n\nDECEMBER 2025\nDec 1: World AIDS Day\nDec 3: International Day of Persons with Disabilities\nDec 4: National Cookie Day — group baking\nDec 14–22: Hanukkah — crafts, food-themed events\nDec 21: Winter Solstice\nDec 25: Christmas Day\nDec 26–Jan 1: Kwanzaa\n\nJANUARY 2026\nJanuary: Alzheimer’s Awareness Month\nJan 4: World Braille Day\nJan 18: Museum Selfie Day — virtual or local museum visits\nJan 21: National Squirrel Appreciation Day — nature watching\nJan 24: National Fun at Work Day — team games\nJan 25: Family Literacy Day — book clubs/reading\n\nFEBRUARY 2026\nFebruary: Heart Health Month, Black History Month, Psychology Month\nFeb 4: World Cancer Day\nFeb 13: Wear Red Canada (Women’s Heart Health)\nFeb 15: International Childhood Cancer Day\nFeb 20: National Love Your Pet Day — share pet photos, stories\nLast Day: Rare Disease Day\n\nMARCH 2026\nMarch: Kidney Health Month, Nutrition Month\nMar 8: International Women’s Day\nMar 14: Pi Day — bake pies, math fun\nMar 21: World Down Syndrome Day\nMar 22: World Water Day — gardening, nature themed events\nMar 31: Transgender Day of Visibility\n\nAPRIL 2026\nApril: Parkinson’s Awareness Month\nApr 2: World Autism Awareness Day\nApr 7: World Health Day — cooking/nutrition\nApr 11: World Parkinson’s Day\nApr 16: National Advance Care Planning Day\nApr 18: National Haiku Poetry Day — creative writing workshop\nApr 20–26: National Organ & Tissue Donation Awareness Week\n\nMAY 2026\nMay: Brain Tumor Awareness Month, Speech and Hearing Month, Mental Health Awareness Month, Bladder Cancer Awareness Month, Asian Heritage Month\nMay 6–12: National Nursing Week\nMay 8: World Ovarian Cancer Day\nMay 12: International Nurses Day\nMay 17: World Baking Day — staff/client bake-off\nMay 24: Victoria Day\nMay 25: National Scavenger Hunt Day — group activity\nMay 31: World No Tobacco Day\n\nJUNE 2026\nJune: ALS Awareness Month, National Indigenous History Month, Stroke Awareness Month, Canadian Men’s Health Month\nJun 1: Intergenerational Day\nJun 5: World Environment Day — gardening, sustainability projects\nJun 13–15: Garden Days Canada — garden visits, crafts\nJun 15: World Elder Abuse Awareness Day\nJun 21: National Indigenous Peoples Day, Summer Solstice\nJun 21: International Yoga Day — wellness activity\n\nJULY 2026\nJuly: UV Safety Month\nJul 7: National Chocolate Day — cooking/baking\nJul 11: National Cheer Up the Lonely Day — outreach, crafts\nJul 24: International Self-Care Day — relaxation activities\nJul 26: Disability Independence Day\n\nAUGUST 2026\nAug 8: International Cat Day — pet events\nAug 12: International Youth Day — youth crafts\nAug 30: National Toasted Marshmallow Day — treats\nAug 31: International Overdose Awareness Day\n\nSEPTEMBER 2026\nSeptember: World Alzheimer’s Month, Arthritis Awareness Month, Prostate Cancer Awareness Month, Childhood Cancer Awareness Month\nSep 8: International Literacy Day — reading club\nSep 10: World Suicide Prevention Day\nSep 13: National Grandparents Day — intergenerational events\nSep 15–21: National Dementia Awareness Week\nSep 21: World Alzheimer’s Day\nSep 30: National Day for Truth and Reconciliation\n\n---\n\nPlease identify which of these dates or awareness observances fall from **{{ $('Information Extractor').item.json.output.week }}**, including anything being observed that month, list all the days of that week (e.g. October 6, October 7, …), and then suggest the **most suitable one** for the senior care audience that week.",
+          "options": {
+            "systemMessage": "You are an expert content and event-planning assistant for Right at Home Winnipeg, a trusted in-home senior care agency serving older adults in Manitoba.\n\nYou are given:\n- A start and end date for a specific week (e.g. October 6–12, 2025)\n- A master list of awareness days, holidays, and observances between October 2025 and September 2026.\n\nYour job:\n1. Identify all events, holidays, or observances from the list that fall within the given date range.\n2. Write out the days of the week (e.g. October 6, October 7, October 8, …) separated by commas.\n3. Suggest **which event or day that week** is most relevant or suitable for Right at Home Winnipeg’s audience (primarily seniors, caregivers, and community health & wellness).\n4. Keep your tone professional, warm, and concise — the output will be used for automated scheduling and planning.\n\nIf there are no direct matches, identify the **closest relevant ongoing awareness month or week** that overlaps with the given dates."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          7584,
+          1248
+        ],
+        "id": "4079b522-086a-45a3-983a-b585a62cabde",
+        "name": "Calendar"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "87158930-7e73-4954-837d-b94b65307f85",
+                "name": "week",
+                "value": "={{ $('Information Extractor').item.json.output.week }}",
+                "type": "string"
+              },
+              {
+                "id": "dda3fcb0-2d76-48de-be7c-7834b3b9dc02",
+                "name": "marketing1",
+                "value": "={{ $('Information Extractor1').item.json.output.marketing1 }}",
+                "type": "string"
+              },
+              {
+                "id": "e426ee14-bca3-42d0-8722-b8cc8f4c139d",
+                "name": "marketing2",
+                "value": "={{ $('Information Extractor1').item.json.output.marketing2 }}",
+                "type": "string"
+              },
+              {
+                "id": "83c6b975-5ddb-49fe-af79-c78f31a879fe",
+                "name": "calendar",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              },
+              {
+                "id": "f03ca860-ea69-4603-aab6-78b0f7136936",
+                "name": "resource",
+                "value": "={{ $('Resource').item.json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          7920,
+          1248
+        ],
+        "id": "d377eac6-b55a-481e-917e-5170ad5985ea",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          7536,
+          1504
+        ],
+        "id": "42a6c248-fc0e-41b1-8983-21a773bda98f",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          6368,
+          1472
+        ],
+        "id": "a99573c6-845e-49af-96c7-69849a41c769",
+        "name": "OpenAI Chat Model1",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "text": "=You are a date range formatter.\n\nYou will receive a date input through the variable below:\n{{ $json.date }}\n\nExample format: “November 6th 2025, 8:04:37 pm”\n\nYour task:\n1. Parse this date.\n2. Calculate the 7-day range (the given date plus the next 6 calendar days).\n3. Output all results in the following exact structure:\n\nweek(Full sentence summarizing the week range, including both start and end dates, month(s), and year.): <Month> <StartDay> to <EndDay>, <Year>\ndateRange(Short range format without the year or the word “to”, using a dash between dates.): <Month> <StartDay> - <EndDay>\nstartDate(Start date of the 7-day range in Month Day, Year format.): <Month> <StartDay>, <Year>\nendDate(End date (6 days after start) in Month Day, Year format.): <Month> <EndDay>, <Year>\n\nFormatting rules:\n- Month must be the full month name (e.g., “November”).\n- Do NOT include ordinal suffixes (“st”, “nd”, “th”).\n- StartDay = the date of the input.\n- EndDay = six days after StartDay (total of 7 days).\n- Year = the same as the input year.\n- If the week crosses into a new month, show both months (e.g., “November 29 to December 5, 2025”).\n\nExample:\nInput: November 6th 2025, 8:04:37 pm  \nOutput:\nweek: November 6 to November 12, 2025  \ndateRange: November 6 - November 12  \nstartDate: November 6, 2025  \nendDate: November 12, 2025\n",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "week",
+                "description": "Full sentence summarizing the week range, including both start and end dates, month(s), and year.",
+                "required": true
+              },
+              {
+                "name": "dateRange",
+                "description": "Short range format without the year or the word “to”, using a dash between dates.",
+                "required": true
+              },
+              {
+                "name": "startDate",
+                "description": "Start date of the 7-day range in Month Day, Year format.",
+                "required": true
+              },
+              {
+                "name": "endDate",
+                "description": "End date (6 days after start) in Month Day, Year format.",
+                "required": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          6048,
+          1248
+        ],
+        "id": "927ce2ca-3efc-4bdf-b647-b5890d68c4d6",
+        "name": "Information Extractor"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "date",
+                "type": "any"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          5760,
+          1248
+        ],
+        "id": "a686899b-d6e5-4a93-9ee3-f221c6e2d574",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          6000,
+          1424
+        ],
+        "id": "14392077-9834-42c9-897e-186742c12f24",
+        "name": "OpenAI Chat Model2",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          8160,
+          1248
+        ],
+        "id": "b275242a-1fb5-4fb3-b24f-c0f894f3dae6",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          7168,
+          1440
+        ],
+        "id": "51e6d57f-1130-474d-817b-d739291de0c4",
+        "name": "OpenAI Chat Model3",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=user:\nStart date: {{ $json.output.startDate }}\nEnd date: {{ $json.output.endDate }}\n\nWebsite to reference:\nhttps://www.rightathomecanada.com/winnipeg\n\nTask:\nGenerate one marketing topic idea for the week that promotes Right at Home Winnipeg by highlighting a company resource (guide, blog post, educational article, downloadable, seasonal content, recently posted material, etc.).\n\nRequirements:\n\nThe topic must focus on a specific resource found on the website.\n\nInclude the valid, fully qualified URL to that resource (or the main URL if general).\n\nPrefer resources that are time-relevant (seasonal, recently posted, or otherwise timely for the provided week).\n\nOutput only the three lines in this exact format (no extra text, no JSON, no explanation):\nWeek of {{ $json.output.week }}\nTopic: [Insert concise resource-focused topic idea]\nURL: [Insert matching URL]\n\nKeep Topic to one concise line suitable for a social/weekly content brief.",
+          "options": {
+            "systemMessage": "You are a professional marketing strategist and content planner for Right at Home Winnipeg, a trusted in-home senior care agency.\n\nYou are provided with:\n\nThe start and end date for a specific week.\n\nThe company website: https://www.rightathomecanada.com/winnipeg\n\nYour task:\n\nReview the Right at Home Winnipeg website and locate a company resource that can be promoted that week. Resources include blog posts, guides, downloadable PDFs, educational pages, seasonal/holiday posts, news items, or any time-relevant content posted on the site.\n\nPrefer resources that are directly relevant to the week’s timing (seasonal content, recently posted blogs, or timely guides). If multiple applicable resources exist, choose the clearest, most actionable one.\n\nProduce one concise marketing topic idea that highlights that resource and include the exact, valid URL to the resource page. If no specific resource exists, still produce a distinct resource-focused topic and use the main URL: https://www.rightathomecanada.com/winnipeg\n.\n\nOutput only the three lines in this exact format (no JSON, no extra explanation, no markdown, no captions):\nWeek of {{ $json.output.week }}\nTopic: [Insert concise resource-focused topic idea — one line]\nURL: [Insert matching, fully qualified URL]\n\nEnsure the topic is relevant and appealing to seniors, caregivers, and families, and matches Right at Home Winnipeg’s compassionate, community-centered brand tone.\n\nPrefer linking to the most specific page that supports the topic (blog post, guide, resource page). Do not output anything other than the three required lines."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          7216,
+          1248
+        ],
+        "id": "fde1b183-d760-4e15-ab13-c9b63b65a725",
+        "name": "Resource"
+      },
+      {
+        "parameters": {
+          "text": "=Extract the JSON string from the following input;\n{{ $json.output }}\n\nFor each of marketing1 and marketing2, combine the Week, Topic, and URL fields into a single formatted text block using this exact structure and punctuation:\n\nWeek of {Week}\nTopic: {Topic}\nURL: {URL}\n\nReturn only two variables: marketing1 and marketing2. Do not include explanations, labels, JSON wrappers, or any additional text.",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "marketing1",
+                "description": "Formatted three-line marketing block for the first topic (Week, Topic, URL)",
+                "required": true
+              },
+              {
+                "name": "marketing2",
+                "description": "Formatted three-line marketing block for the second topic (Week, Topic, URL)",
+                "required": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          6784,
+          1248
+        ],
+        "id": "0e9869b2-0607-4f8c-8d4b-933fddb584f9",
+        "name": "Information Extractor1"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-5-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          6720,
+          1456
+        ],
+        "id": "0389e8c3-7669-4a25-949c-d39ddb035508",
+        "name": "OpenAI Chat Model4",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Marketing": {
+        "main": [
+          [
+            {
+              "node": "Information Extractor1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calendar": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Calendar",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Marketing",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Information Extractor": {
+        "main": [
+          [
+            {
+              "node": "Marketing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Information Extractor",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Information Extractor",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Resource",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Resource": {
+        "main": [
+          [
+            {
+              "node": "Calendar",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Information Extractor1": {
+        "main": [
+          [
+            {
+              "node": "Resource",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model4": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Information Extractor1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version 7449e554",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
