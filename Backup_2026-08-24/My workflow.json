@@ -1,0 +1,81 @@
+{
+  "updatedAt": "2026-05-03T20:27:19.465Z",
+  "createdAt": "2026-05-03T20:19:30.737Z",
+  "id": "Yq2kEfOw72OgaRfb",
+  "name": "My workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "af2bfa73-3701-402b-acb9-9c9963b40d2f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca",
+        "subject": "Test",
+        "message": "Test connection",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ae01274c-62a5-4654-96c5-a5271e725700",
+      "name": "Send a message",
+      "webhookId": "5e65e5bd-e4b0-45e2-b50d-24a856185a7b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1ed79ed4-4bbc-4004-9ede-cacb4fa58e3d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T20:19:30.737Z",
+      "createdAt": "2026-05-03T20:19:30.737Z",
+      "role": "workflow:owner",
+      "workflowId": "Yq2kEfOw72OgaRfb",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
