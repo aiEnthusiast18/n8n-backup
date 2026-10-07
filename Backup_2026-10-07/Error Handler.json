@@ -1,0 +1,187 @@
+{
+  "updatedAt": "2026-05-03T22:10:21.480Z",
+  "createdAt": "2026-05-03T21:54:00.212Z",
+  "id": "AzYIPHs9CsXeopw4",
+  "name": "Error Handler",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "54f9cbac-0aaa-480c-a0e7-66064e782a71",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=Error - {{ $json.workflow.name }}",
+        "bodyContent": "=Execution ID:  {{ $json.execution.id }}\nURL: {{ $json.execution.url }}\nError Message: {{ $json.execution.error.message }}\nLast Node Executed: {{ $json.execution.lastNodeExecuted }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        192,
+        192
+      ],
+      "id": "91210a7a-8b56-47c6-a01b-8aecf062ade8",
+      "name": "Send a message1",
+      "webhookId": "7a3b82e9-d33b-4e74-a366-3647454b0dc8",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "=Error - {{ $json.workflow.name }}",
+        "message": "=Execution ID:  {{ $json.execution.id }}\nURL: {{ $json.execution.url }}\nError Message: {{ $json.execution.error.message }}\nLast Node Executed: {{ $json.execution.lastNodeExecuted }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "ed24d97f-c9e5-4c53-bad2-7b9af8805287",
+      "name": "Send a message",
+      "webhookId": "38785347-c6fa-4be3-aea8-7df5a27b47cb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d7a0a2d2-47ba-4e4a-a28e-a9f524749582",
+  "activeVersionId": "d7a0a2d2-47ba-4e4a-a28e-a9f524749582",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T21:54:00.212Z",
+      "createdAt": "2026-05-03T21:54:00.212Z",
+      "role": "workflow:owner",
+      "workflowId": "AzYIPHs9CsXeopw4",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-03T22:14:56.370Z",
+    "createdAt": "2026-05-03T22:10:21.482Z",
+    "versionId": "d7a0a2d2-47ba-4e4a-a28e-a9f524749582",
+    "workflowId": "AzYIPHs9CsXeopw4",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -192,
+          0
+        ],
+        "id": "54f9cbac-0aaa-480c-a0e7-66064e782a71",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "toRecipients": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "=Error - {{ $json.workflow.name }}",
+          "bodyContent": "=Execution ID:  {{ $json.execution.id }}\nURL: {{ $json.execution.url }}\nError Message: {{ $json.execution.error.message }}\nLast Node Executed: {{ $json.execution.lastNodeExecuted }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          192,
+          192
+        ],
+        "id": "91210a7a-8b56-47c6-a01b-8aecf062ade8",
+        "name": "Send a message1",
+        "webhookId": "7a3b82e9-d33b-4e74-a366-3647454b0dc8",
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "=Error - {{ $json.workflow.name }}",
+          "message": "=Execution ID:  {{ $json.execution.id }}\nURL: {{ $json.execution.url }}\nError Message: {{ $json.execution.error.message }}\nLast Node Executed: {{ $json.execution.lastNodeExecuted }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          16,
+          0
+        ],
+        "id": "ed24d97f-c9e5-4c53-bad2-7b9af8805287",
+        "name": "Send a message",
+        "webhookId": "38785347-c6fa-4be3-aea8-7df5a27b47cb",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version d7a0a2d2",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
