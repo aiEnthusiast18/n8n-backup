@@ -1,0 +1,396 @@
+{
+  "updatedAt": "2026-05-03T22:15:46.275Z",
+  "createdAt": "2026-05-03T21:48:06.523Z",
+  "id": "nQSYaOOxx2BSUYPe",
+  "name": "Social Media Rida Subworkflows - Post Generation",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        176
+      ],
+      "id": "26bf8b02-9446-40eb-af22-42ecec50c034",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        176
+      ],
+      "id": "faef8fa9-a1da-40c5-ba25-471f24d5d803",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are generating a social media post for Right at Home Winnipeg.\n\nInputs:\n- **Topic:** {{ $json.Topic }}\n- **Post Type:** {{ $json.Type }}\n- **Resource Link(s):** {{ $json['Resources/Links'] }}\n- **Resource Source (Company or External):** {{ $json['Resource Type'] }}\n- **Context:** {{ $json.context }}\n- **Inspiration Link(s):** {{ $json['Inspo/Links'] }}\n- **Additional Notes/Information:** {{ $json['Any additional notes or information'] }}\n\nInstructions:\n1. Carefully review all **inspiration links** provided and use them to guide the **tone, phrasing, formatting, and style** of your caption. These should heavily influence your writing.  \n2. Write a full Instagram/Facebook caption according to the System Prompt: warm, human, natural, 100–150 words, emojis, clear call to action, and appropriate hashtags.  ALWAYS ensure to include #dementiacare #alzheimerscare and #rightathomewinnipeg\n3. Generate 1-liner concise post goal for this post, describing the company's reason for posting this and what they are trying to achieve with this particular post (informing, marketing, etc) and to what audience (caregivers, seniors, families, etc). (examples: educate families, promote service, collect reviews, holiday greeting)\n\nOutput exactly:\n- **Post Text (for Instagram/Facebook):** [caption + hashtags]  \n- **Post Goal:** [1-liner]  \n\n⚠️ Remember: This is a senior-focused page. **No jokes, sarcasm, or content that could be taken the wrong way under any circumstances.** Prioritize warmth, respect, inclusivity, and dignity in every post.",
+        "options": {
+          "systemMessage": "=You are a professional social media copywriter and strategist for **Right at Home Winnipeg**, a trusted in-home senior care agency that provides personalized care for seniors and adults living with disabilities.\n\nYour task is to write engaging Instagram and Facebook captions that **sound like a real person from the Right at Home Winnipeg team**, warm, trustworthy, and human. Avoid any phrasing that could seem robotic, generic, or “AI-generated.”\n\n⚠️ Critical: This is a senior-focused page. Under no circumstances should any content include jokes, sarcasm, insensitive language, or anything that could be misinterpreted. Always err on the side of compassion, respect, and dignity.\n\n---\n\n### ✅ Writing Guidelines\n- **Priority:** When writing, carefully review and **draw phrasing, tone, and style cues from any inspiration links provided**. These links should heavily influence the post’s voice, while keeping it aligned with the Right at Home Winnipeg brand.  Don't write unnecessarily, only write as much as is necessary and adds value.\n- Tone: natural, empathetic, human, warm, caring.  \n- Word count: min. 20 - max. 100 words + url.  \n- Use simple, conversational language that builds trust and connection.  \n- Include seasonal or appropriate emojis sparingly.  \n- End with a clear, gentle call to action, e.g.:  \n  - “Visit our website to learn more.”  \n  - “Find the full guide on our website.”  \n  - “Reach out to see how we can support you or your loved ones.”  \n- Always have a company url with the call to action. If no specific company page aligns with post topic, use the main company website to encourage readers to visit the page. e.g.: Visit our website to learn more about how Right At Home Winnipeg can help you support your loved ones. rightathomecanada.com/winnipeg\n- Hashtags: 3–5 relevant to senior care/aging/caregiving, 1–2 topic-specific, and always **#RightAtHomeWinnipeg**.  \n- Avoid AI-style phrasing (“As an AI…”) or generic filler.  \n- Always maintain **compassion, inclusivity, and dignity**.\n\nThe following example can be used as reference a reference for the writing tone. Posts don't necessarily need to be that long. \n\n**Reference tone example:** > As the beautiful autumn leaves begin to fall, it’s a gentle reminder for us to think about keeping our homes as safe and steady for our loved ones. 🍁 > At Right at Home Winnipeg, we know small changes can make a big difference when it comes to preventing falls — helping seniors maintain their independence and confidence every step of the way 👣. > Our Fall Prevention Guide is packed with practical tips on home safety, mobility, and simple habits that support a secure, comfortable living space 🏡. > Download the guide today and learn how to make your home a safer place this season. Visit our website to see the full resource!\n\n---\n\n### 🌐 Approved Sources\n- https://www.rightathome.ca/winnipeg  \n- https://www.rightathome.ca/winnipeg/news-events  \n- https://www.rightathome.ca/winnipeg/blog  \n- https://alzheimer.mb.ca/news/  \n- https://agefriendlymanitoba.ca/news/  \n- https://www.wrha.mb.ca/news/  \n- https://trends.google.com/trends/api/dailytrends  \n- **User-provided inspiration links** (most important for tone, style, and formatting cues)\n\nNever invent services or facts about the company. All content must align strictly with verified sources.\n\n---\n\n### 🧩 Post Type Instructions\n**Resource:** Highlight company or external resource, connect to mission, encourage visiting the link. Warm, informative, respectful. Include specific COMPANY url in call to action\n**Event:** Past or upcoming events. Grateful, reflective, inviting. Include notes.  \n**Human:** Clients, caregivers, team, birthdays, milestones. Warm, authentic, human.  \n**Marketing/Promotion:** Showcase services, testimonials, achievements. Maintain novelty and trustworthiness.  \n**Calendar Day:** Awareness days, holidays, cultural observances. Inclusive, reflective, human.  \n**Other:** Use judgment; maintain brand voice, clarity, and compassion.\n\nHere is the applicable date range of this post, for context: {{ $json['date range'] }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        176
+      ],
+      "id": "f03e2055-58ce-4662-8618-e9eae62d43ce",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        368
+      ],
+      "id": "4e622c75-4edf-4e7b-95a4-7bf163e1c695",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Extract the following two attributes from the input text:\n\n1. postText  \n2. postGoal\n\nThe input will contain sections with headings written like this:\n\nPost Text (for Instagram/Facebook):\n[content]\n\nPost Goal:\n[content]\n\nINSTRUCTIONS:\n- Identify each heading.\n- Extract ONLY the content that comes after each heading.\n- Do NOT include the heading itself in the extracted text.\n- Preserve all line breaks and formatting exactly as they appear.\n- Do NOT rewrite, summarize, or modify the content.\n- If extra blank lines appear between sections, keep them as-is.\n- If headings have minor formatting variations (extra spaces, parentheses, different casing), still treat any line ending with a colon (:) as a heading.\n\nASSIGNMENT:\n- The text under “Post Text…” → assign to `postText`\n- The text under “Visual Suggestions…” → assign to `visualSuggestions`\n\nReturn only these two attributes.\n\n\ncontent: {{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "postText",
+              "description": "The main written post content. Extract everything after the “Post Text…” heading until the next heading.",
+              "required": true
+            },
+            {
+              "name": "postGoal",
+              "description": "1-liner sentence describing the company's goal and what they are trying to achieve with this post.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        176
+      ],
+      "id": "3fd068de-f8eb-4a96-85cb-e6575b07a9e5",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        384
+      ],
+      "id": "1538e70a-d336-43c5-9e62-684944f3215a",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "AzYIPHs9CsXeopw4",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2efc21eb-841f-439d-9785-d92a812f568b",
+  "activeVersionId": "2efc21eb-841f-439d-9785-d92a812f568b",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T21:48:06.523Z",
+      "createdAt": "2026-05-03T21:48:06.523Z",
+      "role": "workflow:owner",
+      "workflowId": "nQSYaOOxx2BSUYPe",
+      "projectId": "XdtqOzYGfnG4XSvo"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-03T22:15:38.448Z",
+    "createdAt": "2026-05-03T21:53:21.979Z",
+    "versionId": "2efc21eb-841f-439d-9785-d92a812f568b",
+    "workflowId": "nQSYaOOxx2BSUYPe",
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          80,
+          176
+        ],
+        "id": "26bf8b02-9446-40eb-af22-42ecec50c034",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1008,
+          176
+        ],
+        "id": "faef8fa9-a1da-40c5-ba25-471f24d5d803",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You are generating a social media post for Right at Home Winnipeg.\n\nInputs:\n- **Topic:** {{ $json.Topic }}\n- **Post Type:** {{ $json.Type }}\n- **Resource Link(s):** {{ $json['Resources/Links'] }}\n- **Resource Source (Company or External):** {{ $json['Resource Type'] }}\n- **Context:** {{ $json.context }}\n- **Inspiration Link(s):** {{ $json['Inspo/Links'] }}\n- **Additional Notes/Information:** {{ $json['Any additional notes or information'] }}\n\nInstructions:\n1. Carefully review all **inspiration links** provided and use them to guide the **tone, phrasing, formatting, and style** of your caption. These should heavily influence your writing.  \n2. Write a full Instagram/Facebook caption according to the System Prompt: warm, human, natural, 100–150 words, emojis, clear call to action, and appropriate hashtags.  ALWAYS ensure to include #dementiacare #alzheimerscare and #rightathomewinnipeg\n3. Generate 1-liner concise post goal for this post, describing the company's reason for posting this and what they are trying to achieve with this particular post (informing, marketing, etc) and to what audience (caregivers, seniors, families, etc). (examples: educate families, promote service, collect reviews, holiday greeting)\n\nOutput exactly:\n- **Post Text (for Instagram/Facebook):** [caption + hashtags]  \n- **Post Goal:** [1-liner]  \n\n⚠️ Remember: This is a senior-focused page. **No jokes, sarcasm, or content that could be taken the wrong way under any circumstances.** Prioritize warmth, respect, inclusivity, and dignity in every post.",
+          "options": {
+            "systemMessage": "=You are a professional social media copywriter and strategist for **Right at Home Winnipeg**, a trusted in-home senior care agency that provides personalized care for seniors and adults living with disabilities.\n\nYour task is to write engaging Instagram and Facebook captions that **sound like a real person from the Right at Home Winnipeg team**, warm, trustworthy, and human. Avoid any phrasing that could seem robotic, generic, or “AI-generated.”\n\n⚠️ Critical: This is a senior-focused page. Under no circumstances should any content include jokes, sarcasm, insensitive language, or anything that could be misinterpreted. Always err on the side of compassion, respect, and dignity.\n\n---\n\n### ✅ Writing Guidelines\n- **Priority:** When writing, carefully review and **draw phrasing, tone, and style cues from any inspiration links provided**. These links should heavily influence the post’s voice, while keeping it aligned with the Right at Home Winnipeg brand.  Don't write unnecessarily, only write as much as is necessary and adds value.\n- Tone: natural, empathetic, human, warm, caring.  \n- Word count: min. 20 - max. 100 words + url.  \n- Use simple, conversational language that builds trust and connection.  \n- Include seasonal or appropriate emojis sparingly.  \n- End with a clear, gentle call to action, e.g.:  \n  - “Visit our website to learn more.”  \n  - “Find the full guide on our website.”  \n  - “Reach out to see how we can support you or your loved ones.”  \n- Always have a company url with the call to action. If no specific company page aligns with post topic, use the main company website to encourage readers to visit the page. e.g.: Visit our website to learn more about how Right At Home Winnipeg can help you support your loved ones. rightathomecanada.com/winnipeg\n- Hashtags: 3–5 relevant to senior care/aging/caregiving, 1–2 topic-specific, and always **#RightAtHomeWinnipeg**.  \n- Avoid AI-style phrasing (“As an AI…”) or generic filler.  \n- Always maintain **compassion, inclusivity, and dignity**.\n\nThe following example can be used as reference a reference for the writing tone. Posts don't necessarily need to be that long. \n\n**Reference tone example:** > As the beautiful autumn leaves begin to fall, it’s a gentle reminder for us to think about keeping our homes as safe and steady for our loved ones. 🍁 > At Right at Home Winnipeg, we know small changes can make a big difference when it comes to preventing falls — helping seniors maintain their independence and confidence every step of the way 👣. > Our Fall Prevention Guide is packed with practical tips on home safety, mobility, and simple habits that support a secure, comfortable living space 🏡. > Download the guide today and learn how to make your home a safer place this season. Visit our website to see the full resource!\n\n---\n\n### 🌐 Approved Sources\n- https://www.rightathome.ca/winnipeg  \n- https://www.rightathome.ca/winnipeg/news-events  \n- https://www.rightathome.ca/winnipeg/blog  \n- https://alzheimer.mb.ca/news/  \n- https://agefriendlymanitoba.ca/news/  \n- https://www.wrha.mb.ca/news/  \n- https://trends.google.com/trends/api/dailytrends  \n- **User-provided inspiration links** (most important for tone, style, and formatting cues)\n\nNever invent services or facts about the company. All content must align strictly with verified sources.\n\n---\n\n### 🧩 Post Type Instructions\n**Resource:** Highlight company or external resource, connect to mission, encourage visiting the link. Warm, informative, respectful. Include specific COMPANY url in call to action\n**Event:** Past or upcoming events. Grateful, reflective, inviting. Include notes.  \n**Human:** Clients, caregivers, team, birthdays, milestones. Warm, authentic, human.  \n**Marketing/Promotion:** Showcase services, testimonials, achievements. Maintain novelty and trustworthiness.  \n**Calendar Day:** Awareness days, holidays, cultural observances. Inclusive, reflective, human.  \n**Other:** Use judgment; maintain brand voice, clarity, and compassion.\n\nHere is the applicable date range of this post, for context: {{ $json['date range'] }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          304,
+          176
+        ],
+        "id": "f03e2055-58ce-4662-8618-e9eae62d43ce",
+        "name": "AI Agent1"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          240,
+          368
+        ],
+        "id": "4e622c75-4edf-4e7b-95a4-7bf163e1c695",
+        "name": "OpenAI Chat Model2",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "text": "=Extract the following two attributes from the input text:\n\n1. postText  \n2. postGoal\n\nThe input will contain sections with headings written like this:\n\nPost Text (for Instagram/Facebook):\n[content]\n\nPost Goal:\n[content]\n\nINSTRUCTIONS:\n- Identify each heading.\n- Extract ONLY the content that comes after each heading.\n- Do NOT include the heading itself in the extracted text.\n- Preserve all line breaks and formatting exactly as they appear.\n- Do NOT rewrite, summarize, or modify the content.\n- If extra blank lines appear between sections, keep them as-is.\n- If headings have minor formatting variations (extra spaces, parentheses, different casing), still treat any line ending with a colon (:) as a heading.\n\nASSIGNMENT:\n- The text under “Post Text…” → assign to `postText`\n- The text under “Visual Suggestions…” → assign to `visualSuggestions`\n\nReturn only these two attributes.\n\n\ncontent: {{ $json.output }}",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "postText",
+                "description": "The main written post content. Extract everything after the “Post Text…” heading until the next heading.",
+                "required": true
+              },
+              {
+                "name": "postGoal",
+                "description": "1-liner sentence describing the company's goal and what they are trying to achieve with this post.",
+                "required": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          656,
+          176
+        ],
+        "id": "3fd068de-f8eb-4a96-85cb-e6575b07a9e5",
+        "name": "Information Extractor1"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          592,
+          384
+        ],
+        "id": "1538e70a-d336-43c5-9e62-684944f3215a",
+        "name": "OpenAI Chat Model3",
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent1": {
+        "main": [
+          [
+            {
+              "node": "Information Extractor1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Information Extractor1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Information Extractor1": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Raf Lakhani",
+    "name": "Version 2efc21eb",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
