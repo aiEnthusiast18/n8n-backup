@@ -1,0 +1,632 @@
+{
+  "id": "cqMzgAbxqwAmHoH6",
+  "name": "RAH Dashboard Alerts (5 min) ACTIVE",
+  "active": true,
+  "activeVersionId": "2ba3067a-c5f6-4d8e-9f8b-daf5e7ce2dd6",
+  "createdAt": "2026-10-20T19:45:22.874Z",
+  "updatedAt": "2026-10-21T14:06:51.650Z",
+  "isArchived": false,
+  "versionId": "38e7213e-ea7c-4158-acfa-880360b047b7",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "93f700f1-db97-464f-8730-21c59985a674",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dashboard.apps.204it.ca/alerts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "cce50956-dad8-4aec-8098-3d7de9a216f4",
+      "name": "Check Dashboard Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        96
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "GtVvh6XgdG7uDsJ7",
+          "name": "Dashboard API token"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ String($json.ok) }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c4f129a2-0111-41f0-88c1-85a98df6813d",
+      "name": "Run OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.notification ? \"yes\" : \"no\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "yes"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ca2ddb44-ccf1-4bb4-ba1d-51c4d8fd04af",
+      "name": "Has New Alerts?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "rlakhani@Anagomb.ca",
+        "subject": "={{ $json.notification.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.notification.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a8c80833-fffd-4c3c-91b2-bd35d622820e",
+      "name": "Email Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        0
+      ],
+      "webhookId": "c109fcaa-2e14-46dd-b861-8b26bf355aba",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fail-subject",
+              "name": "subject",
+              "value": "[AlayaCare 1021] Dashboard alert check FAILED",
+              "type": "string"
+            },
+            {
+              "id": "fail-text",
+              "name": "text",
+              "value": "=The 5-minute alert check did not return ok=true at {{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }} (server time).\nDetail: {{ $json.error?.message ?? $json.error ?? \"ok was not true\" }}\nNo alerts were evaluated for this run. Check the dashboard container logs in Coolify.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8f7cc8cc-458f-41fe-9e4e-f3c3851c6b34",
+      "name": "Build Failure Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $getWorkflowStaticData(\"global\");\nconst now = Date.now();\nif (data.lastFailureEmail && now - data.lastFailureEmail < 3600000) {\n  return [];\n}\ndata.lastFailureEmail = now;\nreturn $input.all();"
+      },
+      "id": "9d64acc9-e363-46c5-9221-53ee791a417a",
+      "name": "Limit Failure Emails To Hourly",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "70347ee1-4021-4ce5-a081-72498be975b0",
+      "name": "Email Failure Notice",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        192
+      ],
+      "webhookId": "97e64c5b-953f-47bb-ad30-c957ab72ba0d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Check Dashboard Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Dashboard Alerts": {
+      "main": [
+        [
+          {
+            "node": "Run OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run OK?": {
+      "main": [
+        [
+          {
+            "node": "Has New Alerts?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Failure Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Alerts?": {
+      "main": [
+        [
+          {
+            "node": "Email Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Failure Message": {
+      "main": [
+        [
+          {
+            "node": "Limit Failure Emails To Hourly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit Failure Emails To Hourly": {
+      "main": [
+        [
+          {
+            "node": "Email Failure Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "AzYIPHs9CsXeopw4"
+  },
+  "staticData": {
+    "node:Every 5 Minutes": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "cqMzgAbxqwAmHoH6",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-20T19:45:22.874Z",
+      "updatedAt": "2026-10-20T19:45:22.874Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "2ba3067a-c5f6-4d8e-9f8b-daf5e7ce2dd6",
+    "workflowId": "cqMzgAbxqwAmHoH6",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "id": "93f700f1-db97-464f-8730-21c59985a674",
+        "name": "Every 5 Minutes",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          0,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://dashboard.apps.204it.ca/alerts",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            },
+            "timeout": 60000
+          }
+        },
+        "id": "cce50956-dad8-4aec-8098-3d7de9a216f4",
+        "name": "Check Dashboard Alerts",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          224,
+          96
+        ],
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "GtVvh6XgdG7uDsJ7",
+            "name": "Dashboard API token"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ String($json.ok) }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                },
+                "rightValue": "true"
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "c4f129a2-0111-41f0-88c1-85a98df6813d",
+        "name": "Run OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.notification ? \"yes\" : \"no\" }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                },
+                "rightValue": "yes"
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "ca2ddb44-ccf1-4bb4-ba1d-51c4d8fd04af",
+        "name": "Has New Alerts?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          672,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "raflak@gmail.com",
+          "subject": "={{ $json.notification.subject }}",
+          "emailType": "text",
+          "message": "={{ $json.notification.text }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "a8c80833-fffd-4c3c-91b2-bd35d622820e",
+        "name": "Email Alert",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          896,
+          0
+        ],
+        "webhookId": "c109fcaa-2e14-46dd-b861-8b26bf355aba",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "fail-subject",
+                "name": "subject",
+                "value": "[AlayaCare 1021] Dashboard alert check FAILED",
+                "type": "string"
+              },
+              {
+                "id": "fail-text",
+                "name": "text",
+                "value": "=The 5-minute alert check did not return ok=true at {{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }} (server time).\nDetail: {{ $json.error?.message ?? $json.error ?? \"ok was not true\" }}\nNo alerts were evaluated for this run. Check the dashboard container logs in Coolify.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "8f7cc8cc-458f-41fe-9e4e-f3c3851c6b34",
+        "name": "Build Failure Message",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.5,
+        "position": [
+          672,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $getWorkflowStaticData(\"global\");\nconst now = Date.now();\nif (data.lastFailureEmail && now - data.lastFailureEmail < 3600000) {\n  return [];\n}\ndata.lastFailureEmail = now;\nreturn $input.all();"
+        },
+        "id": "9d64acc9-e363-46c5-9221-53ee791a417a",
+        "name": "Limit Failure Emails To Hourly",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "raflak@gmail.com",
+          "subject": "={{ $json.subject }}",
+          "emailType": "text",
+          "message": "={{ $json.text }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "70347ee1-4021-4ce5-a081-72498be975b0",
+        "name": "Email Failure Notice",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1120,
+          192
+        ],
+        "webhookId": "97e64c5b-953f-47bb-ad30-c957ab72ba0d",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Every 5 Minutes": {
+        "main": [
+          [
+            {
+              "node": "Check Dashboard Alerts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Dashboard Alerts": {
+        "main": [
+          [
+            {
+              "node": "Run OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run OK?": {
+        "main": [
+          [
+            {
+              "node": "Has New Alerts?",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Failure Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Alerts?": {
+        "main": [
+          [
+            {
+              "node": "Email Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Failure Message": {
+        "main": [
+          [
+            {
+              "node": "Limit Failure Emails To Hourly",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit Failure Emails To Hourly": {
+        "main": [
+          [
+            {
+              "node": "Email Failure Notice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani",
+    "name": "Version 2ba3067a",
+    "description": "",
+    "autosaved": true,
+    "createdAt": "2026-10-20T20:17:49.979Z",
+    "updatedAt": "2026-10-20T20:55:33.691Z"
+  }
+}
