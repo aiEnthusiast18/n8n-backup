@@ -1,0 +1,189 @@
+{
+  "id": "FHVr2PdC8D7ywqOb",
+  "name": "RAH Alerts Watchdog TEST INACTIVE",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-10-29T03:58:15.496Z",
+  "updatedAt": "2026-10-29T03:58:15.496Z",
+  "isArchived": false,
+  "versionId": "742089dd-1b5d-4054-a518-36a7a3672a80",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "480e0a4c-4ceb-48d5-aae7-1ee93031ff74",
+      "name": "Run Check Now",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f668867a-8bd6-46b2-99aa-8f7afbcec1ff",
+      "name": "Check Alerts Heartbeat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        96
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://dashboard.apps.204it.ca/healthz/alerts",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "5cfad516-a799-4d00-b2ce-afd7a6bd6842",
+      "name": "Decide Whether To Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        96
+      ],
+      "parameters": {
+        "jsCode": "// Email when the heartbeat goes down (then at most hourly while it stays down),\n// and once when it recovers. Times and status only; no visit data.\nconst data = $getWorkflowStaticData('global');\nconst r = $input.first().json;\nconst status = typeof r.statusCode === 'number' ? r.statusCode : null;\nconst body = r.body && typeof r.body === 'object' ? r.body : {};\nconst healthy = status === 200 && body.ok === true;\nconst now = Date.now();\nconst at = $now.setZone('America/Winnipeg').toFormat('yyyy-MM-dd HH:mm');\nif (healthy) {\n  if (data.downSince) {\n    const mins = Math.round((now - data.downSince) / 60000);\n    data.downSince = null;\n    data.lastEmail = null;\n    return [{ json: {\n      subject: '[TEST watchdog] [AlayaCare 1021] Alert checks running again',\n      text: 'Alert checks are running again as of ' + at + ' (Winnipeg time). They were down for about ' + mins + ' minutes. Missed-shift alerts for that time may not have been sent; check AlayaCare for visits without a clock-in.'\n    } }];\n  }\n  return [];\n}\nif (!data.downSince) data.downSince = now;\nif (data.lastEmail && now - data.lastEmail < 3600000) return [];\ndata.lastEmail = now;\nconst why = status === null\n  ? 'The dashboard did not answer (' + (r.error && r.error.message ? r.error.message : 'no response') + ').'\n  : status === 503\n    ? 'No alert check has succeeded for ' + body.minutes_since + ' minutes (last success: ' + (body.last_ok_at || 'none since the service started') + ').'\n    : 'The heartbeat answered HTTP ' + status + '.';\nreturn [{ json: {\n  subject: '[TEST watchdog] [AlayaCare 1021] Missed-shift alerts are NOT running',\n  text: 'Checked at ' + at + ' (Winnipeg time).\\n' + why + '\\n\\nUntil this is fixed, no missed-shift alerts are being sent. Check that the n8n alerts workflow is active and see the dashboard container logs in Coolify. This email repeats hourly while the problem lasts.'\n} }];"
+      }
+    },
+    {
+      "id": "bca0cf50-a793-4969-8a92-24f17b90a6e6",
+      "name": "Email Raf",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        96
+      ],
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      },
+      "webhookId": "76e60918-4354-4798-be86-3c22b5c96285"
+    },
+    {
+      "id": "34dafa4f-badf-4f3a-bc5d-f5631ce30b21",
+      "name": "Every 10 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        192
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "608d87ad-0f0a-435f-a5d3-87a55892714c",
+      "name": "Sticky Note 8f7d44c0",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        192
+      ],
+      "parameters": {
+        "content": "## Alerts watchdog (TEST, inactive)\nEvery 10 minutes reads GET /healthz/alerts on the dashboard. If no alert check has succeeded for 20 minutes (or the dashboard does not answer), emails raflak@gmail.com, then hourly while it lasts, and once on recovery. Times only, no visit data. Cannot detect n8n itself being down: pair with an outside uptime monitor on the same URL.",
+        "color": 5
+      }
+    }
+  ],
+  "connections": {
+    "Run Check Now": {
+      "main": [
+        [
+          {
+            "node": "Check Alerts Heartbeat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Alerts Heartbeat": {
+      "main": [
+        [
+          {
+            "node": "Decide Whether To Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Whether To Email": {
+      "main": [
+        [
+          {
+            "node": "Email Raf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 10 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Check Alerts Heartbeat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "FHVr2PdC8D7ywqOb",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-29T03:58:15.496Z",
+      "updatedAt": "2026-10-29T03:58:15.496Z"
+    }
+  ],
+  "activeVersion": null
+}
