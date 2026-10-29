@@ -1,0 +1,89 @@
+{
+  "id": "GGfsC8og18QCIWsY",
+  "name": "TEMP probe pm health (delete me)",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-10-28T19:28:24.007Z",
+  "updatedAt": "2026-10-28T19:28:34.989Z",
+  "isArchived": true,
+  "versionId": "da1e7efa-8044-40dc-802e-80a1b45bb68a",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "67c96d66-3534-4904-a48a-f37e7e7fa601",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b6076d64-5886-4b44-b8d7-9ffb064a39e3",
+      "name": "Probe",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://pm.apps.204it.ca/api/health",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Probe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "GGfsC8og18QCIWsY",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-28T19:28:24.007Z",
+      "updatedAt": "2026-10-28T19:28:24.007Z"
+    }
+  ],
+  "activeVersion": null
+}
