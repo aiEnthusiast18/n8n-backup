@@ -1,0 +1,559 @@
+{
+  "id": "CLHtulH8tkSAtNC9",
+  "name": "RAH Reminders: Daily Dry Run (shadow week)",
+  "active": true,
+  "activeVersionId": "e742fe13-b2c8-49fd-a463-e5eee93f4c54",
+  "createdAt": "2026-10-23T09:31:26.151Z",
+  "updatedAt": "2026-10-29T12:58:24.316Z",
+  "isArchived": false,
+  "versionId": "e742fe13-b2c8-49fd-a463-e5eee93f4c54",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "40 16 * * *"
+            }
+          ]
+        }
+      },
+      "id": "1ec82a6a-eacf-40e3-8fab-d911b3d04913",
+      "name": "Daily 11:40 Winnipeg (16:40 UTC)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://reminders.apps.204it.ca/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"job\":\"reminders\",\"dryRun\":true}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 600000
+        }
+      },
+      "id": "2d5b2174-1c89-446d-81c5-8a219d474aab",
+      "name": "Run Dry Run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        96
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4YPxUmArUHlQowH0",
+          "name": "REMINDERS_API_TOKEN"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ String($json.ok) }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3bb5b0f5-2800-416b-a8ca-d729809408c5",
+      "name": "Run OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const MODE = \"digest\";\nconst j = $input.first().json;\nconst JOB = j.job || \"reminders\";\nconst TEAL = \"#00838F\";\nconst NAVY = \"#06324F\";\nconst LABELS = { reminders: \"Evening-before reminders\", changes: \"Schedule changes\", reconcile: \"Delivery check\" };\nconst REASONS = {\nunassigned: \"No caregiver is assigned to this visit\",\ninactive_caregiver: \"The assigned caregiver is not active\",\nno_phone: \"The caregiver has no phone number on file\",\ninvalid_phone: \"The caregiver's phone number is not a valid mobile number\",\nundeliverable: \"Twilio cannot deliver to this caregiver (for example, they replied STOP)\",\nundelivered: \"The text was not delivered\",\nsend_outcome_unknown: \"The text may or may not have been sent. Check before resending\",\nsend_failed_repeatedly: \"Sending to this caregiver has failed repeatedly\",\nstale_pending: \"A text was started but never confirmed\",\ncaregiver_lookup_failed: \"A caregiver who was texted earlier could not be looked up\",\n};\nconst ALERTS = {\nneeds_attention: \"Something needs a person to look at it (see Needs review).\",\nsend_failures: \"One or more texts failed to send.\",\nsend_outcome_unknown: \"The outcome of one or more texts is unknown.\",\nno_visits_found: \"No visits were found for the day.\",\nrun_failed: \"The run stopped with an error.\",\n};\nconst esc = (v) => String(v).replace(/&/g, \"&amp;\").replace(/</g, \"&lt;\").replace(/>/g, \"&gt;\");\nconst c = j.counts || {};\nconst test = j.mode === \"test\";\nconst dry = j.dryRun === true;\nconst label = LABELS[JOB] || JOB;\nconst when = new Date().toLocaleString(\"en-CA\", { timeZone: \"America/Winnipeg\", dateStyle: \"medium\", timeStyle: \"short\" });\nconst dateOf = (opts) => new Date(j.serviceDate + \"T12:00:00Z\").toLocaleDateString(\"en-CA\", Object.assign({ timeZone: \"UTC\" }, opts));\nconst day = j.serviceDate ? dateOf({ weekday: \"long\", year: \"numeric\", month: \"long\", day: \"numeric\" }) : \"\";\nconst shortDay = j.serviceDate ? dateOf({ month: \"short\", day: \"numeric\" }) : \"\";\nconst alerts = j.alerts || [];\nconst exceptions = j.exceptions || [];\nconst warnings = j.warnings || [];\nconst plural = (n, w) => n + \" \" + w + (n === 1 ? \"\" : \"s\");\nconst digest = MODE === \"digest\";\nconst headline = JOB === \"reconcile\"\n? plural(c.checked || 0, \"text\") + \" checked: \" + (c.delivered || 0) + \" delivered, \" + (c.undelivered || 0) + \" not delivered, \" + (c.inFlight || 0) + \" still in transit.\"\n: dry\n? \"Dry run for \" + day + \": \" + plural(c.planned || 0, \"text\") + \" would be sent. Nothing was sent.\"\n: label + \" for \" + day + \": \" + plural(c.sent || 0, \"text\") + \" sent, \" + (c.failed || 0) + \" failed.\";\nconst modeNote = test\n? \"Every text goes to the owner's phone only. No caregiver is texted.\"\n: \"Texts go to caregivers.\";\nconst runText = dry ? \"Dry run (nothing sent)\" : \"Real send\";\nconst rows = JOB === \"reconcile\"\n? [[\"Messages checked\", c.checked], [\"Delivered\", c.delivered], [\"Not delivered\", c.undelivered], [\"Still in transit\", c.inFlight], [\"Not found at Twilio\", c.notFound]]\n: [\n[\"Visits for the day\", c.visits + (c.cancelledVisits ? \" (\" + c.cancelledVisits + \" cancelled)\" : \"\")],\n[\"Caregivers on the schedule\", c.caregivers],\n[\"Texts planned\", c.planned],\n[\"Texts sent\", c.sent],\n[\"Failed\", c.failed],\n[\"Already texted earlier\", c.skippedAlreadySent],\n[\"Held back by the test limit\", c.skippedTestLimit],\n[\"Caregivers with no visits\", c.skippedNoVisits],\n[\"Unchanged since last text\", c.skippedUnchanged],\n].filter((r, i) => r[1] !== undefined && (i < 5 || Number(r[1]) > 0));\nconst td = \"padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:14px;\";\nconst tableRows = rows.map((r) => \"<tr><td style='\" + td + \"color:#4b5563;'>\" + esc(r[0]) + \"</td><td style='\" + td + \"text-align:right;font-weight:600;color:\" + NAVY + \";'>\" + esc(r[1]) + \"</td></tr>\").join(\"\");\nconst excHtml = exceptions.length\n? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:14px;color:#111827;'>\" + exceptions.map((e) => {\nconst ids = (e.visitIds || []).length ? \" Visit\" + (e.visitIds.length > 1 ? \"s\" : \"\") + \" \" + e.visitIds.map(esc).join(\", \") + \".\" : \"\";\nconst who = e.caregiverUid ? \" Caregiver \" + esc(e.caregiverUid) + \".\" : \"\";\nconst det = e.detail ? \" (\" + esc(e.detail) + \")\" : \"\";\nreturn \"<li style='margin:4px 0;'>\" + esc(REASONS[e.reason] || e.reason) + det + \".\" + who + ids + \"</li>\";\n}).join(\"\") + \"</ul>\"\n: \"<p style='margin:6px 0 0;font-size:14px;color:#4b5563;'>Nothing to review.</p>\";\nconst warnHtml = warnings.length\n? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:13px;color:#4b5563;'>\" + warnings.map((w) => \"<li style='margin:3px 0;'>\" + esc(w) + \"</li>\").join(\"\") + \"</ul>\"\n: \"\";\nconst whyHtml = alerts.length\n? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:14px;color:#111827;'>\" + alerts.map((a) => \"<li style='margin:3px 0;'>\" + esc(ALERTS[a] || a) + \"</li>\").join(\"\") + \"</ul>\"\n: \"\";\nconst h = (t) => \"<h3 style='margin:20px 0 0;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:\" + TEAL + \";'>\" + t + \"</h3>\";\nconst title = digest ? \"Shadow week: daily dry run\" : \"Needs review: \" + label;\nconst compare = digest\n? \"<p style='margin:12px 0 0;font-size:14px;line-height:1.5;color:#111827;'>Compare with the old workflow: it should have texted about <strong>\" + esc(c.planned) + \"</strong> caregivers for this date. Any difference needs an explanation.</p>\"\n: \"\";\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;'>\"\n+ \"<div style='background:\" + TEAL + \";color:#ffffff;padding:14px 18px;border-radius:6px 6px 0 0;'>\"\n+ \"<div style='font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.9;'>Right at Home Winnipeg &middot; shift reminders</div>\"\n+ \"<div style='font-size:18px;font-weight:600;margin-top:2px;'>\" + esc(title) + \"</div></div>\"\n+ \"<div style='border:1px solid #e5e7eb;border-top:0;padding:16px 18px;border-radius:0 0 6px 6px;'>\"\n+ \"<p style='margin:0;font-size:15px;line-height:1.5;color:\" + NAVY + \";'>\" + esc(headline) + \"</p>\"\n+ \"<p style='margin:10px 0 0;font-size:13px;color:#4b5563;'><strong>\" + (test ? \"TEST MODE\" : \"LIVE\") + \"</strong>: \" + esc(modeNote) + \" &middot; \" + esc(runText) + \"</p>\"\n+ compare\n+ (alerts.length ? h(\"Why you are getting this\") + whyHtml : \"\")\n+ h(\"Needs review\") + excHtml\n+ h(\"Summary\") + \"<table style='width:100%;border-collapse:collapse;margin-top:6px;'>\" + tableRows + \"</table>\"\n+ (warnings.length ? h(\"Notes\") + warnHtml : \"\")\n+ \"<p style='margin:22px 0 0;font-size:12px;color:#6b7280;line-height:1.5;'>Run time: \" + esc(when) + \" (Winnipeg). Workflow: \" + esc($workflow.name) + \", execution \" + esc($execution.id) + \".<br>This email contains counts and IDs only: no names, phone numbers or message text. For detail, open Coolify, then alayacare-reminders, then Logs.</p>\"\n+ \"</div></div>\";\nconst subject = digest\n? \"[RAH Reminders] Shadow week\" + (shortDay ? \" \" + shortDay : \"\") + \": \" + plural(c.planned || 0, \"text\") + \" planned\"\n: \"[RAH Reminders] Needs review: \" + label + (shortDay ? \" for \" + shortDay : \"\") + (test ? \" (TEST)\" : \"\");\nreturn [{ json: { subject, html } }];"
+      },
+      "id": "4a9e5e64-54df-4fc1-9856-713c38649885",
+      "name": "Format Digest Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "72b36c3a-9a7f-4460-817a-61c48d07bd85",
+      "name": "Email Daily Counts",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        0
+      ],
+      "webhookId": "08042a15-15cc-4935-8cbf-8dafb3c029b9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst LABEL = \"Daily dry run (shadow week)\";\nconst NAVY = \"#06324F\";\nconst esc = (v) => String(v).replace(/&/g, \"&amp;\").replace(/</g, \"&lt;\").replace(/>/g, \"&gt;\");\nconst detail = typeof j.error === \"string\" ? j.error : (j.error && j.error.message ? j.error.message : \"No detail was returned (the service may not have responded).\");\nconst when = new Date().toLocaleString(\"en-CA\", { timeZone: \"America/Winnipeg\", dateStyle: \"medium\", timeStyle: \"short\" });\nconst alerts = j.alerts || [];\nconst li = (t) => \"<li style='margin:4px 0;'>\" + t + \"</li>\";\nconst h = (t) => \"<h3 style='margin:20px 0 0;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#b91c1c;'>\" + t + \"</h3>\";\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;'>\"\n+ \"<div style='background:#b91c1c;color:#ffffff;padding:14px 18px;border-radius:6px 6px 0 0;'>\"\n+ \"<div style='font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.9;'>Right at Home Winnipeg &middot; shift reminders</div>\"\n+ \"<div style='font-size:18px;font-weight:600;margin-top:2px;'>Failed: \" + esc(LABEL) + \" did not run</div></div>\"\n+ \"<div style='border:1px solid #e5e7eb;border-top:0;padding:16px 18px;border-radius:0 0 6px 6px;'>\"\n+ \"<p style='margin:0;font-size:15px;line-height:1.5;color:\" + NAVY + \";'>The reminders service did not return a successful result at \" + esc(when) + \" (Winnipeg). Some texts may not have been sent.</p>\"\n+ h(\"What the service said\") + \"<p style='margin:6px 0 0;font-size:14px;color:#111827;'>\" + esc(detail) + \"</p>\"\n+ (alerts.length ? \"<p style='margin:6px 0 0;font-size:13px;color:#4b5563;'>Alerts: \" + esc(alerts.join(\", \")) + \"</p>\" : \"\")\n+ h(\"What to do\")\n+ \"<ol style='margin:6px 0 0 18px;padding:0;font-size:14px;'>\"\n+ li(\"Open Coolify, then alayacare-reminders, then Logs, and read the last few lines.\")\n+ li(\"Do not run the job again until you know why it stopped. Texts already sent are recorded and are never repeated, so it is safe to wait.\")\n+ li(\"You will get at most one of these emails per hour.\") + \"</ol>\"\n+ \"<p style='margin:22px 0 0;font-size:12px;color:#6b7280;line-height:1.5;'>Workflow: \" + esc($workflow.name) + \", execution \" + esc($execution.id) + \". This email contains no names, phone numbers or message text.</p>\"\n+ \"</div></div>\";\nconst subject = \"[RAH Reminders] FAILED: \" + LABEL + \" did not run\";\nreturn [{ json: { subject, html } }];"
+      },
+      "id": "92c2199e-26cb-4bd4-a228-60077672936f",
+      "name": "Format Failure Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $getWorkflowStaticData(\"global\");\nconst now = Date.now();\nif (data.lastFailureEmail && now - data.lastFailureEmail < 3600000) {\n  return [];\n}\ndata.lastFailureEmail = now;\nreturn $input.all();"
+      },
+      "id": "fa419455-2f8b-4132-b582-bf5ae462cedc",
+      "name": "Limit Failure Emails To Hourly",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a39aca39-3b22-45c3-af61-de5a04b6424a",
+      "name": "Email Failure Notice",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        192
+      ],
+      "webhookId": "ea9f0744-7caa-4865-8330-6bfe0bcd8c79",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 11:40 Winnipeg (16:40 UTC)": {
+      "main": [
+        [
+          {
+            "node": "Run Dry Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Dry Run": {
+      "main": [
+        [
+          {
+            "node": "Run OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run OK?": {
+      "main": [
+        [
+          {
+            "node": "Format Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Failure Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Digest Email": {
+      "main": [
+        [
+          {
+            "node": "Email Daily Counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Failure Email": {
+      "main": [
+        [
+          {
+            "node": "Limit Failure Emails To Hourly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit Failure Emails To Hourly": {
+      "main": [
+        [
+          {
+            "node": "Email Failure Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "UTC",
+    "saveDataSuccessExecution": "none",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Daily 11:40 Winnipeg (16:40 UTC)": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "CLHtulH8tkSAtNC9",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-23T09:31:26.151Z",
+      "updatedAt": "2026-10-23T09:31:26.151Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "e742fe13-b2c8-49fd-a463-e5eee93f4c54",
+    "workflowId": "CLHtulH8tkSAtNC9",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "40 16 * * *"
+              }
+            ]
+          }
+        },
+        "id": "1ec82a6a-eacf-40e3-8fab-d911b3d04913",
+        "name": "Daily 11:40 Winnipeg (16:40 UTC)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          0,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://reminders.apps.204it.ca/run",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\"job\":\"reminders\",\"dryRun\":true}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            },
+            "timeout": 600000
+          }
+        },
+        "id": "2d5b2174-1c89-446d-81c5-8a219d474aab",
+        "name": "Run Dry Run",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          224,
+          96
+        ],
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "4YPxUmArUHlQowH0",
+            "name": "REMINDERS_API_TOKEN"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ String($json.ok) }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                },
+                "rightValue": "true"
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "3bb5b0f5-2800-416b-a8ca-d729809408c5",
+        "name": "Run OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const MODE = \"digest\";\nconst j = $input.first().json;\nconst JOB = j.job || \"reminders\";\nconst TEAL = \"#00838F\";\nconst NAVY = \"#06324F\";\nconst LABELS = { reminders: \"Evening-before reminders\", changes: \"Schedule changes\", reconcile: \"Delivery check\" };\nconst REASONS = {\nunassigned: \"No caregiver is assigned to this visit\",\ninactive_caregiver: \"The assigned caregiver is not active\",\nno_phone: \"The caregiver has no phone number on file\",\ninvalid_phone: \"The caregiver's phone number is not a valid mobile number\",\nundeliverable: \"Twilio cannot deliver to this caregiver (for example, they replied STOP)\",\nundelivered: \"The text was not delivered\",\nsend_outcome_unknown: \"The text may or may not have been sent. Check before resending\",\nsend_failed_repeatedly: \"Sending to this caregiver has failed repeatedly\",\nstale_pending: \"A text was started but never confirmed\",\ncaregiver_lookup_failed: \"A caregiver who was texted earlier could not be looked up\",\n};\nconst ALERTS = {\nneeds_attention: \"Something needs a person to look at it (see Needs review).\",\nsend_failures: \"One or more texts failed to send.\",\nsend_outcome_unknown: \"The outcome of one or more texts is unknown.\",\nno_visits_found: \"No visits were found for the day.\",\nrun_failed: \"The run stopped with an error.\",\n};\nconst esc = (v) => String(v).replace(/&/g, \"&amp;\").replace(/</g, \"&lt;\").replace(/>/g, \"&gt;\");\nconst c = j.counts || {};\nconst test = j.mode === \"test\";\nconst dry = j.dryRun === true;\nconst label = LABELS[JOB] || JOB;\nconst when = new Date().toLocaleString(\"en-CA\", { timeZone: \"America/Winnipeg\", dateStyle: \"medium\", timeStyle: \"short\" });\nconst dateOf = (opts) => new Date(j.serviceDate + \"T12:00:00Z\").toLocaleDateString(\"en-CA\", Object.assign({ timeZone: \"UTC\" }, opts));\nconst day = j.serviceDate ? dateOf({ weekday: \"long\", year: \"numeric\", month: \"long\", day: \"numeric\" }) : \"\";\nconst shortDay = j.serviceDate ? dateOf({ month: \"short\", day: \"numeric\" }) : \"\";\nconst alerts = j.alerts || [];\nconst exceptions = j.exceptions || [];\nconst warnings = j.warnings || [];\nconst plural = (n, w) => n + \" \" + w + (n === 1 ? \"\" : \"s\");\nconst digest = MODE === \"digest\";\nconst headline = JOB === \"reconcile\"\n? plural(c.checked || 0, \"text\") + \" checked: \" + (c.delivered || 0) + \" delivered, \" + (c.undelivered || 0) + \" not delivered, \" + (c.inFlight || 0) + \" still in transit.\"\n: dry\n? \"Dry run for \" + day + \": \" + plural(c.planned || 0, \"text\") + \" would be sent. Nothing was sent.\"\n: label + \" for \" + day + \": \" + plural(c.sent || 0, \"text\") + \" sent, \" + (c.failed || 0) + \" failed.\";\nconst modeNote = test\n? \"Every text goes to the owner's phone only. No caregiver is texted.\"\n: \"Texts go to caregivers.\";\nconst runText = dry ? \"Dry run (nothing sent)\" : \"Real send\";\nconst rows = JOB === \"reconcile\"\n? [[\"Messages checked\", c.checked], [\"Delivered\", c.delivered], [\"Not delivered\", c.undelivered], [\"Still in transit\", c.inFlight], [\"Not found at Twilio\", c.notFound]]\n: [\n[\"Visits for the day\", c.visits + (c.cancelledVisits ? \" (\" + c.cancelledVisits + \" cancelled)\" : \"\")],\n[\"Caregivers on the schedule\", c.caregivers],\n[\"Texts planned\", c.planned],\n[\"Texts sent\", c.sent],\n[\"Failed\", c.failed],\n[\"Already texted earlier\", c.skippedAlreadySent],\n[\"Held back by the test limit\", c.skippedTestLimit],\n[\"Caregivers with no visits\", c.skippedNoVisits],\n[\"Unchanged since last text\", c.skippedUnchanged],\n].filter((r, i) => r[1] !== undefined && (i < 5 || Number(r[1]) > 0));\nconst td = \"padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:14px;\";\nconst tableRows = rows.map((r) => \"<tr><td style='\" + td + \"color:#4b5563;'>\" + esc(r[0]) + \"</td><td style='\" + td + \"text-align:right;font-weight:600;color:\" + NAVY + \";'>\" + esc(r[1]) + \"</td></tr>\").join(\"\");\nconst excHtml = exceptions.length\n? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:14px;color:#111827;'>\" + exceptions.map((e) => {\nconst ids = (e.visitIds || []).length ? \" Visit\" + (e.visitIds.length > 1 ? \"s\" : \"\") + \" \" + e.visitIds.map(esc).join(\", \") + \".\" : \"\";\nconst who = e.caregiverUid ? \" Caregiver \" + esc(e.caregiverUid) + \".\" : \"\";\nconst det = e.detail ? \" (\" + esc(e.detail) + \")\" : \"\";\nreturn \"<li style='margin:4px 0;'>\" + esc(REASONS[e.reason] || e.reason) + det + \".\" + who + ids + \"</li>\";\n}).join(\"\") + \"</ul>\"\n: \"<p style='margin:6px 0 0;font-size:14px;color:#4b5563;'>Nothing to review.</p>\";\nconst warnHtml = warnings.length\n? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:13px;color:#4b5563;'>\" + warnings.map((w) => \"<li style='margin:3px 0;'>\" + esc(w) + \"</li>\").join(\"\") + \"</ul>\"\n: \"\";\nconst whyHtml = alerts.length\n? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:14px;color:#111827;'>\" + alerts.map((a) => \"<li style='margin:3px 0;'>\" + esc(ALERTS[a] || a) + \"</li>\").join(\"\") + \"</ul>\"\n: \"\";\nconst h = (t) => \"<h3 style='margin:20px 0 0;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:\" + TEAL + \";'>\" + t + \"</h3>\";\nconst title = digest ? \"Shadow week: daily dry run\" : \"Needs review: \" + label;\nconst compare = digest\n? \"<p style='margin:12px 0 0;font-size:14px;line-height:1.5;color:#111827;'>Compare with the old workflow: it should have texted about <strong>\" + esc(c.planned) + \"</strong> caregivers for this date. Any difference needs an explanation.</p>\"\n: \"\";\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;'>\"\n+ \"<div style='background:\" + TEAL + \";color:#ffffff;padding:14px 18px;border-radius:6px 6px 0 0;'>\"\n+ \"<div style='font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.9;'>Right at Home Winnipeg &middot; shift reminders</div>\"\n+ \"<div style='font-size:18px;font-weight:600;margin-top:2px;'>\" + esc(title) + \"</div></div>\"\n+ \"<div style='border:1px solid #e5e7eb;border-top:0;padding:16px 18px;border-radius:0 0 6px 6px;'>\"\n+ \"<p style='margin:0;font-size:15px;line-height:1.5;color:\" + NAVY + \";'>\" + esc(headline) + \"</p>\"\n+ \"<p style='margin:10px 0 0;font-size:13px;color:#4b5563;'><strong>\" + (test ? \"TEST MODE\" : \"LIVE\") + \"</strong>: \" + esc(modeNote) + \" &middot; \" + esc(runText) + \"</p>\"\n+ compare\n+ (alerts.length ? h(\"Why you are getting this\") + whyHtml : \"\")\n+ h(\"Needs review\") + excHtml\n+ h(\"Summary\") + \"<table style='width:100%;border-collapse:collapse;margin-top:6px;'>\" + tableRows + \"</table>\"\n+ (warnings.length ? h(\"Notes\") + warnHtml : \"\")\n+ \"<p style='margin:22px 0 0;font-size:12px;color:#6b7280;line-height:1.5;'>Run time: \" + esc(when) + \" (Winnipeg). Workflow: \" + esc($workflow.name) + \", execution \" + esc($execution.id) + \".<br>This email contains counts and IDs only: no names, phone numbers or message text. For detail, open Coolify, then alayacare-reminders, then Logs.</p>\"\n+ \"</div></div>\";\nconst subject = digest\n? \"[RAH Reminders] Shadow week\" + (shortDay ? \" \" + shortDay : \"\") + \": \" + plural(c.planned || 0, \"text\") + \" planned\"\n: \"[RAH Reminders] Needs review: \" + label + (shortDay ? \" for \" + shortDay : \"\") + (test ? \" (TEST)\" : \"\");\nreturn [{ json: { subject, html } }];"
+        },
+        "id": "4a9e5e64-54df-4fc1-9856-713c38649885",
+        "name": "Format Digest Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "={{ $json.subject }}",
+          "message": "={{ $json.html }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "72b36c3a-9a7f-4460-817a-61c48d07bd85",
+        "name": "Email Daily Counts",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          896,
+          0
+        ],
+        "webhookId": "08042a15-15cc-4935-8cbf-8dafb3c029b9",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const j = $input.first().json;\nconst LABEL = \"Daily dry run (shadow week)\";\nconst NAVY = \"#06324F\";\nconst esc = (v) => String(v).replace(/&/g, \"&amp;\").replace(/</g, \"&lt;\").replace(/>/g, \"&gt;\");\nconst detail = typeof j.error === \"string\" ? j.error : (j.error && j.error.message ? j.error.message : \"No detail was returned (the service may not have responded).\");\nconst when = new Date().toLocaleString(\"en-CA\", { timeZone: \"America/Winnipeg\", dateStyle: \"medium\", timeStyle: \"short\" });\nconst alerts = j.alerts || [];\nconst li = (t) => \"<li style='margin:4px 0;'>\" + t + \"</li>\";\nconst h = (t) => \"<h3 style='margin:20px 0 0;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#b91c1c;'>\" + t + \"</h3>\";\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;'>\"\n+ \"<div style='background:#b91c1c;color:#ffffff;padding:14px 18px;border-radius:6px 6px 0 0;'>\"\n+ \"<div style='font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.9;'>Right at Home Winnipeg &middot; shift reminders</div>\"\n+ \"<div style='font-size:18px;font-weight:600;margin-top:2px;'>Failed: \" + esc(LABEL) + \" did not run</div></div>\"\n+ \"<div style='border:1px solid #e5e7eb;border-top:0;padding:16px 18px;border-radius:0 0 6px 6px;'>\"\n+ \"<p style='margin:0;font-size:15px;line-height:1.5;color:\" + NAVY + \";'>The reminders service did not return a successful result at \" + esc(when) + \" (Winnipeg). Some texts may not have been sent.</p>\"\n+ h(\"What the service said\") + \"<p style='margin:6px 0 0;font-size:14px;color:#111827;'>\" + esc(detail) + \"</p>\"\n+ (alerts.length ? \"<p style='margin:6px 0 0;font-size:13px;color:#4b5563;'>Alerts: \" + esc(alerts.join(\", \")) + \"</p>\" : \"\")\n+ h(\"What to do\")\n+ \"<ol style='margin:6px 0 0 18px;padding:0;font-size:14px;'>\"\n+ li(\"Open Coolify, then alayacare-reminders, then Logs, and read the last few lines.\")\n+ li(\"Do not run the job again until you know why it stopped. Texts already sent are recorded and are never repeated, so it is safe to wait.\")\n+ li(\"You will get at most one of these emails per hour.\") + \"</ol>\"\n+ \"<p style='margin:22px 0 0;font-size:12px;color:#6b7280;line-height:1.5;'>Workflow: \" + esc($workflow.name) + \", execution \" + esc($execution.id) + \". This email contains no names, phone numbers or message text.</p>\"\n+ \"</div></div>\";\nconst subject = \"[RAH Reminders] FAILED: \" + LABEL + \" did not run\";\nreturn [{ json: { subject, html } }];"
+        },
+        "id": "92c2199e-26cb-4bd4-a228-60077672936f",
+        "name": "Format Failure Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $getWorkflowStaticData(\"global\");\nconst now = Date.now();\nif (data.lastFailureEmail && now - data.lastFailureEmail < 3600000) {\n  return [];\n}\ndata.lastFailureEmail = now;\nreturn $input.all();"
+        },
+        "id": "fa419455-2f8b-4132-b582-bf5ae462cedc",
+        "name": "Limit Failure Emails To Hourly",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "={{ $json.subject }}",
+          "message": "={{ $json.html }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "a39aca39-3b22-45c3-af61-de5a04b6424a",
+        "name": "Email Failure Notice",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1120,
+          192
+        ],
+        "webhookId": "ea9f0744-7caa-4865-8330-6bfe0bcd8c79",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Daily 11:40 Winnipeg (16:40 UTC)": {
+        "main": [
+          [
+            {
+              "node": "Run Dry Run",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run Dry Run": {
+        "main": [
+          [
+            {
+              "node": "Run OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run OK?": {
+        "main": [
+          [
+            {
+              "node": "Format Digest Email",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Format Failure Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Digest Email": {
+        "main": [
+          [
+            {
+              "node": "Email Daily Counts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Failure Email": {
+        "main": [
+          [
+            {
+              "node": "Limit Failure Emails To Hourly",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit Failure Emails To Hourly": {
+        "main": [
+          [
+            {
+              "node": "Email Failure Notice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani",
+    "name": "Version e742fe13",
+    "description": "",
+    "autosaved": true,
+    "createdAt": "2026-10-23T09:45:48.434Z",
+    "updatedAt": "2026-10-23T09:45:52.927Z"
+  }
+}
