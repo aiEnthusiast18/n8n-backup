@@ -1,0 +1,483 @@
+{
+  "id": "0tvkHVlsmIe0i2gW",
+  "name": "RAH Dashboard Alerts TEST (ack + on-call SMS) INACTIVE",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-10-28T05:19:07.932Z",
+  "updatedAt": "2026-10-29T12:58:24.100Z",
+  "isArchived": false,
+  "versionId": "b0ce94e3-8c44-45eb-ae3a-251018f48ab3",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9ec4121f-e85f-4717-8a59-3129dfeb21c0",
+      "name": "Run Test Now",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dashboard.apps.204it.ca/alerts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"requireAck\": true}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "334e30c1-fc77-4314-9946-a0b354f9b0c8",
+      "name": "Check Dashboard Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        96
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "GtVvh6XgdG7uDsJ7",
+          "name": "Dashboard API token"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "9d499433-fcd9-4dc1-9271-0f481ce05493",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ String($json.ok) }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "71ec3b7c-509c-4241-9d7b-4fa21a3660a0",
+      "name": "Run OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.notification ? \"yes\" : \"no\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "yes"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e891c932-fe46-4f3d-b439-0150e37e6f3d",
+      "name": "Has New Alerts?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "=[TEST ack+SMS] {{ $json.notification.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.notification.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "77215912-7de6-44b7-807b-3d0e958aefc2",
+      "name": "Email Alert (TEST)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        0
+      ],
+      "webhookId": "57a820f5-3a0f-49d4-b298-2dcb5569ba87",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Check Dashboard Alerts').first().json.sms ? 'yes' : 'no' }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "yes"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b4874564-4663-48fd-adb7-595e94e48392",
+      "name": "Has On-Call SMS?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "from": "+14313411115",
+        "to": "+12045885088",
+        "message": "=[TEST] {{ $('Check Dashboard Alerts').first().json.sms.text }}",
+        "options": {}
+      },
+      "id": "8a18007f-87fb-4520-9336-39902318ca15",
+      "name": "Text Test Phone (not on-call)",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -96
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "iPmKPsJyQJ1o8XRw",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dashboard.apps.204it.ca/alerts/ack",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ids: $('Check Dashboard Alerts').first().json.new_alerts.map(a => a.alert_id) }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "54ae9bf7-3ada-4c30-9720-743902bd87f1",
+      "name": "Acknowledge Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1568,
+        0
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "GtVvh6XgdG7uDsJ7",
+          "name": "Dashboard API token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fail-subject",
+              "name": "subject",
+              "value": "[TEST ack+SMS] [AlayaCare 1021] Dashboard alert check FAILED",
+              "type": "string"
+            },
+            {
+              "id": "fail-text",
+              "name": "text",
+              "value": "=The 5-minute alert check (TEST copy) did not return ok=true at {{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }} (server time).\nDetail: {{ $json.error?.message ?? $json.error ?? \"ok was not true\" }}\nNo alerts were evaluated for this run. Check the dashboard container logs in Coolify.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0e94226c-2a29-4540-876b-26eb8b280977",
+      "name": "Build Failure Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $getWorkflowStaticData(\"global\");\nconst now = Date.now();\nif (data.lastFailureEmail && now - data.lastFailureEmail < 3600000) {\n  return [];\n}\ndata.lastFailureEmail = now;\nreturn $input.all();"
+      },
+      "id": "5dd7074a-3349-4462-a2ab-0c09da80b802",
+      "name": "Limit Failure Emails To Hourly",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "8af987d0-27d1-41f6-a710-88f91b6d3e76",
+      "name": "Email Failure Notice",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        192
+      ],
+      "webhookId": "a4314538-6122-4259-8ebd-3d2ebf6245d2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## TEST copy: acknowledged alerts + on-call SMS\nInactive. Emails go to raflak@gmail.com marked [TEST]; the text goes to the fixed test mobile in the Twilio node, never to the number in the service reply. The alert is acknowledged only after the email (and text, if any) succeed; a failure means it repeats in 5 minutes. Uses alert-acks.json, so it does not disturb the live workflow.",
+        "height": 416,
+        "width": 1504,
+        "color": 5
+      },
+      "id": "64a63c1f-d800-4934-9a22-8711ebfcb030",
+      "name": "Sticky Note 44d9be7e",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -512
+      ]
+    }
+  ],
+  "connections": {
+    "Run Test Now": {
+      "main": [
+        [
+          {
+            "node": "Check Dashboard Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Dashboard Alerts": {
+      "main": [
+        [
+          {
+            "node": "Run OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Check Dashboard Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run OK?": {
+      "main": [
+        [
+          {
+            "node": "Has New Alerts?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Failure Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Alerts?": {
+      "main": [
+        [
+          {
+            "node": "Email Alert (TEST)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Alert (TEST)": {
+      "main": [
+        [
+          {
+            "node": "Has On-Call SMS?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has On-Call SMS?": {
+      "main": [
+        [
+          {
+            "node": "Text Test Phone (not on-call)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Acknowledge Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Test Phone (not on-call)": {
+      "main": [
+        [
+          {
+            "node": "Acknowledge Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Failure Message": {
+      "main": [
+        [
+          {
+            "node": "Limit Failure Emails To Hourly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit Failure Emails To Hourly": {
+      "main": [
+        [
+          {
+            "node": "Email Failure Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "0tvkHVlsmIe0i2gW",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-28T05:19:07.932Z",
+      "updatedAt": "2026-10-28T05:19:07.932Z"
+    }
+  ],
+  "activeVersion": null
+}
