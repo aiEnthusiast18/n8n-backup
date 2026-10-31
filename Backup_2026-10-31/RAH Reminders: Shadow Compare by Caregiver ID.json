@@ -1,0 +1,609 @@
+{
+  "id": "E0P5HUXSUzTcgO9B",
+  "name": "RAH Reminders: Shadow Compare by Caregiver ID",
+  "active": true,
+  "activeVersionId": "f73fe6d1-233c-472a-9bb3-33775810e9af",
+  "createdAt": "2026-10-29T06:52:21.157Z",
+  "updatedAt": "2026-10-29T20:30:53.646Z",
+  "isArchived": false,
+  "versionId": "f73fe6d1-233c-472a-9bb3-33775810e9af",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 18 * * *"
+            }
+          ]
+        }
+      },
+      "id": "8a0b33e0-4636-4e55-81ac-66a055283271",
+      "name": "Daily 13:00 Winnipeg (18:00 UTC)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://reminders.apps.204it.ca/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"job\":\"reminders\",\"dryRun\":true}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 600000
+        }
+      },
+      "id": "97984ef5-98c0-4aaf-bfed-8e368b9dd912",
+      "name": "Run Dry Run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        96
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4YPxUmArUHlQowH0",
+          "name": "REMINDERS_API_TOKEN"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ String($json.ok) }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "170e83fa-efc6-465e-a9d3-d3ff3d1ba5f0",
+      "name": "Run OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+          "mode": "list",
+          "cachedResultName": "shift reminders"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1474171429,
+          "mode": "list",
+          "cachedResultName": "shifts"
+        },
+        "options": {}
+      },
+      "id": "f10b7880-f739-4a0e-9c96-fe759db71b5a",
+      "name": "Read Old Reminders Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        0
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "n1bU0OP2hCGK4EEO",
+          "name": "Rida Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Compares, by caregiver ID only, who the old sheet workflow texted for the service date\n// with who the new reminders service would text. Reads no names, phones or client fields.\n// The sheet node continues on error after its retries; say so instead of comparing nothing.\nconst firstJson = ($input.first() || { json: {} }).json;\nif (firstJson.error !== undefined && firstJson['Employee UID'] === undefined) {\n  const msg = typeof firstJson.error === 'string' ? firstJson.error : (firstJson.error && firstJson.error.message) || 'unknown error';\n  const e = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n  return [{ json: {\n    subject: '[RAH Reminders] Compare FAILED: could not read the old reminders sheet',\n    html: \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;'><p>The old reminders sheet could not be read after 3 tries, so there is no comparison today.</p><p>\" + e(msg) + \"</p><p style='font-size:12px;color:#6b7280;'>Execution \" + e($execution.id) + '. No names, phone numbers or message text.</p></div>',\n  } }];\n}\n\nconst run = $('Run Dry Run').first().json;\nconst date = run.serviceDate;\nconst planned = Array.isArray(run.plannedCaregiverUids) ? run.plannedCaregiverUids : null;\nconst esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n\n// Old side: per caregiver ID, what the sheet says for this date.\nconst old = {};\nlet rowsForDate = 0;\nfor (const item of $input.all()) {\n  const r = item.json;\n  if (String(r['Visit Start Date'] || '') !== date) continue;\n  const uid = String(r['Employee UID'] || '').trim();\n  const status = String(r['text status'] || '').trim();\n  rowsForDate += 1;\n  if (!uid) continue;\n  const o = old[uid] || (old[uid] = { texted: false, error: false, blank: false });\n  if (!status) o.blank = true;\n  else if (status.toUpperCase().startsWith('ERROR')) o.error = true;\n  else o.texted = true;\n}\nconst oldTexted = Object.keys(old).filter((u) => old[u].texted).sort();\n\n// New side: why the service would not text someone, from its exceptions (IDs only).\nconst newReason = {};\nfor (const e of run.exceptions || []) {\n  if (e.caregiverUid && !newReason[e.caregiverUid]) newReason[e.caregiverUid] = e.reason;\n}\n\nconst NEW_REASONS = {\n  inactive_caregiver: 'not active in AlayaCare',\n  no_phone: 'no phone in AlayaCare',\n  invalid_phone: 'phone not a valid mobile in AlayaCare',\n};\nlet onlyOld = [];\nlet onlyNew = [];\nif (planned) {\n  const p = new Set(planned);\n  const o = new Set(oldTexted);\n  onlyOld = oldTexted.filter((u) => !p.has(u)).map((u) => ({\n    uid: u,\n    why: newReason[u] ? 'new: ' + (NEW_REASONS[newReason[u]] || newReason[u]) : 'new: no visit for this caregiver, or ID excluded',\n  }));\n  onlyNew = planned.filter((u) => !o.has(u)).map((u) => {\n    const s = old[u];\n    const why = !s ? 'old: no row in the sheet for this date' : s.error ? 'old: marked ERROR' : 'old: row not processed';\n    return { uid: u, why };\n  });\n}\n\nconst same = planned ? planned.length - onlyNew.length : 0;\nconst shortDay = date ? new Date(date + 'T12:00:00Z').toLocaleDateString('en-CA', { timeZone: 'UTC', month: 'short', day: 'numeric' }) : '';\nconst subject = !planned\n  ? '[RAH Reminders] Compare ' + shortDay + ': not available (service has no ID list yet)'\n  : '[RAH Reminders] Compare ' + shortDay + ': ' + (onlyOld.length + onlyNew.length === 0 ? 'match' : onlyOld.length + ' only old, ' + onlyNew.length + ' only new');\nconst td = 'padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:14px;';\nconst row = (a, b) => \"<tr><td style='\" + td + \"color:#4b5563;'>\" + esc(a) + \"</td><td style='\" + td + \"text-align:right;font-weight:600;'>\" + esc(b) + '</td></tr>';\nconst list = (items) => items.length\n  ? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:14px;'>\" + items.map((x) => '<li>' + esc(x.uid) + ' (' + esc(x.why) + ')</li>').join('') + '</ul>'\n  : \"<p style='margin:6px 0 0;font-size:14px;color:#4b5563;'>None.</p>\";\nconst h = (t) => \"<h3 style='margin:20px 0 0;font-size:13px;text-transform:uppercase;color:#00838F;'>\" + t + '</h3>';\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;'>\"\n  + \"<p style='margin:0;font-size:15px;'>Caregivers texted for \" + esc(date || '?') + ': old workflow vs new service (dry run).</p>'\n  + (planned\n    ? \"<table style='width:100%;border-collapse:collapse;margin-top:10px;'>\"\n      + row('Old: texted (sheet status set, not ERROR)', oldTexted.length)\n      + row('Old: marked ERROR', Object.keys(old).filter((u) => old[u].error && !old[u].texted).length)\n      + row('New: would text', planned.length)\n      + row('Both', same)\n      + '</table>'\n      + h('Only the old workflow texted') + list(onlyOld)\n      + h('Only the new service would text') + list(onlyNew)\n    : \"<p style='margin:10px 0 0;font-size:14px;'>Not available: the reminders service did not return plannedCaregiverUids. Redeploy reminders from main.</p>\")\n  + \"<p style='margin:22px 0 0;font-size:12px;color:#6b7280;'>Sheet rows for this date: \" + rowsForDate + '. The new side is checked at run time, about 90 minutes after the old send, so a visit added in between shows as only new. Caregiver IDs only: no names, phone numbers or message text. Execution ' + esc($execution.id) + '.</p>'\n  + '</div>';\nreturn [{ json: { subject, html } }];\n"
+      },
+      "id": "c9674af7-90a1-4d53-ae47-e0fbf4c2dc8e",
+      "name": "Compare Caregiver IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b0646bc5-8b60-4bcb-a042-d9ed04ddeb64",
+      "name": "Email Comparison",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        0
+      ],
+      "webhookId": "70e7d294-1817-4a1f-a23d-d3f14effe0ee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $('Run Dry Run').first().json;\nconst esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst detail = typeof j.error === 'string' ? j.error : (j.error && j.error.message ? j.error.message : 'No detail returned (the service may not have responded).');\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;'><p>The shadow comparison could not run: the reminders dry run did not succeed.</p><p>\" + esc(detail) + \"</p><p style='font-size:12px;color:#6b7280;'>Execution \" + esc($execution.id) + \". No names, phone numbers or message text.</p></div>\";\nreturn [{ json: { subject: '[RAH Reminders] Compare FAILED: dry run did not succeed', html } }];"
+      },
+      "id": "3f00ce8a-a071-408d-9589-101ca832f523",
+      "name": "Format Failure Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "raflak@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b854111a-7316-4714-87a6-37f45f11b0a6",
+      "name": "Email Failure Notice",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        192
+      ],
+      "webhookId": "c39da466-ca49-4190-bd22-c9b0d9f4e5e4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VtFSlT7rgOw5EZZK",
+          "name": "Rida Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 13:00 Winnipeg (18:00 UTC)": {
+      "main": [
+        [
+          {
+            "node": "Run Dry Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Dry Run": {
+      "main": [
+        [
+          {
+            "node": "Run OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run OK?": {
+      "main": [
+        [
+          {
+            "node": "Read Old Reminders Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Failure Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Old Reminders Sheet": {
+      "main": [
+        [
+          {
+            "node": "Compare Caregiver IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Caregiver IDs": {
+      "main": [
+        [
+          {
+            "node": "Email Comparison",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Failure Email": {
+      "main": [
+        [
+          {
+            "node": "Email Failure Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "UTC",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Daily 13:00 Winnipeg (18:00 UTC)": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "E0P5HUXSUzTcgO9B",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-29T06:52:21.157Z",
+      "updatedAt": "2026-10-29T06:52:21.157Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "f73fe6d1-233c-472a-9bb3-33775810e9af",
+    "workflowId": "E0P5HUXSUzTcgO9B",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 18 * * *"
+              }
+            ]
+          }
+        },
+        "id": "8a0b33e0-4636-4e55-81ac-66a055283271",
+        "name": "Daily 13:00 Winnipeg (18:00 UTC)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          0,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://reminders.apps.204it.ca/run",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\"job\":\"reminders\",\"dryRun\":true}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            },
+            "timeout": 600000
+          }
+        },
+        "id": "97984ef5-98c0-4aaf-bfed-8e368b9dd912",
+        "name": "Run Dry Run",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          224,
+          96
+        ],
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "4YPxUmArUHlQowH0",
+            "name": "REMINDERS_API_TOKEN"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ String($json.ok) }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                },
+                "rightValue": "true"
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "170e83fa-efc6-465e-a9d3-d3ff3d1ba5f0",
+        "name": "Run OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1wsO8LjLsNKMrL8IhWmIwsL5bsJq-VhKoIXdeQYRqmRI",
+            "mode": "list",
+            "cachedResultName": "shift reminders"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1474171429,
+            "mode": "list",
+            "cachedResultName": "shifts"
+          },
+          "options": {}
+        },
+        "id": "f10b7880-f739-4a0e-9c96-fe759db71b5a",
+        "name": "Read Old Reminders Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          672,
+          0
+        ],
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "n1bU0OP2hCGK4EEO",
+            "name": "Rida Google Sheets account"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000
+      },
+      {
+        "parameters": {
+          "jsCode": "// Compares, by caregiver ID only, who the old sheet workflow texted for the service date\n// with who the new reminders service would text. Reads no names, phones or client fields.\n// The sheet node continues on error after its retries; say so instead of comparing nothing.\nconst firstJson = ($input.first() || { json: {} }).json;\nif (firstJson.error !== undefined && firstJson['Employee UID'] === undefined) {\n  const msg = typeof firstJson.error === 'string' ? firstJson.error : (firstJson.error && firstJson.error.message) || 'unknown error';\n  const e = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n  return [{ json: {\n    subject: '[RAH Reminders] Compare FAILED: could not read the old reminders sheet',\n    html: \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;'><p>The old reminders sheet could not be read after 3 tries, so there is no comparison today.</p><p>\" + e(msg) + \"</p><p style='font-size:12px;color:#6b7280;'>Execution \" + e($execution.id) + '. No names, phone numbers or message text.</p></div>',\n  } }];\n}\n\nconst run = $('Run Dry Run').first().json;\nconst date = run.serviceDate;\nconst planned = Array.isArray(run.plannedCaregiverUids) ? run.plannedCaregiverUids : null;\nconst esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n\n// Old side: per caregiver ID, what the sheet says for this date.\nconst old = {};\nlet rowsForDate = 0;\nfor (const item of $input.all()) {\n  const r = item.json;\n  if (String(r['Visit Start Date'] || '') !== date) continue;\n  const uid = String(r['Employee UID'] || '').trim();\n  const status = String(r['text status'] || '').trim();\n  rowsForDate += 1;\n  if (!uid) continue;\n  const o = old[uid] || (old[uid] = { texted: false, error: false, blank: false });\n  if (!status) o.blank = true;\n  else if (status.toUpperCase().startsWith('ERROR')) o.error = true;\n  else o.texted = true;\n}\nconst oldTexted = Object.keys(old).filter((u) => old[u].texted).sort();\n\n// New side: why the service would not text someone, from its exceptions (IDs only).\nconst newReason = {};\nfor (const e of run.exceptions || []) {\n  if (e.caregiverUid && !newReason[e.caregiverUid]) newReason[e.caregiverUid] = e.reason;\n}\n\nconst NEW_REASONS = {\n  inactive_caregiver: 'not active in AlayaCare',\n  no_phone: 'no phone in AlayaCare',\n  invalid_phone: 'phone not a valid mobile in AlayaCare',\n};\nlet onlyOld = [];\nlet onlyNew = [];\nif (planned) {\n  const p = new Set(planned);\n  const o = new Set(oldTexted);\n  onlyOld = oldTexted.filter((u) => !p.has(u)).map((u) => ({\n    uid: u,\n    why: newReason[u] ? 'new: ' + (NEW_REASONS[newReason[u]] || newReason[u]) : 'new: no visit for this caregiver, or ID excluded',\n  }));\n  onlyNew = planned.filter((u) => !o.has(u)).map((u) => {\n    const s = old[u];\n    const why = !s ? 'old: no row in the sheet for this date' : s.error ? 'old: marked ERROR' : 'old: row not processed';\n    return { uid: u, why };\n  });\n}\n\nconst same = planned ? planned.length - onlyNew.length : 0;\nconst shortDay = date ? new Date(date + 'T12:00:00Z').toLocaleDateString('en-CA', { timeZone: 'UTC', month: 'short', day: 'numeric' }) : '';\nconst subject = !planned\n  ? '[RAH Reminders] Compare ' + shortDay + ': not available (service has no ID list yet)'\n  : '[RAH Reminders] Compare ' + shortDay + ': ' + (onlyOld.length + onlyNew.length === 0 ? 'match' : onlyOld.length + ' only old, ' + onlyNew.length + ' only new');\nconst td = 'padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:14px;';\nconst row = (a, b) => \"<tr><td style='\" + td + \"color:#4b5563;'>\" + esc(a) + \"</td><td style='\" + td + \"text-align:right;font-weight:600;'>\" + esc(b) + '</td></tr>';\nconst list = (items) => items.length\n  ? \"<ul style='margin:6px 0 0 18px;padding:0;font-size:14px;'>\" + items.map((x) => '<li>' + esc(x.uid) + ' (' + esc(x.why) + ')</li>').join('') + '</ul>'\n  : \"<p style='margin:6px 0 0;font-size:14px;color:#4b5563;'>None.</p>\";\nconst h = (t) => \"<h3 style='margin:20px 0 0;font-size:13px;text-transform:uppercase;color:#00838F;'>\" + t + '</h3>';\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;'>\"\n  + \"<p style='margin:0;font-size:15px;'>Caregivers texted for \" + esc(date || '?') + ': old workflow vs new service (dry run).</p>'\n  + (planned\n    ? \"<table style='width:100%;border-collapse:collapse;margin-top:10px;'>\"\n      + row('Old: texted (sheet status set, not ERROR)', oldTexted.length)\n      + row('Old: marked ERROR', Object.keys(old).filter((u) => old[u].error && !old[u].texted).length)\n      + row('New: would text', planned.length)\n      + row('Both', same)\n      + '</table>'\n      + h('Only the old workflow texted') + list(onlyOld)\n      + h('Only the new service would text') + list(onlyNew)\n    : \"<p style='margin:10px 0 0;font-size:14px;'>Not available: the reminders service did not return plannedCaregiverUids. Redeploy reminders from main.</p>\")\n  + \"<p style='margin:22px 0 0;font-size:12px;color:#6b7280;'>Sheet rows for this date: \" + rowsForDate + '. The new side is checked at run time, about 90 minutes after the old send, so a visit added in between shows as only new. Caregiver IDs only: no names, phone numbers or message text. Execution ' + esc($execution.id) + '.</p>'\n  + '</div>';\nreturn [{ json: { subject, html } }];\n"
+        },
+        "id": "c9674af7-90a1-4d53-ae47-e0fbf4c2dc8e",
+        "name": "Compare Caregiver IDs",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "rida@anagomb.ca,rlakhani@anagomb.ca",
+          "subject": "={{ $json.subject }}",
+          "message": "={{ $json.html }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "b0646bc5-8b60-4bcb-a042-d9ed04ddeb64",
+        "name": "Email Comparison",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1120,
+          0
+        ],
+        "webhookId": "70e7d294-1817-4a1f-a23d-d3f14effe0ee",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const j = $('Run Dry Run').first().json;\nconst esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst detail = typeof j.error === 'string' ? j.error : (j.error && j.error.message ? j.error.message : 'No detail returned (the service may not have responded).');\nconst html = \"<div style='font-family:Arial,Helvetica,sans-serif;max-width:560px;'><p>The shadow comparison could not run: the reminders dry run did not succeed.</p><p>\" + esc(detail) + \"</p><p style='font-size:12px;color:#6b7280;'>Execution \" + esc($execution.id) + \". No names, phone numbers or message text.</p></div>\";\nreturn [{ json: { subject: '[RAH Reminders] Compare FAILED: dry run did not succeed', html } }];"
+        },
+        "id": "3f00ce8a-a071-408d-9589-101ca832f523",
+        "name": "Format Failure Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "raflak@gmail.com",
+          "subject": "={{ $json.subject }}",
+          "message": "={{ $json.html }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "b854111a-7316-4714-87a6-37f45f11b0a6",
+        "name": "Email Failure Notice",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          896,
+          192
+        ],
+        "webhookId": "c39da466-ca49-4190-bd22-c9b0d9f4e5e4",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "VtFSlT7rgOw5EZZK",
+            "name": "Rida Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Daily 13:00 Winnipeg (18:00 UTC)": {
+        "main": [
+          [
+            {
+              "node": "Run Dry Run",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run Dry Run": {
+        "main": [
+          [
+            {
+              "node": "Run OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run OK?": {
+        "main": [
+          [
+            {
+              "node": "Read Old Reminders Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Format Failure Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Old Reminders Sheet": {
+        "main": [
+          [
+            {
+              "node": "Compare Caregiver IDs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Compare Caregiver IDs": {
+        "main": [
+          [
+            {
+              "node": "Email Comparison",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Failure Email": {
+        "main": [
+          [
+            {
+              "node": "Email Failure Notice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Retry sheet read; email on sheet failure",
+    "description": "The 13:00 run on 2026-10-29 sent no email, most likely a transient Google Sheets error (the legacy workflow hit 'Bad gateway' the same day). The sheet read now retries 3 times, 5 s apart, then continues so the compare step emails a FAILED notice instead of failing silently.",
+    "autosaved": false,
+    "createdAt": "2026-10-29T20:30:53.650Z",
+    "updatedAt": "2026-10-29T20:30:53.650Z"
+  }
+}
