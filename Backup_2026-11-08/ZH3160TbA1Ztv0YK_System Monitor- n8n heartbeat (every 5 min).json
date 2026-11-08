@@ -1,0 +1,191 @@
+{
+  "id": "ZH3160TbA1Ztv0YK",
+  "name": "System Monitor: n8n heartbeat (every 5 min)",
+  "active": true,
+  "activeVersionId": "43a2dab3-f460-48a2-8601-a4d620eff678",
+  "createdAt": "2026-10-28T16:48:39.989Z",
+  "updatedAt": "2026-10-28T19:32:28.744Z",
+  "isArchived": false,
+  "versionId": "28d2c539-61b9-4fd7-84f4-2e0d4e2df97d",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "02568fa5-4a95-4787-ad93-e735ede0505e",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://hc-ping.com/75247f53-c428-4e5f-9a2c-3daed0f13ab0",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "71fe64e3-8c8f-48b6-bbca-6704fac9d37d",
+      "name": "Ping healthchecks.io",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "content": "If this workflow stops pinging (n8n down, server down, or the scheduler stuck), healthchecks.io emails rlakhani@anagomb.ca. Setup: paste the check's ping URL into the HTTP node, then publish.",
+        "height": 224,
+        "width": 160,
+        "color": 4
+      },
+      "id": "86c5c16a-cbf3-4fd1-ad4b-4238aef77c41",
+      "name": "Sticky Note e101070c",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -256
+      ]
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Ping healthchecks.io",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Every 5 Minutes": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "ZH3160TbA1Ztv0YK",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-28T16:48:39.989Z",
+      "updatedAt": "2026-10-28T16:48:39.989Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "43a2dab3-f460-48a2-8601-a4d620eff678",
+    "workflowId": "ZH3160TbA1Ztv0YK",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "id": "02568fa5-4a95-4787-ad93-e735ede0505e",
+        "name": "Every 5 Minutes",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://hc-ping.com/75247f53-c428-4e5f-9a2c-3daed0f13ab0",
+          "options": {
+            "timeout": 10000
+          }
+        },
+        "id": "71fe64e3-8c8f-48b6-bbca-6704fac9d37d",
+        "name": "Ping healthchecks.io",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          0
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000
+      },
+      {
+        "parameters": {
+          "content": "If this workflow stops pinging (n8n down, server down, or the scheduler stuck), healthchecks.io emails rlakhani@anagomb.ca. Setup: paste the check's ping URL into the HTTP node, then publish.",
+          "height": 224,
+          "width": 160,
+          "color": 4
+        },
+        "id": "86c5c16a-cbf3-4fd1-ad4b-4238aef77c41",
+        "name": "Sticky Note e101070c",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          192,
+          -96
+        ]
+      }
+    ],
+    "connections": {
+      "Every 5 Minutes": {
+        "main": [
+          [
+            {
+              "node": "Ping healthchecks.io",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani",
+    "name": "Version 43a2dab3",
+    "description": "",
+    "autosaved": true,
+    "createdAt": "2026-10-28T19:32:01.845Z",
+    "updatedAt": "2026-10-28T19:32:20.078Z"
+  }
+}
