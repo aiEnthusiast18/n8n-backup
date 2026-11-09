@@ -1,0 +1,96 @@
+{
+  "id": "JLxtKygW528LJ3mn",
+  "name": "Anago OS jobs pinger",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-08T22:49:17.494Z",
+  "updatedAt": "2026-11-09T04:40:16.543Z",
+  "isArchived": false,
+  "versionId": "e88dd53f-a5db-43f1-85d7-986080d0e12e",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "33e0ebed-b885-4c64-841f-6836dfd1a7ab",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://anago-chi.vercel.app/api/cron/crm/jobs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {
+          "timeout": 70000
+        }
+      },
+      "id": "70fc4491-0d20-4a18-8381-0320199b661c",
+      "name": "Run due Anago OS jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4YPxUmArUHlQowH0",
+          "name": "REMINDERS_API_TOKEN"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Run due Anago OS jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "JLxtKygW528LJ3mn",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-08T22:49:17.494Z",
+      "updatedAt": "2026-11-08T22:49:17.494Z"
+    }
+  ],
+  "activeVersion": null
+}
