@@ -1,0 +1,1695 @@
+{
+  "id": "JtdoXwI0YugBWhVq",
+  "name": "Website inquiries to Pipedrive",
+  "active": true,
+  "activeVersionId": "1c1d1fde-0374-4891-8e6e-88a37329bb0d",
+  "createdAt": "2026-11-08T17:59:26.869Z",
+  "updatedAt": "2026-11-08T20:09:33.634Z",
+  "isArchived": false,
+  "versionId": "1c1d1fde-0374-4891-8e6e-88a37329bb0d",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "4fdcdd0b-1865-41fd-98a9-3a79dc4c8e3a",
+      "name": "New website inquiry email",
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "event": "messageReceived",
+        "output": "raw",
+        "filters": {
+          "custom": "contains(subject,'New Contact Form Submission')",
+          "readStatus": "both"
+        },
+        "options": {
+          "downloadAttachments": false
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "id": "40d5877b-569e-4601-a9fd-0aa0b16a40c6",
+      "name": "Skip emails already handled",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        320
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "BO38dzBVJcANR8h4",
+          "cachedResultName": "website_inquiries_handled"
+        },
+        "matchType": "anyCondition",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "message_id",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4907a33a-287c-4930-ae00-877f5630091a",
+      "name": "Read form fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const m = $json;\nconst NL = String.fromCharCode(10);\nconst raw = (m.body && m.body.content) || m.bodyPreview || '';\nconst text = raw\n  .replace(/<[/]?(br|p|div|tr|li|td)[^>]*>/gi, NL)\n  .replace(/<[^>]+>/g, '')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#34;|&quot;/g, '\"')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&amp;/g, '&');\nconst lines = text.split(NL).map(function (l) { return l.trim(); });\nfunction field(label) {\n  const p = label.toLowerCase() + ':';\n  for (const l of lines) {\n    if (l.toLowerCase().startsWith(p)) return l.slice(p.length).trim();\n  }\n  return '';\n}\nconst first = field('First Name');\nconst last = field('Last Name');\nconst phone = field('Phone');\nconst email = field('Email');\nconst zip = field('Zip Code');\nconst lang = field('Lang');\nlet message = '';\nconst start = lines.findIndex(function (l) { return l.toLowerCase().startsWith('message:'); });\nif (start >= 0) {\n  const parts = [lines[start].slice('message:'.length).trim()];\n  for (let i = start + 1; i < lines.length; i += 1) {\n    const l = lines[i];\n    if (l === '--' || l.toLowerCase().startsWith('this e-mail was sent from a contact form')) break;\n    parts.push(l);\n  }\n  message = parts.join(NL).trim();\n}\nconst fullName = [first, last].filter(Boolean).join(' ');\nconst parseOk = Boolean(fullName) && Boolean(email || phone) && Boolean(message);\nreturn {\n  json: {\n    message_id: m.id,\n    web_link: m.webLink || '',\n    received_at: m.receivedDateTime || '',\n    first_name: first,\n    last_name: last,\n    full_name: fullName,\n    phone: phone,\n    email: email,\n    zip: zip,\n    lang: lang,\n    message: message.slice(0, 4000),\n    parse_ok: parseOk,\n    raw_text: text.replace(/\\n{3,}/g, NL + NL).slice(0, 6000)\n  }\n};"
+      }
+    },
+    {
+      "id": "3f72acac-6471-47b4-9f7e-8385aaf5bf1d",
+      "name": "Sort the inquiry",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        320
+      ],
+      "parameters": {
+        "text": "=Name: {{ $json.full_name }}\nEmail: {{ $json.email }}\nPhone: {{ $json.phone }}\nPostal code: {{ $json.zip }}\nMessage:\n{{ $json.message || $json.raw_text }}",
+        "schemaType": "fromAttributes",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "category",
+              "type": "string",
+              "required": true,
+              "description": "Exactly one of: client_enquiry, franchise_enquiry, job_application, spam_or_marketing, unclear"
+            },
+            {
+              "name": "reason",
+              "type": "string",
+              "required": true,
+              "description": "One short sentence explaining the choice"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You sort messages sent through the website contact form of Anago of Manitoba, a commercial cleaning master franchise in Winnipeg. Pick one category. client_enquiry: a business, property or person asking about cleaning services, a quote, a site visit or pricing. franchise_enquiry: someone asking about buying or owning an Anago cleaning franchise or business opportunity. job_application: someone looking for a job, shifts or employment as a cleaner or staff. spam_or_marketing: anyone selling something to Anago (SEO, websites, marketing, leads, software, financing, supplies), link spam, scams, or gibberish. unclear: anything you cannot place with confidence. When in doubt between client_enquiry and anything else, choose client_enquiry or unclear, never spam_or_marketing."
+        }
+      }
+    },
+    {
+      "id": "a711f984-09d5-4ba1-b9cd-499cbe48b110",
+      "name": "OpenAI model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        544
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "5cpaSfGqQRDK0lUw",
+          "name": "RAF OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "7cfae519-ea8f-4bc1-a276-771ce44aa92e",
+      "name": "Combine fields and category",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        320
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "category",
+              "value": "={{ $json.output.category }}",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "reason",
+              "value": "={{ $json.output.reason }}",
+              "type": "string"
+            },
+            {
+              "id": "c3",
+              "name": "message_id",
+              "value": "={{ $('Read form fields').item.json.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "c4",
+              "name": "web_link",
+              "value": "={{ $('Read form fields').item.json.web_link }}",
+              "type": "string"
+            },
+            {
+              "id": "c5",
+              "name": "full_name",
+              "value": "={{ $('Read form fields').item.json.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "c6",
+              "name": "email",
+              "value": "={{ $('Read form fields').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "c7",
+              "name": "phone",
+              "value": "={{ $('Read form fields').item.json.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "c8",
+              "name": "zip",
+              "value": "={{ $('Read form fields').item.json.zip }}",
+              "type": "string"
+            },
+            {
+              "id": "c9",
+              "name": "lang",
+              "value": "={{ $('Read form fields').item.json.lang }}",
+              "type": "string"
+            },
+            {
+              "id": "c10",
+              "name": "message",
+              "value": "={{ $('Read form fields').item.json.message || $('Read form fields').item.json.raw_text }}",
+              "type": "string"
+            },
+            {
+              "id": "c11",
+              "name": "parse_ok",
+              "value": "={{ $('Read form fields').item.json.parse_ok }}",
+              "type": "boolean"
+            },
+            {
+              "id": "c12",
+              "name": "lead_title",
+              "value": "={{ (!$('Read form fields').item.json.parse_ok || !['client_enquiry','franchise_enquiry'].includes($json.output.category) ? 'NEEDS REVIEW – ' : ($json.output.category === 'franchise_enquiry' ? 'Franchise enquiry – ' : 'Website enquiry – ')) + ($('Read form fields').item.json.full_name || 'Unknown name') + ($('Read form fields').item.json.zip ? ' (' + $('Read form fields').item.json.zip + ')' : '') }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b47c1600-15b5-45cb-a096-a8a81b2fe971",
+      "name": "Route by category",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        752,
+        176
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "renameOutput": true,
+              "outputKey": "Job application",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "job_application"
+                  },
+                  {
+                    "leftValue": "={{ $json.parse_ok }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "Spam or marketing",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "spam_or_marketing"
+                  },
+                  {
+                    "leftValue": "={{ $json.parse_ok }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Lead"
+        }
+      }
+    },
+    {
+      "id": "4bc88574-e573-4040-93da-91eb56065ec0",
+      "name": "Tag email: job application",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "update",
+        "messageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.message_id }}"
+        },
+        "updateFields": {
+          "categories": [
+            "Website - Job application"
+          ]
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "9e596e3c-f6dd-4a66-99ae-16885f2682c3"
+    },
+    {
+      "id": "7a85e099-43b4-410d-a002-c275c6c3fa4c",
+      "name": "Record email as handled",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        192
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "BO38dzBVJcANR8h4",
+          "cachedResultName": "website_inquiries_handled"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_id": "={{ $json.id }}",
+            "outcome": "={{ ($json.categories || []).join(', ') }}"
+          },
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outcome",
+              "displayName": "outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "690d62d5-7537-453f-b55c-7c53b3412b21",
+      "name": "Tag email: junk",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        192
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "update",
+        "messageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.message_id }}"
+        },
+        "updateFields": {
+          "categories": [
+            "Website - Junk"
+          ]
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "77fd042b-b1ed-4212-b396-35c79922100c"
+    },
+    {
+      "id": "a11afcb5-6b34-4fa6-ab27-a3a0ad6d36b8",
+      "name": "Find person in Pipedrive",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        512
+      ],
+      "parameters": {
+        "resource": "person",
+        "operation": "search",
+        "authentication": "apiToken",
+        "term": "={{ $json.email || $json.phone || $json.full_name }}",
+        "exactMatch": true,
+        "returnAll": false,
+        "limit": 1
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "f6f755d7-4b82-4da2-88d9-95d740511c9e",
+      "name": "Person already in Pipedrive?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        512
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.id }}",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "fb025619-6106-4fe3-a992-8181994b086d",
+      "name": "Create lead",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        512
+      ],
+      "parameters": {
+        "resource": "lead",
+        "operation": "create",
+        "authentication": "apiToken",
+        "title": "={{ $('Combine fields and category').item.json.lead_title }}",
+        "associateWith": "person",
+        "person_id": "={{ $json.id }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "1f687afe-8e0a-4c09-bfe8-b1fe3b311ea5",
+      "name": "Add the inquiry as a note",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        512
+      ],
+      "parameters": {
+        "resource": "note",
+        "operation": "create",
+        "authentication": "apiToken",
+        "content": "=<p><b>Website contact form</b></p><p>{{ $('Combine fields and category').item.json.message.replace(/\\n/g, '<br>') }}</p><p>Phone: {{ $('Combine fields and category').item.json.phone }}<br>Email: {{ $('Combine fields and category').item.json.email }}<br>Postal code: {{ $('Combine fields and category').item.json.zip }}<br>Language: {{ $('Combine fields and category').item.json.lang }}</p><p>Sorted as: {{ $('Combine fields and category').item.json.category }} ({{ $('Combine fields and category').item.json.reason }})</p><p><a href=\"{{ $('Combine fields and category').item.json.web_link }}\">Open the original email</a></p>",
+        "additionalFields": {
+          "lead_id": "={{ $json.id }}"
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "29f5fe9c-786e-491b-82c7-508736fd1d1e",
+      "name": "Tag email: lead created",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        512
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "update",
+        "messageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Combine fields and category').item.json.message_id }}"
+        },
+        "updateFields": {
+          "categories": [
+            "Website - Lead created"
+          ]
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "146c1f48-ef2c-4118-9bed-a71265f1aa4a"
+    },
+    {
+      "id": "70aaca49-72f4-4755-8467-5d9909ba0f59",
+      "name": "Create person",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        592
+      ],
+      "parameters": {
+        "resource": "person",
+        "operation": "create",
+        "authentication": "apiToken",
+        "name": "={{ $('Combine fields and category').item.json.full_name || 'Website enquiry' }}",
+        "additionalFields": {
+          "emails": {
+            "emailProperties": [
+              {
+                "value": "={{ $('Combine fields and category').item.json.email }}",
+                "primary": true,
+                "label": "work"
+              }
+            ]
+          },
+          "phones": {
+            "phoneProperties": [
+              {
+                "value": "={{ $('Combine fields and category').item.json.phone }}",
+                "primary": true,
+                "label": "mobile"
+              }
+            ]
+          }
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "e8c46228-abdc-44ca-98e9-a07c7053812b",
+      "name": "Sticky Note 23528b40",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        592
+      ],
+      "parameters": {
+        "content": "## Website inquiries → Pipedrive\nPolls Outlook every 5 minutes for \"New Contact Form Submission\" emails (any sender). Each email is handled once (data table website_inquiries_handled).\n\n- Client or franchise enquiry, unclear, or a format it cannot read → Pipedrive Lead (unclear/unreadable titled NEEDS REVIEW) with the message as a note.\n- Job application → Outlook category \"Website - Job application\", no lead.\n- Spam or marketing → Outlook category \"Website - Junk\", no lead.\n\nEmails are never moved, deleted or marked read.",
+        "color": 4
+      }
+    }
+  ],
+  "connections": {
+    "New website inquiry email": {
+      "main": [
+        [
+          {
+            "node": "Skip emails already handled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip emails already handled": {
+      "main": [
+        [
+          {
+            "node": "Read form fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read form fields": {
+      "main": [
+        [
+          {
+            "node": "Sort the inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort the inquiry": {
+      "main": [
+        [
+          {
+            "node": "Combine fields and category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sort the inquiry",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine fields and category": {
+      "main": [
+        [
+          {
+            "node": "Route by category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by category": {
+      "main": [
+        [
+          {
+            "node": "Tag email: job application",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tag email: junk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find person in Pipedrive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag email: job application": {
+      "main": [
+        [
+          {
+            "node": "Record email as handled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag email: junk": {
+      "main": [
+        [
+          {
+            "node": "Record email as handled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find person in Pipedrive": {
+      "main": [
+        [
+          {
+            "node": "Person already in Pipedrive?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Person already in Pipedrive?": {
+      "main": [
+        [
+          {
+            "node": "Create lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create lead": {
+      "main": [
+        [
+          {
+            "node": "Add the inquiry as a note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add the inquiry as a note": {
+      "main": [
+        [
+          {
+            "node": "Tag email: lead created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag email: lead created": {
+      "main": [
+        [
+          {
+            "node": "Record email as handled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create person": {
+      "main": [
+        [
+          {
+            "node": "Create lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [
+    {
+      "id": "41878c88-ee04-4855-9ecb-02f2159b5153",
+      "name": "Read and sort",
+      "nodeIds": [
+        "40d5877b-569e-4601-a9fd-0aa0b16a40c6",
+        "4907a33a-287c-4930-ae00-877f5630091a",
+        "3f72acac-6471-47b4-9f7e-8385aaf5bf1d",
+        "a711f984-09d5-4ba1-b9cd-499cbe48b110",
+        "7cfae519-ea8f-4bc1-a276-771ce44aa92e"
+      ],
+      "description": "Skips handled emails, reads the form fields, and sorts each inquiry into client, franchise, job, spam or unclear"
+    },
+    {
+      "id": "975e857a-17b0-4b74-ad11-16e317026530",
+      "name": "Create the lead",
+      "nodeIds": [
+        "a11afcb5-6b34-4fa6-ab27-a3a0ad6d36b8",
+        "f6f755d7-4b82-4da2-88d9-95d740511c9e",
+        "70aaca49-72f4-4755-8467-5d9909ba0f59",
+        "fb025619-6106-4fe3-a992-8181994b086d",
+        "1f687afe-8e0a-4c09-bfe8-b1fe3b311ea5",
+        "29f5fe9c-786e-491b-82c7-508736fd1d1e"
+      ],
+      "description": "Finds or creates the person in Pipedrive, creates the lead with the message as a note, and tags the email"
+    }
+  ],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "JtdoXwI0YugBWhVq",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-08T17:59:26.869Z",
+      "updatedAt": "2026-11-08T17:59:26.869Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "1c1d1fde-0374-4891-8e6e-88a37329bb0d",
+    "workflowId": "JtdoXwI0YugBWhVq",
+    "nodes": [
+      {
+        "id": "4fdcdd0b-1865-41fd-98a9-3a79dc4c8e3a",
+        "name": "New website inquiry email",
+        "type": "n8n-nodes-base.microsoftOutlookTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          192
+        ],
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyX",
+                "value": 5,
+                "unit": "minutes"
+              }
+            ]
+          },
+          "event": "messageReceived",
+          "output": "raw",
+          "filters": {
+            "custom": "contains(subject,'New Contact Form Submission')",
+            "readStatus": "both"
+          },
+          "options": {
+            "downloadAttachments": false
+          }
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        }
+      },
+      {
+        "id": "40d5877b-569e-4601-a9fd-0aa0b16a40c6",
+        "name": "Skip emails already handled",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          272,
+          320
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "rowNotExists",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "BO38dzBVJcANR8h4",
+            "cachedResultName": "website_inquiries_handled"
+          },
+          "matchType": "anyCondition",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "message_id",
+                "keyValue": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "4907a33a-287c-4930-ae00-877f5630091a",
+        "name": "Read form fields",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          496,
+          320
+        ],
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "language": "javaScript",
+          "jsCode": "const m = $json;\nconst NL = String.fromCharCode(10);\nconst raw = (m.body && m.body.content) || m.bodyPreview || '';\nconst text = raw\n  .replace(/<[/]?(br|p|div|tr|li|td)[^>]*>/gi, NL)\n  .replace(/<[^>]+>/g, '')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#34;|&quot;/g, '\"')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&amp;/g, '&');\nconst lines = text.split(NL).map(function (l) { return l.trim(); });\nfunction field(label) {\n  const p = label.toLowerCase() + ':';\n  for (const l of lines) {\n    if (l.toLowerCase().startsWith(p)) return l.slice(p.length).trim();\n  }\n  return '';\n}\nconst first = field('First Name');\nconst last = field('Last Name');\nconst phone = field('Phone');\nconst email = field('Email');\nconst zip = field('Zip Code');\nconst lang = field('Lang');\nlet message = '';\nconst start = lines.findIndex(function (l) { return l.toLowerCase().startsWith('message:'); });\nif (start >= 0) {\n  const parts = [lines[start].slice('message:'.length).trim()];\n  for (let i = start + 1; i < lines.length; i += 1) {\n    const l = lines[i];\n    if (l === '--' || l.toLowerCase().startsWith('this e-mail was sent from a contact form')) break;\n    parts.push(l);\n  }\n  message = parts.join(NL).trim();\n}\nconst fullName = [first, last].filter(Boolean).join(' ');\nconst parseOk = Boolean(fullName) && Boolean(email || phone) && Boolean(message);\nreturn {\n  json: {\n    message_id: m.id,\n    web_link: m.webLink || '',\n    received_at: m.receivedDateTime || '',\n    first_name: first,\n    last_name: last,\n    full_name: fullName,\n    phone: phone,\n    email: email,\n    zip: zip,\n    lang: lang,\n    message: message.slice(0, 4000),\n    parse_ok: parseOk,\n    raw_text: text.replace(/\\n{3,}/g, NL + NL).slice(0, 6000)\n  }\n};"
+        }
+      },
+      {
+        "id": "3f72acac-6471-47b4-9f7e-8385aaf5bf1d",
+        "name": "Sort the inquiry",
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1.2,
+        "position": [
+          720,
+          320
+        ],
+        "parameters": {
+          "text": "=Name: {{ $json.full_name }}\nEmail: {{ $json.email }}\nPhone: {{ $json.phone }}\nPostal code: {{ $json.zip }}\nMessage:\n{{ $json.message || $json.raw_text }}",
+          "schemaType": "fromAttributes",
+          "attributes": {
+            "attributes": [
+              {
+                "name": "category",
+                "type": "string",
+                "required": true,
+                "description": "Exactly one of: client_enquiry, franchise_enquiry, job_application, spam_or_marketing, unclear"
+              },
+              {
+                "name": "reason",
+                "type": "string",
+                "required": true,
+                "description": "One short sentence explaining the choice"
+              }
+            ]
+          },
+          "options": {
+            "systemPromptTemplate": "You sort messages sent through the website contact form of Anago of Manitoba, a commercial cleaning master franchise in Winnipeg. Pick one category. client_enquiry: a business, property or person asking about cleaning services, a quote, a site visit or pricing. franchise_enquiry: someone asking about buying or owning an Anago cleaning franchise or business opportunity. job_application: someone looking for a job, shifts or employment as a cleaner or staff. spam_or_marketing: anyone selling something to Anago (SEO, websites, marketing, leads, software, financing, supplies), link spam, scams, or gibberish. unclear: anything you cannot place with confidence. When in doubt between client_enquiry and anything else, choose client_enquiry or unclear, never spam_or_marketing."
+          }
+        }
+      },
+      {
+        "id": "a711f984-09d5-4ba1-b9cd-499cbe48b110",
+        "name": "OpenAI model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          800,
+          544
+        ],
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-5-mini"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "openAiApi": {
+            "id": "5cpaSfGqQRDK0lUw",
+            "name": "RAF OpenAi account"
+          }
+        }
+      },
+      {
+        "id": "7cfae519-ea8f-4bc1-a276-771ce44aa92e",
+        "name": "Combine fields and category",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1072,
+          320
+        ],
+        "parameters": {
+          "mode": "manual",
+          "includeOtherFields": false,
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c1",
+                "name": "category",
+                "value": "={{ $json.output.category }}",
+                "type": "string"
+              },
+              {
+                "id": "c2",
+                "name": "reason",
+                "value": "={{ $json.output.reason }}",
+                "type": "string"
+              },
+              {
+                "id": "c3",
+                "name": "message_id",
+                "value": "={{ $('Read form fields').item.json.message_id }}",
+                "type": "string"
+              },
+              {
+                "id": "c4",
+                "name": "web_link",
+                "value": "={{ $('Read form fields').item.json.web_link }}",
+                "type": "string"
+              },
+              {
+                "id": "c5",
+                "name": "full_name",
+                "value": "={{ $('Read form fields').item.json.full_name }}",
+                "type": "string"
+              },
+              {
+                "id": "c6",
+                "name": "email",
+                "value": "={{ $('Read form fields').item.json.email }}",
+                "type": "string"
+              },
+              {
+                "id": "c7",
+                "name": "phone",
+                "value": "={{ $('Read form fields').item.json.phone }}",
+                "type": "string"
+              },
+              {
+                "id": "c8",
+                "name": "zip",
+                "value": "={{ $('Read form fields').item.json.zip }}",
+                "type": "string"
+              },
+              {
+                "id": "c9",
+                "name": "lang",
+                "value": "={{ $('Read form fields').item.json.lang }}",
+                "type": "string"
+              },
+              {
+                "id": "c10",
+                "name": "message",
+                "value": "={{ $('Read form fields').item.json.message || $('Read form fields').item.json.raw_text }}",
+                "type": "string"
+              },
+              {
+                "id": "c11",
+                "name": "parse_ok",
+                "value": "={{ $('Read form fields').item.json.parse_ok }}",
+                "type": "boolean"
+              },
+              {
+                "id": "c12",
+                "name": "lead_title",
+                "value": "={{ (!$('Read form fields').item.json.parse_ok || !['client_enquiry','franchise_enquiry'].includes($json.output.category) ? 'NEEDS REVIEW – ' : ($json.output.category === 'franchise_enquiry' ? 'Franchise enquiry – ' : 'Website enquiry – ')) + ($('Read form fields').item.json.full_name || 'Unknown name') + ($('Read form fields').item.json.zip ? ' (' + $('Read form fields').item.json.zip + ')' : '') }}",
+                "type": "string"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "b47c1600-15b5-45cb-a096-a8a81b2fe971",
+        "name": "Route by category",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          752,
+          176
+        ],
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "renameOutput": true,
+                "outputKey": "Job application",
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "leftValue": "",
+                    "typeValidation": "loose"
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.category }}",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "rightValue": "job_application"
+                    },
+                    {
+                      "leftValue": "={{ $json.parse_ok }}",
+                      "operator": {
+                        "type": "boolean",
+                        "operation": "true",
+                        "singleValue": true
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "renameOutput": true,
+                "outputKey": "Spam or marketing",
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "leftValue": "",
+                    "typeValidation": "loose"
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.category }}",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "rightValue": "spam_or_marketing"
+                    },
+                    {
+                      "leftValue": "={{ $json.parse_ok }}",
+                      "operator": {
+                        "type": "boolean",
+                        "operation": "true",
+                        "singleValue": true
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra",
+            "renameFallbackOutput": "Lead"
+          }
+        }
+      },
+      {
+        "id": "4bc88574-e573-4040-93da-91eb56065ec0",
+        "name": "Tag email: job application",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          1136,
+          0
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "update",
+          "messageId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.message_id }}"
+          },
+          "updateFields": {
+            "categories": [
+              "Website - Job application"
+            ]
+          }
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "webhookId": "9e596e3c-f6dd-4a66-99ae-16885f2682c3"
+      },
+      {
+        "id": "7a85e099-43b4-410d-a002-c275c6c3fa4c",
+        "name": "Record email as handled",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          1504,
+          192
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "insert",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "BO38dzBVJcANR8h4",
+            "cachedResultName": "website_inquiries_handled"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "message_id": "={{ $json.id }}",
+              "outcome": "={{ ($json.categories || []).join(', ') }}"
+            },
+            "schema": [
+              {
+                "id": "message_id",
+                "displayName": "message_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "outcome",
+                "displayName": "outcome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "690d62d5-7537-453f-b55c-7c53b3412b21",
+        "name": "Tag email: junk",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          1136,
+          192
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "update",
+          "messageId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.message_id }}"
+          },
+          "updateFields": {
+            "categories": [
+              "Website - Junk"
+            ]
+          }
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "webhookId": "77fd042b-b1ed-4212-b396-35c79922100c"
+      },
+      {
+        "id": "a11afcb5-6b34-4fa6-ab27-a3a0ad6d36b8",
+        "name": "Find person in Pipedrive",
+        "type": "n8n-nodes-base.pipedrive",
+        "typeVersion": 2,
+        "position": [
+          1024,
+          512
+        ],
+        "parameters": {
+          "resource": "person",
+          "operation": "search",
+          "authentication": "apiToken",
+          "term": "={{ $json.email || $json.phone || $json.full_name }}",
+          "exactMatch": true,
+          "returnAll": false,
+          "limit": 1
+        },
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput",
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "f6f755d7-4b82-4da2-88d9-95d740511c9e",
+        "name": "Person already in Pipedrive?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1248,
+          512
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.id }}",
+                "operator": {
+                  "type": "number",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "fb025619-6106-4fe3-a992-8181994b086d",
+        "name": "Create lead",
+        "type": "n8n-nodes-base.pipedrive",
+        "typeVersion": 2,
+        "position": [
+          1696,
+          512
+        ],
+        "parameters": {
+          "resource": "lead",
+          "operation": "create",
+          "authentication": "apiToken",
+          "title": "={{ $('Combine fields and category').item.json.lead_title }}",
+          "associateWith": "person",
+          "person_id": "={{ $json.id }}",
+          "additionalFields": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "1f687afe-8e0a-4c09-bfe8-b1fe3b311ea5",
+        "name": "Add the inquiry as a note",
+        "type": "n8n-nodes-base.pipedrive",
+        "typeVersion": 2,
+        "position": [
+          1920,
+          512
+        ],
+        "parameters": {
+          "resource": "note",
+          "operation": "create",
+          "authentication": "apiToken",
+          "content": "=<p><b>Website contact form</b></p><p>{{ $('Combine fields and category').item.json.message.replace(/\\n/g, '<br>') }}</p><p>Phone: {{ $('Combine fields and category').item.json.phone }}<br>Email: {{ $('Combine fields and category').item.json.email }}<br>Postal code: {{ $('Combine fields and category').item.json.zip }}<br>Language: {{ $('Combine fields and category').item.json.lang }}</p><p>Sorted as: {{ $('Combine fields and category').item.json.category }} ({{ $('Combine fields and category').item.json.reason }})</p><p><a href=\"{{ $('Combine fields and category').item.json.web_link }}\">Open the original email</a></p>",
+          "additionalFields": {
+            "lead_id": "={{ $json.id }}"
+          }
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "29f5fe9c-786e-491b-82c7-508736fd1d1e",
+        "name": "Tag email: lead created",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          2144,
+          512
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "update",
+          "messageId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $('Combine fields and category').item.json.message_id }}"
+          },
+          "updateFields": {
+            "categories": [
+              "Website - Lead created"
+            ]
+          }
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "webhookId": "146c1f48-ef2c-4118-9bed-a71265f1aa4a"
+      },
+      {
+        "id": "70aaca49-72f4-4755-8467-5d9909ba0f59",
+        "name": "Create person",
+        "type": "n8n-nodes-base.pipedrive",
+        "typeVersion": 2,
+        "position": [
+          1472,
+          592
+        ],
+        "parameters": {
+          "resource": "person",
+          "operation": "create",
+          "authentication": "apiToken",
+          "name": "={{ $('Combine fields and category').item.json.full_name || 'Website enquiry' }}",
+          "additionalFields": {
+            "emails": {
+              "emailProperties": [
+                {
+                  "value": "={{ $('Combine fields and category').item.json.email }}",
+                  "primary": true,
+                  "label": "work"
+                }
+              ]
+            },
+            "phones": {
+              "phoneProperties": [
+                {
+                  "value": "={{ $('Combine fields and category').item.json.phone }}",
+                  "primary": true,
+                  "label": "mobile"
+                }
+              ]
+            }
+          }
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "e8c46228-abdc-44ca-98e9-a07c7053812b",
+        "name": "Sticky Note 23528b40",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1008,
+          592
+        ],
+        "parameters": {
+          "content": "## Website inquiries → Pipedrive\nPolls Outlook every 5 minutes for \"New Contact Form Submission\" emails (any sender). Each email is handled once (data table website_inquiries_handled).\n\n- Client or franchise enquiry, unclear, or a format it cannot read → Pipedrive Lead (unclear/unreadable titled NEEDS REVIEW) with the message as a note.\n- Job application → Outlook category \"Website - Job application\", no lead.\n- Spam or marketing → Outlook category \"Website - Junk\", no lead.\n\nEmails are never moved, deleted or marked read.",
+          "color": 4
+        }
+      }
+    ],
+    "connections": {
+      "New website inquiry email": {
+        "main": [
+          [
+            {
+              "node": "Skip emails already handled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Skip emails already handled": {
+        "main": [
+          [
+            {
+              "node": "Read form fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read form fields": {
+        "main": [
+          [
+            {
+              "node": "Sort the inquiry",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sort the inquiry": {
+        "main": [
+          [
+            {
+              "node": "Combine fields and category",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Sort the inquiry",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Combine fields and category": {
+        "main": [
+          [
+            {
+              "node": "Route by category",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Route by category": {
+        "main": [
+          [
+            {
+              "node": "Tag email: job application",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Tag email: junk",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Find person in Pipedrive",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tag email: job application": {
+        "main": [
+          [
+            {
+              "node": "Record email as handled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tag email: junk": {
+        "main": [
+          [
+            {
+              "node": "Record email as handled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find person in Pipedrive": {
+        "main": [
+          [
+            {
+              "node": "Person already in Pipedrive?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Person already in Pipedrive?": {
+        "main": [
+          [
+            {
+              "node": "Create lead",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create person",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create lead": {
+        "main": [
+          [
+            {
+              "node": "Add the inquiry as a note",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Add the inquiry as a note": {
+        "main": [
+          [
+            {
+              "node": "Tag email: lead created",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tag email: lead created": {
+        "main": [
+          [
+            {
+              "node": "Record email as handled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create person": {
+        "main": [
+          [
+            {
+              "node": "Create lead",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [
+      {
+        "id": "41878c88-ee04-4855-9ecb-02f2159b5153",
+        "name": "Read and sort",
+        "nodeIds": [
+          "40d5877b-569e-4601-a9fd-0aa0b16a40c6",
+          "4907a33a-287c-4930-ae00-877f5630091a",
+          "3f72acac-6471-47b4-9f7e-8385aaf5bf1d",
+          "a711f984-09d5-4ba1-b9cd-499cbe48b110",
+          "7cfae519-ea8f-4bc1-a276-771ce44aa92e"
+        ],
+        "description": "Skips handled emails, reads the form fields, and sorts each inquiry into client, franchise, job, spam or unclear"
+      },
+      {
+        "id": "975e857a-17b0-4b74-ad11-16e317026530",
+        "name": "Create the lead",
+        "nodeIds": [
+          "a11afcb5-6b34-4fa6-ab27-a3a0ad6d36b8",
+          "f6f755d7-4b82-4da2-88d9-95d740511c9e",
+          "70aaca49-72f4-4755-8467-5d9909ba0f59",
+          "fb025619-6106-4fe3-a992-8181994b086d",
+          "1f687afe-8e0a-4c09-bfe8-b1fe3b311ea5",
+          "29f5fe9c-786e-491b-82c7-508736fd1d1e"
+        ],
+        "description": "Finds or creates the person in Pipedrive, creates the lead with the message as a note, and tags the email"
+      }
+    ],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Connect the Pipedrive Anago credential",
+    "description": "Updated nodes: Find person in Pipedrive, Create lead, Add the inquiry as a note, Create person",
+    "autosaved": false,
+    "createdAt": "2026-11-08T20:09:33.637Z",
+    "updatedAt": "2026-11-08T22:21:56.241Z"
+  }
+}
