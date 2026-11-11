@@ -1,0 +1,101 @@
+{
+  "id": "LzEGJ4ShEr0ujOek",
+  "name": "TEMP diagnostic: which mailbox",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-08T22:37:12.721Z",
+  "updatedAt": "2026-11-08T22:37:12.721Z",
+  "isArchived": false,
+  "versionId": "6dc9e125-68eb-4788-bbe6-1c0744f8c574",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "1182892a-27d8-4e24-b1c8-66ded5311ad3",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c50691fb-7dca-4bf8-aae2-dfcf19f0cee2",
+      "name": "Recent form emails",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "output": "fields",
+        "fields": [
+          "subject",
+          "receivedDateTime",
+          "toRecipients",
+          "parentFolderId",
+          "categories"
+        ],
+        "filtersUI": {
+          "values": {
+            "filterBy": "filters",
+            "filters": {
+              "custom": "contains(subject,'New Contact Form Submission')",
+              "readStatus": "both",
+              "receivedAfter": "2026-11-08T20:00:00Z"
+            }
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "841f96cd-93bc-4f79-ab06-7317efc04522"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Recent form emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "LzEGJ4ShEr0ujOek",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-08T22:37:12.721Z",
+      "updatedAt": "2026-11-08T22:37:12.721Z"
+    }
+  ],
+  "activeVersion": null
+}
