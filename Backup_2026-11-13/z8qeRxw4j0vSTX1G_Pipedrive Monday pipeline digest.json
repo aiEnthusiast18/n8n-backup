@@ -1,0 +1,443 @@
+{
+  "id": "z8qeRxw4j0vSTX1G",
+  "name": "Pipedrive Monday pipeline digest",
+  "active": true,
+  "activeVersionId": "610b5197-834e-4986-93ac-a751f17b5bb1",
+  "createdAt": "2026-11-12T05:25:29.211Z",
+  "updatedAt": "2026-11-12T05:25:35.333Z",
+  "isArchived": false,
+  "versionId": "610b5197-834e-4986-93ac-a751f17b5bb1",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "9f3da85c-0dae-4166-9d78-4951023c2377",
+      "name": "Monday 7:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b5fa7484-7e1a-4b51-9480-5ebb0820208a",
+      "name": "Get leads",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/leads?archived_status=not_archived&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "ed3fae98-11de-4840-b047-7fea50d16a9a",
+      "name": "Get deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=all_not_deleted&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "437f4e11-0d85-4752-8608-97e4ba57271a",
+      "name": "Get stages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/stages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "b6444c44-75f5-410c-ae5d-c163ae4f76c6",
+      "name": "Build digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const leads = ($('Get leads').first().json.data || []).filter(l => !l.is_archived);\nconst deals = $('Get deals').first().json.data || [];\nconst stages = {}; for (const s of ($('Get stages').first().json.data || [])) stages[s.id] = s.pipeline_name + ' / ' + s.name;\nconst now = DateTime.now().setZone('America/Winnipeg');\nconst weekAgo = now.minus({ days: 7 });\nconst t = s => s ? DateTime.fromISO(String(s).replace(' ', 'T'), { zone: 'utc' }).setZone('America/Winnipeg') : null;\nconst esc = s => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));\nconst ago = d => { const n = Math.floor(now.diff(d, 'days').days); return n === 0 ? 'today' : n + 'd ago'; };\nconst money = v => v ? '$' + Number(v).toLocaleString('en-CA') : '';\nconst real = x => !/zztest/i.test(x.title || '');\nconst newLeads = leads.filter(real).filter(l => t(l.add_time) >= weekAgo);\nconst noNext = leads.filter(real).filter(l => !l.next_activity_id && t(l.add_time) <= now.minus({ hours: 24 }));\nconst open = deals.filter(real).filter(d => d.status === 'open');\nconst rotting = open.filter(d => d.rotten_time);\nconst proposals = open.filter(d => [4, 8].includes(d.stage_id));\nconst won = deals.filter(real).filter(d => d.status === 'won' && t(d.won_time) >= weekAgo);\nconst lost = deals.filter(real).filter(d => d.status === 'lost' && t(d.lost_time) >= weekAgo);\nconst list = (title, rows, fmt) => '<h3 style=\"margin:18px 0 6px\">' + title + ' (' + rows.length + ')</h3>' + (rows.length ? '<ul style=\"margin:0;padding-left:18px\">' + rows.slice(0, 25).map(r => '<li>' + fmt(r) + '</li>').join('') + '</ul>' + (rows.length > 25 ? '<p>…and ' + (rows.length - 25) + ' more</p>' : '') : '<p style=\"color:#777;margin:0\">None</p>');\nconst html = '<div style=\"font-family:Arial,sans-serif;font-size:14px;color:#222\">'\n  + '<p>Pipeline for the week of ' + now.toFormat('d LLL yyyy') + '. Open deals: ' + open.length + ', worth ' + money(open.reduce((a, d) => a + (Number(d.value) || 0), 0)) + '.</p>'\n  + list('Leads with no next step after 24 hours', noNext, l => esc(l.title) + ' · added ' + ago(t(l.add_time)))\n  + list('Rotting deals', rotting, d => esc(d.title) + ' · ' + esc(stages[d.stage_id] || '') + ' · stuck since ' + ago(t(d.rotten_time)))\n  + list('Proposals and quotes waiting on an answer', proposals, d => esc(d.title) + ' · ' + money(d.value) + ' · sent ' + ago(t(d.stage_change_time || d.add_time)))\n  + list('New leads this week', newLeads, l => esc(l.title))\n  + list('Won this week', won, d => esc(d.title) + ' · ' + money(d.value))\n  + list('Lost this week', lost, d => esc(d.title) + (d.lost_reason ? ' · ' + esc(d.lost_reason) : ''))\n  + '<p style=\"color:#777;margin-top:18px\">Sent automatically every Monday at 7:00 from n8n.</p></div>';\nreturn [{ json: { subject: 'Pipeline this week: ' + noNext.length + ' leads need a next step, ' + rotting.length + ' rotting deals', html } }];\n"
+      }
+    },
+    {
+      "id": "ecab7fdd-1144-4e79-beca-cd2933923fe6",
+      "name": "Email Raf",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "rlakhani@anagomb.ca",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "6322dced-63d7-4c0d-81f2-8537ca8b016c"
+    }
+  ],
+  "connections": {
+    "Monday 7:00": {
+      "main": [
+        [
+          {
+            "node": "Get leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get leads": {
+      "main": [
+        [
+          {
+            "node": "Get deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get deals": {
+      "main": [
+        [
+          {
+            "node": "Get stages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get stages": {
+      "main": [
+        [
+          {
+            "node": "Build digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build digest": {
+      "main": [
+        [
+          {
+            "node": "Email Raf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "America/Winnipeg"
+  },
+  "staticData": {
+    "node:Monday 7:00": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "z8qeRxw4j0vSTX1G",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-12T05:25:29.211Z",
+      "updatedAt": "2026-11-12T05:25:29.211Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "610b5197-834e-4986-93ac-a751f17b5bb1",
+    "workflowId": "z8qeRxw4j0vSTX1G",
+    "nodes": [
+      {
+        "id": "9f3da85c-0dae-4166-9d78-4951023c2377",
+        "name": "Monday 7:00",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "weeksInterval": 1,
+                "triggerAtDay": [
+                  1
+                ],
+                "triggerAtHour": 7,
+                "triggerAtMinute": 0
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "b5fa7484-7e1a-4b51-9480-5ebb0820208a",
+        "name": "Get leads",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          224,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.pipedrive.com/v1/leads?archived_status=not_archived&limit=500",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "executeOnce": true
+      },
+      {
+        "id": "ed3fae98-11de-4840-b047-7fea50d16a9a",
+        "name": "Get deals",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          448,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.pipedrive.com/v1/deals?status=all_not_deleted&limit=500",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "executeOnce": true
+      },
+      {
+        "id": "437f4e11-0d85-4752-8608-97e4ba57271a",
+        "name": "Get stages",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          672,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.pipedrive.com/v1/stages",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "executeOnce": true
+      },
+      {
+        "id": "b6444c44-75f5-410c-ae5d-c163ae4f76c6",
+        "name": "Build digest",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          0
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "mode": "runOnceForAllItems",
+          "jsCode": "const leads = ($('Get leads').first().json.data || []).filter(l => !l.is_archived);\nconst deals = $('Get deals').first().json.data || [];\nconst stages = {}; for (const s of ($('Get stages').first().json.data || [])) stages[s.id] = s.pipeline_name + ' / ' + s.name;\nconst now = DateTime.now().setZone('America/Winnipeg');\nconst weekAgo = now.minus({ days: 7 });\nconst t = s => s ? DateTime.fromISO(String(s).replace(' ', 'T'), { zone: 'utc' }).setZone('America/Winnipeg') : null;\nconst esc = s => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));\nconst ago = d => { const n = Math.floor(now.diff(d, 'days').days); return n === 0 ? 'today' : n + 'd ago'; };\nconst money = v => v ? '$' + Number(v).toLocaleString('en-CA') : '';\nconst real = x => !/zztest/i.test(x.title || '');\nconst newLeads = leads.filter(real).filter(l => t(l.add_time) >= weekAgo);\nconst noNext = leads.filter(real).filter(l => !l.next_activity_id && t(l.add_time) <= now.minus({ hours: 24 }));\nconst open = deals.filter(real).filter(d => d.status === 'open');\nconst rotting = open.filter(d => d.rotten_time);\nconst proposals = open.filter(d => [4, 8].includes(d.stage_id));\nconst won = deals.filter(real).filter(d => d.status === 'won' && t(d.won_time) >= weekAgo);\nconst lost = deals.filter(real).filter(d => d.status === 'lost' && t(d.lost_time) >= weekAgo);\nconst list = (title, rows, fmt) => '<h3 style=\"margin:18px 0 6px\">' + title + ' (' + rows.length + ')</h3>' + (rows.length ? '<ul style=\"margin:0;padding-left:18px\">' + rows.slice(0, 25).map(r => '<li>' + fmt(r) + '</li>').join('') + '</ul>' + (rows.length > 25 ? '<p>…and ' + (rows.length - 25) + ' more</p>' : '') : '<p style=\"color:#777;margin:0\">None</p>');\nconst html = '<div style=\"font-family:Arial,sans-serif;font-size:14px;color:#222\">'\n  + '<p>Pipeline for the week of ' + now.toFormat('d LLL yyyy') + '. Open deals: ' + open.length + ', worth ' + money(open.reduce((a, d) => a + (Number(d.value) || 0), 0)) + '.</p>'\n  + list('Leads with no next step after 24 hours', noNext, l => esc(l.title) + ' · added ' + ago(t(l.add_time)))\n  + list('Rotting deals', rotting, d => esc(d.title) + ' · ' + esc(stages[d.stage_id] || '') + ' · stuck since ' + ago(t(d.rotten_time)))\n  + list('Proposals and quotes waiting on an answer', proposals, d => esc(d.title) + ' · ' + money(d.value) + ' · sent ' + ago(t(d.stage_change_time || d.add_time)))\n  + list('New leads this week', newLeads, l => esc(l.title))\n  + list('Won this week', won, d => esc(d.title) + ' · ' + money(d.value))\n  + list('Lost this week', lost, d => esc(d.title) + (d.lost_reason ? ' · ' + esc(d.lost_reason) : ''))\n  + '<p style=\"color:#777;margin-top:18px\">Sent automatically every Monday at 7:00 from n8n.</p></div>';\nreturn [{ json: { subject: 'Pipeline this week: ' + noNext.length + ' leads need a next step, ' + rotting.length + ' rotting deals', html } }];\n"
+        }
+      },
+      {
+        "id": "ecab7fdd-1144-4e79-beca-cd2933923fe6",
+        "name": "Email Raf",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          0
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "send",
+          "toRecipients": "rlakhani@anagomb.ca",
+          "subject": "={{ $json.subject }}",
+          "bodyContent": "={{ $json.html }}",
+          "additionalFields": {
+            "bodyContentType": "html"
+          }
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "webhookId": "6322dced-63d7-4c0d-81f2-8537ca8b016c"
+      }
+    ],
+    "connections": {
+      "Monday 7:00": {
+        "main": [
+          [
+            {
+              "node": "Get leads",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get leads": {
+        "main": [
+          [
+            {
+              "node": "Get deals",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get deals": {
+        "main": [
+          [
+            {
+              "node": "Get stages",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get stages": {
+        "main": [
+          [
+            {
+              "node": "Build digest",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build digest": {
+        "main": [
+          [
+            {
+              "node": "Email Raf",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Monday pipeline digest",
+    "description": "Created with 6 nodes: Monday 7:00, Get leads, Get deals, Get stages, Build digest and 1 more",
+    "autosaved": false,
+    "createdAt": "2026-11-12T05:25:29.211Z",
+    "updatedAt": "2026-11-12T05:25:29.211Z"
+  }
+}
