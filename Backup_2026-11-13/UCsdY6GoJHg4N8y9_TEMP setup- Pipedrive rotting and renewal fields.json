@@ -1,0 +1,220 @@
+{
+  "id": "UCsdY6GoJHg4N8y9",
+  "name": "TEMP setup: Pipedrive rotting and renewal fields",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-12T05:21:59.218Z",
+  "updatedAt": "2026-11-12T05:23:04.272Z",
+  "isArchived": true,
+  "versionId": "878c2b24-635e-40fa-82c6-1479fcca7cf3",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "c9c6a105-176b-4f17-87c5-b2f514ca2b3e",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "2fe57a67-590e-46ab-82a2-faf2577adc20",
+      "name": "Rotting days per stage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const m = {1:2,2:7,3:7,4:14,6:2,7:3,8:7,9:7,10:3,11:14,12:14,13:21,14:14}; return Object.entries(m).map(([id,d]) => ({ json: { id: Number(id), body: { rotten_flag: true, rotten_days: d } } }));"
+      }
+    },
+    {
+      "id": "b83d2990-010b-4dd8-a0f7-0b868f40056d",
+      "name": "Set rotting",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://api.pipedrive.com/v1/stages/' + $json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "e3c4e9b0-0339-4e53-9342-19839a363148",
+      "name": "Check stages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{ json: { stages: $input.all().map(i => i.json.data && (i.json.data.name + ':' + i.json.data.rotten_days)) } }];"
+      }
+    },
+    {
+      "id": "2b7a65f5-8be6-4b3b-939d-b4568cde4ab4",
+      "name": "New deal fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        192
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{ json: { name: 'Current cleaner', field_type: 'varchar' } }, { json: { name: 'Current contract ends', field_type: 'date' } }];"
+      }
+    },
+    {
+      "id": "36a83530-91dd-43c1-968b-a40c83a7b80b",
+      "name": "Create field",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        192
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/dealFields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $json.name, field_type: $json.field_type }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "0b367227-018c-427f-90cd-6a2df3d78770",
+      "name": "Field keys",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        192
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{ json: { fields: $input.all().map(i => i.json.data && (i.json.data.name + '=' + i.json.data.key)) } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Rotting days per stage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "New deal fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rotting days per stage": {
+      "main": [
+        [
+          {
+            "node": "Set rotting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set rotting": {
+      "main": [
+        [
+          {
+            "node": "Check stages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New deal fields": {
+      "main": [
+        [
+          {
+            "node": "Create field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create field": {
+      "main": [
+        [
+          {
+            "node": "Field keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "UCsdY6GoJHg4N8y9",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-12T05:21:59.218Z",
+      "updatedAt": "2026-11-12T05:21:59.218Z"
+    }
+  ],
+  "activeVersion": null
+}
