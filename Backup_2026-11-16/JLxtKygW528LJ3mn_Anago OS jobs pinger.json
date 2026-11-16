@@ -1,0 +1,177 @@
+{
+  "id": "JLxtKygW528LJ3mn",
+  "name": "Anago OS jobs pinger",
+  "active": true,
+  "activeVersionId": "206650ae-a96a-484e-bfd4-0f0cd5c5d960",
+  "createdAt": "2026-11-08T22:49:17.494Z",
+  "updatedAt": "2026-11-09T20:44:33.176Z",
+  "isArchived": false,
+  "versionId": "206650ae-a96a-484e-bfd4-0f0cd5c5d960",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "33e0ebed-b885-4c64-841f-6836dfd1a7ab",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://anago-chi.vercel.app/api/cron/crm/jobs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {
+          "timeout": 70000
+        }
+      },
+      "id": "70fc4491-0d20-4a18-8381-0320199b661c",
+      "name": "Run due Anago OS jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "dcPwCb2Puol3iaCs",
+          "name": "Bearer Auth Vercel"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Run due Anago OS jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Every 15 minutes": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "JLxtKygW528LJ3mn",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-08T22:49:17.494Z",
+      "updatedAt": "2026-11-08T22:49:17.494Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "206650ae-a96a-484e-bfd4-0f0cd5c5d960",
+    "workflowId": "JLxtKygW528LJ3mn",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        },
+        "id": "33e0ebed-b885-4c64-841f-6836dfd1a7ab",
+        "name": "Every 15 minutes",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://anago-chi.vercel.app/api/cron/crm/jobs",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "options": {
+            "timeout": 70000
+          }
+        },
+        "id": "70fc4491-0d20-4a18-8381-0320199b661c",
+        "name": "Run due Anago OS jobs",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          224,
+          0
+        ],
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "dcPwCb2Puol3iaCs",
+            "name": "Bearer Auth Vercel"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Every 15 minutes": {
+        "main": [
+          [
+            {
+              "node": "Run due Anago OS jobs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani",
+    "name": "Version 206650ae",
+    "description": "",
+    "autosaved": true,
+    "createdAt": "2026-11-09T20:44:33.181Z",
+    "updatedAt": "2026-11-09T20:44:51.045Z"
+  }
+}
