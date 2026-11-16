@@ -1,0 +1,137 @@
+{
+  "id": "c8IKkV4pT8J4wMCs",
+  "name": "TEMP probe system URLs (delete me)",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-10-28T16:47:45.939Z",
+  "updatedAt": "2026-10-28T16:48:32.667Z",
+  "isArchived": true,
+  "versionId": "a786f2ef-7583-4eef-b0ec-9d63c9f6ce11",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "c6a63915-61d2-4500-a9ed-35a31fac8fc4",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "9a50d95c-aa03-4260-b611-a33edbfb0e2e",
+      "name": "URL List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return ['https://dashboard.apps.204it.ca/login','https://dashboard.apps.204it.ca/healthz','https://dashboard.apps.204it.ca/api/health','https://reminders.apps.204it.ca/healthz','https://reminders.apps.204it.ca/api/health','https://reminders.apps.204it.ca/status','https://reminders.apps.204it.ca/run','https://pm.apps.204it.ca/healthz','https://pm.apps.204it.ca/login'].map(u => ({ json: { url: u } }));"
+      }
+    },
+    {
+      "id": "5287c827-b005-40fb-9148-6aa3bebcaa43",
+      "name": "Probe",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "4201625e-916f-479a-a66f-02903e145372",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const urls = $('URL List').all();\nreturn $input.all().map((it, i) => ({ json: { url: urls[i]?.json.url, status: it.json.statusCode, location: it.json.headers?.location, body: String(it.json.body ?? it.json.data ?? it.json.error?.message ?? '').slice(0, 160) } }));"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "URL List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URL List": {
+      "main": [
+        [
+          {
+            "node": "Probe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Probe": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "c8IKkV4pT8J4wMCs",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-10-28T16:47:45.939Z",
+      "updatedAt": "2026-10-28T16:47:45.939Z"
+    }
+  ],
+  "activeVersion": null
+}
