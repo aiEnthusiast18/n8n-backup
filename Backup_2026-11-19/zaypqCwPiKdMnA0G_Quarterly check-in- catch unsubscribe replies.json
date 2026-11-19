@@ -1,0 +1,308 @@
+{
+  "id": "zaypqCwPiKdMnA0G",
+  "name": "Quarterly check-in: catch unsubscribe replies",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T21:47:16.806Z",
+  "updatedAt": "2026-11-18T22:28:25.114Z",
+  "isArchived": true,
+  "versionId": "cbf3fbce-bcbd-441c-a5c5-7e64059d6f70",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "2b009511-ec3f-40ce-8914-e90f18689b19",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8a7a00c3-aa45-4ec5-a435-867fc7413dae",
+      "name": "Get recent mail",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": true,
+        "output": "fields",
+        "fields": [
+          "subject",
+          "from",
+          "bodyPreview",
+          "receivedDateTime"
+        ],
+        "filtersUI": {
+          "values": {
+            "filterBy": "filters",
+            "filters": {
+              "readStatus": "both",
+              "receivedAfter": "={{ $now.minus({ hours: 3 }).toISO() }}"
+            }
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "alwaysOutputData": true,
+      "webhookId": "09cc6be3-3140-4941-bb2f-dd2ea548cf52"
+    },
+    {
+      "id": "b3f20a1b-362f-4b3b-9c06-5cf74bd087b1",
+      "name": "Get opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "1a2a6997-48ee-44a3-870d-54761c55ddad",
+      "name": "Find unsubscribe replies",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const have = new Set($('Get opt-outs').all().map(i => String(i.json.email || '').toLowerCase().trim()));\nconst out = [];\nfor (const m of $('Get recent mail').all().map(i => i.json)) {\n  const subj = String(m.subject || '');\n  if (!/check-in about cleaning/i.test(subj) || /^\\s*\\[TEST/i.test(subj)) continue;\n  const email = String((m.from && m.from.emailAddress && m.from.emailAddress.address) || '').toLowerCase().trim();\n  if (!email || /@anagomb\\.ca$/.test(email) || have.has(email)) continue;\n  // only the reply itself, not the quoted original (which contains the word unsubscribe)\n  const reply = String(m.bodyPreview || '').split(/\\bFrom:|-----Original|\\bOn .{5,80} wrote:|Hi [^,]{1,40},\\s+In 20\\d\\d we/i)[0];\n  if (!/unsubscri|remove me|stop email|take me off/i.test(reply)) continue;\n  have.add(email);\n  out.push({ json: { email, subject: subj } });\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "e8561648-442d-4d4d-8c8e-5a5617e7e32f",
+      "name": "Add to opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Find unsubscribe replies').item.json.email }}",
+            "source": "unsubscribe reply"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "60249b22-0740-4c14-a10e-54aadb63309a",
+      "name": "Find person in Pipedrive",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Find unsubscribe replies').item.json.email) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "f9942bcc-b14a-4519-a666-b9381fec47da",
+      "name": "Note on person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/notes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'Replied unsubscribe to the quarterly check-in email on ' + $now.toFormat('yyyy-LL-dd') + '. Removed from the quarterly email. Do not email marketing to this address.', person_id: (($json.data && $json.data.items && $json.data.items[0]) || { item: {} }).item.id || null, user_id: 32883646 }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every hour": {
+      "main": [
+        [
+          {
+            "node": "Get recent mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get recent mail": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Find unsubscribe replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find unsubscribe replies": {
+      "main": [
+        [
+          {
+            "node": "Add to opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Find person in Pipedrive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find person in Pipedrive": {
+      "main": [
+        [
+          {
+            "node": "Note on person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": {
+    "node:Every hour": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "zaypqCwPiKdMnA0G",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T21:47:16.806Z",
+      "updatedAt": "2026-11-18T21:47:16.806Z"
+    }
+  ],
+  "activeVersion": null
+}
