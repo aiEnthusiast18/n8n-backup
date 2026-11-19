@@ -1,0 +1,990 @@
+{
+  "id": "reXzu5aYZ8EiTgyG",
+  "name": "Re-engagement emails: handle replies (unsubscribe and call-backs)",
+  "active": true,
+  "activeVersionId": "b8c98f0b-d082-4534-b7fe-73b190e8500e",
+  "createdAt": "2026-11-18T22:26:52.841Z",
+  "updatedAt": "2026-11-18T22:48:12.389Z",
+  "isArchived": false,
+  "versionId": "b8c98f0b-d082-4534-b7fe-73b190e8500e",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "9ccb4488-2cbb-4d80-a610-935e81f27e7f",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        96
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "aba875ea-fe72-4c80-a4c4-ef44f6fddada",
+      "name": "Get recent mail",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        96
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": true,
+        "output": "fields",
+        "fields": [
+          "subject",
+          "from",
+          "bodyPreview",
+          "receivedDateTime",
+          "internetMessageId"
+        ],
+        "filtersUI": {
+          "values": {
+            "filterBy": "filters",
+            "filters": {
+              "readStatus": "both",
+              "receivedAfter": "={{ $now.minus({ hours: 3 }).toISO() }}"
+            }
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "alwaysOutputData": true,
+      "webhookId": "ef909649-6522-402f-baa2-a10861611f7f"
+    },
+    {
+      "id": "4b053e70-2690-45fb-a25f-f1dbf77e4b4d",
+      "name": "Get opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        96
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "6105cbb4-d57a-402b-8a6a-c4bc3b29dcce",
+      "name": "Get replies",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        96
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uGpqmQVuQzTor7NJ",
+          "cachedResultName": "quarterly_email_replied"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "b9f5d570-3f7b-4e62-82e4-39654a1a0efe",
+      "name": "Find replies",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        96
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const lc = s => String(s || '').toLowerCase().trim();\nconst optout = new Set($('Get opt-outs').all().map(i => lc(i.json.email)));\nconst done = new Set($('Get replies').all().map(i => String(i.json.message_id || '')).filter(Boolean));\nconst CAMPAIGN = /check-in about cleaning|Winter floors at|Spring cleaning at|Summer floor work at|ready for winter|new cleaning team working out|How is the cleaning going|Before the snow/i;\nconst out = [];\nfor (const m of $('Get recent mail').all().map(i => i.json)) {\n  const subj = String(m.subject || '');\n  if (!CAMPAIGN.test(subj) || /\\[(TEST|SAMPLE)/i.test(subj)) continue;\n  const email = lc(m.from && m.from.emailAddress && m.from.emailAddress.address);\n  const name = (m.from && m.from.emailAddress && m.from.emailAddress.name) || email;\n  const id = String(m.id || m.internetMessageId || '');\n  if (!/^[^\\s@\\/]+@[^\\s@]+\\.[a-z]+$/.test(email) || /@anagomb\\.ca$/.test(email) || !id || done.has(id) || optout.has(email)) continue;\n  // Auto-replies (out of office, delivery failures) are not real replies.\n  if (/automatic reply|auto.?reply|out of (the )?office|undeliverable|delivery (status|failure)|mail delivery/i.test(subj) || /mailer-daemon|postmaster|no-?reply/i.test(email)) continue;\n  // only the reply itself, not the quoted original (which contains the word unsubscribe)\n  const reply = String(m.bodyPreview || '').split(/\\bFrom:|-----Original|\\bOn .{5,80} wrote:|Hi [^,]{1,40},\\s+(In 20\\d\\d we|It has been about|Snow is on its way)/i)[0].trim();\n  const unsub = /unsubscri|remove me|stop email|take me off/i.test(reply);\n  done.add(id);\n  if (unsub) optout.add(email);\n  const client = /Before the snow/i.test(subj);\n  out.push({ json: { kind: unsub ? 'unsub' : 'reply', email, name, message_id: id, subject: subj, reply: reply.slice(0, 300), next: client ? 'Current client asking about pre-winter floor or carpet work: confirm the date and price, then book it in Anago OS.' : 'If they are interested, reopen their lost deal and book the walkthrough.' } });\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "0815f1d4-f9c5-48ea-bb6b-5a1c26417742",
+      "name": "Unsubscribe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        96
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.kind }}",
+              "rightValue": "unsub",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "45850d6b-12c0-466c-8feb-885b58a3ca60",
+      "name": "Add to opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Find replies').item.json.email }}",
+            "source": "unsubscribe reply"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2cb0437b-517d-4d66-a477-b2f4faad4426",
+      "name": "Find person (unsubscribe)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1568,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Find replies').item.json.email) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "8ccd9ab4-c69b-45cd-b19d-0b5ab79f05ce",
+      "name": "Note on person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1792,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/notes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'Replied unsubscribe to the re-engagement email on ' + $now.toFormat('yyyy-LL-dd') + '. Removed from these emails. Do not send marketing email to this address.', person_id: (($json.data && $json.data.items && $json.data.items[0]) || { item: {} }).item.id || null, user_id: 32883646 }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "bc14ce65-e5e3-4864-8837-5c60cd141f47",
+      "name": "Record reply",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        192
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uGpqmQVuQzTor7NJ",
+          "cachedResultName": "quarterly_email_replied"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Find replies').item.json.email }}",
+            "message_id": "={{ $('Find replies').item.json.message_id }}"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4b75721a-f300-4860-81b1-bb4e9a7201be",
+      "name": "Find person (reply)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1568,
+        192
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Find replies').item.json.email) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "668c9ec6-7b82-430f-9881-2b185fb158b4",
+      "name": "Call-back task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1792,
+        192
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ subject: 'Call back: ' + $('Find replies').item.json.name + ' replied to your email', type: 'call', done: 0, user_id: 32883646, person_id: (($json.data && $json.data.items && $json.data.items[0]) || { item: {} }).item.id || null, due_date: $now.setZone('America/Winnipeg').toISODate(), note: 'They replied to \"' + $('Find replies').item.json.subject + '\": ' + $('Find replies').item.json.reply + ' (full reply in your Outlook). ' + $('Find replies').item.json.next }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every hour": {
+      "main": [
+        [
+          {
+            "node": "Get recent mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get recent mail": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Get replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get replies": {
+      "main": [
+        [
+          {
+            "node": "Find replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find replies": {
+      "main": [
+        [
+          {
+            "node": "Unsubscribe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsubscribe?": {
+      "main": [
+        [
+          {
+            "node": "Add to opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Find person (unsubscribe)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find person (unsubscribe)": {
+      "main": [
+        [
+          {
+            "node": "Note on person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record reply": {
+      "main": [
+        [
+          {
+            "node": "Find person (reply)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find person (reply)": {
+      "main": [
+        [
+          {
+            "node": "Call-back task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": {
+    "node:Every hour": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "reXzu5aYZ8EiTgyG",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T22:26:52.841Z",
+      "updatedAt": "2026-11-18T22:26:52.841Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "b8c98f0b-d082-4534-b7fe-73b190e8500e",
+    "workflowId": "reXzu5aYZ8EiTgyG",
+    "nodes": [
+      {
+        "id": "9ccb4488-2cbb-4d80-a610-935e81f27e7f",
+        "name": "Every hour",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          96
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "aba875ea-fe72-4c80-a4c4-ef44f6fddada",
+        "name": "Get recent mail",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          224,
+          96
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "getAll",
+          "returnAll": true,
+          "output": "fields",
+          "fields": [
+            "subject",
+            "from",
+            "bodyPreview",
+            "receivedDateTime",
+            "internetMessageId"
+          ],
+          "filtersUI": {
+            "values": {
+              "filterBy": "filters",
+              "filters": {
+                "readStatus": "both",
+                "receivedAfter": "={{ $now.minus({ hours: 3 }).toISO() }}"
+              }
+            }
+          },
+          "options": {}
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "alwaysOutputData": true,
+        "webhookId": "ef909649-6522-402f-baa2-a10861611f7f"
+      },
+      {
+        "id": "4b053e70-2690-45fb-a25f-f1dbf77e4b4d",
+        "name": "Get opt-outs",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          448,
+          96
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "XAUhH78HlYPmmZRe",
+            "cachedResultName": "quarterly_email_optout"
+          },
+          "returnAll": true
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "6105cbb4-d57a-402b-8a6a-c4bc3b29dcce",
+        "name": "Get replies",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          672,
+          96
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "uGpqmQVuQzTor7NJ",
+            "cachedResultName": "quarterly_email_replied"
+          },
+          "returnAll": true
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "b9f5d570-3f7b-4e62-82e4-39654a1a0efe",
+        "name": "Find replies",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          96
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "mode": "runOnceForAllItems",
+          "jsCode": "const lc = s => String(s || '').toLowerCase().trim();\nconst optout = new Set($('Get opt-outs').all().map(i => lc(i.json.email)));\nconst done = new Set($('Get replies').all().map(i => String(i.json.message_id || '')).filter(Boolean));\nconst CAMPAIGN = /check-in about cleaning|Winter floors at|Spring cleaning at|Summer floor work at|ready for winter|new cleaning team working out|How is the cleaning going|Before the snow/i;\nconst out = [];\nfor (const m of $('Get recent mail').all().map(i => i.json)) {\n  const subj = String(m.subject || '');\n  if (!CAMPAIGN.test(subj) || /\\[(TEST|SAMPLE)/i.test(subj)) continue;\n  const email = lc(m.from && m.from.emailAddress && m.from.emailAddress.address);\n  const name = (m.from && m.from.emailAddress && m.from.emailAddress.name) || email;\n  const id = String(m.id || m.internetMessageId || '');\n  if (!/^[^\\s@\\/]+@[^\\s@]+\\.[a-z]+$/.test(email) || /@anagomb\\.ca$/.test(email) || !id || done.has(id) || optout.has(email)) continue;\n  // Auto-replies (out of office, delivery failures) are not real replies.\n  if (/automatic reply|auto.?reply|out of (the )?office|undeliverable|delivery (status|failure)|mail delivery/i.test(subj) || /mailer-daemon|postmaster|no-?reply/i.test(email)) continue;\n  // only the reply itself, not the quoted original (which contains the word unsubscribe)\n  const reply = String(m.bodyPreview || '').split(/\\bFrom:|-----Original|\\bOn .{5,80} wrote:|Hi [^,]{1,40},\\s+(In 20\\d\\d we|It has been about|Snow is on its way)/i)[0].trim();\n  const unsub = /unsubscri|remove me|stop email|take me off/i.test(reply);\n  done.add(id);\n  if (unsub) optout.add(email);\n  const client = /Before the snow/i.test(subj);\n  out.push({ json: { kind: unsub ? 'unsub' : 'reply', email, name, message_id: id, subject: subj, reply: reply.slice(0, 300), next: client ? 'Current client asking about pre-winter floor or carpet work: confirm the date and price, then book it in Anago OS.' : 'If they are interested, reopen their lost deal and book the walkthrough.' } });\n}\nreturn out;\n"
+        }
+      },
+      {
+        "id": "0815f1d4-f9c5-48ea-bb6b-5a1c26417742",
+        "name": "Unsubscribe?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1120,
+          96
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.kind }}",
+                "rightValue": "unsub",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "45850d6b-12c0-466c-8feb-885b58a3ca60",
+        "name": "Add to opt-outs",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          1344,
+          0
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "insert",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "XAUhH78HlYPmmZRe",
+            "cachedResultName": "quarterly_email_optout"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "email": "={{ $('Find replies').item.json.email }}",
+              "source": "unsubscribe reply"
+            },
+            "schema": [
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "source",
+                "displayName": "source",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "2cb0437b-517d-4d66-a477-b2f4faad4426",
+        "name": "Find person (unsubscribe)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1568,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Find replies').item.json.email) }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "8ccd9ab4-c69b-45cd-b19d-0b5ab79f05ce",
+        "name": "Note on person",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1792,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.pipedrive.com/v1/notes",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ content: 'Replied unsubscribe to the re-engagement email on ' + $now.toFormat('yyyy-LL-dd') + '. Removed from these emails. Do not send marketing email to this address.', person_id: (($json.data && $json.data.items && $json.data.items[0]) || { item: {} }).item.id || null, user_id: 32883646 }) }}",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "bc14ce65-e5e3-4864-8837-5c60cd141f47",
+        "name": "Record reply",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          1344,
+          192
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "insert",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "uGpqmQVuQzTor7NJ",
+            "cachedResultName": "quarterly_email_replied"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "email": "={{ $('Find replies').item.json.email }}",
+              "message_id": "={{ $('Find replies').item.json.message_id }}"
+            },
+            "schema": [
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "message_id",
+                "displayName": "message_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "4b75721a-f300-4860-81b1-bb4e9a7201be",
+        "name": "Find person (reply)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1568,
+          192
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Find replies').item.json.email) }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "668c9ec6-7b82-430f-9881-2b185fb158b4",
+        "name": "Call-back task",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1792,
+          192
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.pipedrive.com/v1/activities",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ subject: 'Call back: ' + $('Find replies').item.json.name + ' replied to your email', type: 'call', done: 0, user_id: 32883646, person_id: (($json.data && $json.data.items && $json.data.items[0]) || { item: {} }).item.id || null, due_date: $now.setZone('America/Winnipeg').toISODate(), note: 'They replied to \"' + $('Find replies').item.json.subject + '\": ' + $('Find replies').item.json.reply + ' (full reply in your Outlook). ' + $('Find replies').item.json.next }) }}",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "onError": "continueRegularOutput"
+      }
+    ],
+    "connections": {
+      "Every hour": {
+        "main": [
+          [
+            {
+              "node": "Get recent mail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get recent mail": {
+        "main": [
+          [
+            {
+              "node": "Get opt-outs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get opt-outs": {
+        "main": [
+          [
+            {
+              "node": "Get replies",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get replies": {
+        "main": [
+          [
+            {
+              "node": "Find replies",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find replies": {
+        "main": [
+          [
+            {
+              "node": "Unsubscribe?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Unsubscribe?": {
+        "main": [
+          [
+            {
+              "node": "Add to opt-outs",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Add to opt-outs": {
+        "main": [
+          [
+            {
+              "node": "Find person (unsubscribe)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find person (unsubscribe)": {
+        "main": [
+          [
+            {
+              "node": "Note on person",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Record reply": {
+        "main": [
+          [
+            {
+              "node": "Find person (reply)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find person (reply)": {
+        "main": [
+          [
+            {
+              "node": "Call-back task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Handle replies to the Before the snow client email",
+    "description": "Updated nodes: Find replies, Call-back task",
+    "autosaved": false,
+    "createdAt": "2026-11-18T22:48:12.391Z",
+    "updatedAt": "2026-11-18T22:48:12.391Z"
+  }
+}
