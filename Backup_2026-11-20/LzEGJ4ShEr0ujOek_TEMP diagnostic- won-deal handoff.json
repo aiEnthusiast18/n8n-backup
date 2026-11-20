@@ -1,0 +1,143 @@
+{
+  "id": "LzEGJ4ShEr0ujOek",
+  "name": "TEMP diagnostic: won-deal handoff",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-08T22:37:12.721Z",
+  "updatedAt": "2026-11-11T08:29:41.816Z",
+  "isArchived": true,
+  "versionId": "e9fc8d01-4d75-40e5-955a-5f8734b41d30",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "1182892a-27d8-4e24-b1c8-66ded5311ad3",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "6c05a524-f869-4856-8a49-e5f33da22453",
+      "name": "Pipedrive call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "method": "={{ $json.method }}",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "neverError": true
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "url": "={{ $json.url }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "880ab952-fc0c-4594-ac75-ffd8eb667690",
+      "name": "Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "jsonOutput": "{\"method\":\"DELETE\",\"url\":\"https://api.pipedrive.com/v1/organizations/328\",\"body\":{}}",
+        "mode": "raw"
+      }
+    },
+    {
+      "id": "00e13c08-aea3-491e-a524-58994095f516",
+      "name": "Out",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "jsonOutput": "={{ JSON.stringify({ ok: $json.success, err: $json.error, data: $json.data }) }}",
+        "mode": "raw"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request": {
+      "main": [
+        [
+          {
+            "node": "Pipedrive call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pipedrive call": {
+      "main": [
+        [
+          {
+            "node": "Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "LzEGJ4ShEr0ujOek",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-08T22:37:12.721Z",
+      "updatedAt": "2026-11-08T22:37:12.721Z"
+    }
+  ],
+  "activeVersion": null
+}
