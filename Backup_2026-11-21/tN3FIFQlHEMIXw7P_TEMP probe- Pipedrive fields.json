@@ -1,0 +1,167 @@
+{
+  "id": "tN3FIFQlHEMIXw7P",
+  "name": "TEMP probe: Pipedrive fields",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-12T05:21:36.155Z",
+  "updatedAt": "2026-11-12T05:23:03.544Z",
+  "isArchived": true,
+  "versionId": "d523217c-4198-4187-8382-596fbaea6021",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "67c96d66-3534-4904-a48a-f37e7e7fa601",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "52bb18ca-b795-4823-a75e-1a9cb22c7e2f",
+      "name": "Deal fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/dealFields?limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "67a3fd9b-5357-4224-83a8-d0258ac86984",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json.data || []; return [{ json: { fields: d.filter(f => f.edit_flag).map(f => ({ key: f.key, name: f.name, type: f.field_type })) } }];"
+      }
+    },
+    {
+      "id": "2a4e3d5c-34b1-48d2-be69-9e1d5260fe92",
+      "name": "Activity types",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/activityTypes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "c296d5e1-4290-45fb-80e4-4973ab06f54d",
+      "name": "Summarize types",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json.data || []; return [{ json: { types: d.filter(t => t.active_flag).map(t => t.key_string) } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Deal fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal fields": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Activity types",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Activity types": {
+      "main": [
+        [
+          {
+            "node": "Summarize types",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "tN3FIFQlHEMIXw7P",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-12T05:21:36.155Z",
+      "updatedAt": "2026-11-12T05:21:36.155Z"
+    }
+  ],
+  "activeVersion": null
+}
