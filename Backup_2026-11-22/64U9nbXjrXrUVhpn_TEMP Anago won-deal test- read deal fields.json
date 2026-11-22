@@ -1,0 +1,105 @@
+{
+  "id": "64U9nbXjrXrUVhpn",
+  "name": "TEMP Anago won-deal test: read deal fields",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T01:28:20.082Z",
+  "updatedAt": "2026-11-18T01:29:43.003Z",
+  "isArchived": true,
+  "versionId": "f1909d6c-4c8d-4056-a6ad-3eee3a6d11cb",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "0a613720-6e10-4ac7-8c9e-396efc3108e6",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0f65791b-09f8-42ac-90ca-a180677696c3",
+      "name": "Deal fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/dealFields?limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "b3795d63-2462-4f0d-8665-b490cdcd8b7c",
+      "name": "Pick handoff fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const keys = ['270ff7ebd3f11087193741127ab3657ea9bfcfeb','3cb526fa6de62bdff7e0e9d33c5111b4ff324c48','02cc7cad41bc5cfb05f5d68d093848e6039063a0','8498ee80156bfc0b4f825a5abe5a47022abc3c74','83fbf4b1b95e464d4910a65dcb98d16f8e6e8374','4d80fae56da1369de3ac7c50f48a72d9e8fc179f','62d4430b90ba2a8b0607c3875f1592304de7b08c','655cbcd2e5a131c6c93d0e46b43dd513eb375e8a','f96227e76600b58ea41e1660ce4d507c803ccf8c'];\nconst data = $input.first().json.data || [];\nreturn data.filter(f => keys.includes(f.key)).map(f => ({ json: { key: f.key, name: f.name, type: f.field_type, options: (f.options || []).map(o => ({ id: o.id, label: o.label })) } }));"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Deal fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal fields": {
+      "main": [
+        [
+          {
+            "node": "Pick handoff fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "64U9nbXjrXrUVhpn",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T01:28:20.082Z",
+      "updatedAt": "2026-11-18T01:28:20.082Z"
+    }
+  ],
+  "activeVersion": null
+}
