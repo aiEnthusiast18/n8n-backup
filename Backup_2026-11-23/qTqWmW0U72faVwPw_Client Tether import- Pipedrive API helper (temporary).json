@@ -1,0 +1,147 @@
+{
+  "id": "qTqWmW0U72faVwPw",
+  "name": "Client Tether import: Pipedrive API helper (temporary)",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T17:59:07.338Z",
+  "updatedAt": "2026-11-18T19:56:39.656Z",
+  "isArchived": true,
+  "versionId": "ac3a27cb-6068-4f44-8320-2085673b8e5c",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "731b0257-2198-4e77-9505-550922e16442",
+      "name": "Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ct-import-pd-proxy-7f3k",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson"
+      },
+      "webhookId": "744b971d-16cd-494b-8b5c-ff645fbf7304"
+    },
+    {
+      "id": "e75e4d8f-d49c-4c0b-8131-4dc56e843fb3",
+      "name": "Pipedrive API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "={{ $json.body.method || \"GET\" }}",
+        "url": "=https://api.pipedrive.com/{{ $json.body.path }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={{ JSON.stringify($json.body.query || {}) }}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body.body || {}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          },
+          "pagination": {
+            "pagination": {
+              "paginationMode": "={{ $json.body.paginate ? \"updateAParameterInEachRequest\" : \"off\" }}",
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "qs",
+                    "name": "start",
+                    "value": "={{ $response.body.additional_data.pagination.next_start }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !($response.body && $response.body.additional_data && $response.body.additional_data.pagination && $response.body.additional_data.pagination.more_items_in_collection) }}",
+              "limitPagesFetched": true,
+              "maxRequests": 200,
+              "requestInterval": 300
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "e2615059-4345-479c-854f-0be9f53dae2a",
+      "name": "Combine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const req = $('Request').first().json.body;\nconst fields = req.fields;\nlet rows = []; const statuses = []; let extra = null;\nfor (const it of $input.all()) {\n  const r = it.json; statuses.push(r.statusCode);\n  const b = r.body || {};\n  if (Array.isArray(b.data)) rows = rows.concat(b.data);\n  else if (b.data !== undefined) rows.push(b.data);\n  if (b.success === false) extra = { error: b.error, error_info: b.error_info };\n}\nif (fields) rows = rows.map(x => { const o = {}; for (const f of fields) o[f] = x == null ? null : x[f]; return o; });\nreturn [{ json: { statuses, count: rows.length, error: extra, data: rows } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Request": {
+      "main": [
+        [
+          {
+            "node": "Pipedrive API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pipedrive API": {
+      "main": [
+        [
+          {
+            "node": "Combine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "qTqWmW0U72faVwPw",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T17:59:07.338Z",
+      "updatedAt": "2026-11-18T17:59:07.338Z"
+    }
+  ],
+  "activeVersion": null
+}
