@@ -1,0 +1,108 @@
+{
+  "id": "4FaT2eNwAjybFysw",
+  "name": "TEMP: list deal fields",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T19:14:04.507Z",
+  "updatedAt": "2026-11-18T19:14:35.248Z",
+  "isArchived": true,
+  "versionId": "ac9a1195-eea0-48f0-ac40-06e8e6e975ab",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "ec28c41a-1d0b-499f-8ffc-080abfaec178",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e9d045f3-489e-4bc7-8992-2db52b5d07ee",
+      "name": "Get deal fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/dealFields?limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "93809182-be07-4aab-a90f-5dd4fbebd686",
+      "name": "Slim",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const f = $input.first().json.data || []; return [{ json: { fields: f.filter(x => x.edit_flag).map(x => x.name + ' | ' + x.field_type + ' | ' + x.key) } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get deal fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get deal fields": {
+      "main": [
+        [
+          {
+            "node": "Slim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "4FaT2eNwAjybFysw",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T19:14:04.507Z",
+      "updatedAt": "2026-11-18T19:14:04.507Z"
+    }
+  ],
+  "activeVersion": null
+}
