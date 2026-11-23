@@ -1,0 +1,480 @@
+{
+  "id": "r9BSvrtlx5uIWMZ9",
+  "name": "Pipedrive quarterly check-in email to lost prospects",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T21:43:28.278Z",
+  "updatedAt": "2026-11-18T22:28:25.798Z",
+  "isArchived": true,
+  "versionId": "7cbbf5e9-670d-4a2a-b5c2-3dab0c3e38ec",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "11a75454-7da0-4d19-81fc-46cd8d126f2a",
+      "name": "Every quarter, 9:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        32
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 1-7 1,4,7,10 *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a00f88ae-9597-4ded-b3ca-0a3448f2ec02",
+      "name": "Get opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        144
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "4d5fa186-1124-4566-ba3f-fbd994f0153d",
+      "name": "Get sent log",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        144
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "ebc4f651-0a8d-4ac8-bf34-445a972512b4",
+      "name": "Get lost deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        144
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=lost&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "abf2a4a1-0bb3-413f-b990-a4706958cb52",
+      "name": "Get open deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        144
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=open&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "7d9d7f56-e137-4faa-ab1d-f87d43090334",
+      "name": "Pick recipients and write emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        144
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Quarterly check-in: who gets it, and the personalised email for each.\nconst RAF = 'rlakhani@anagomb.ca';\nlet scheduled = false;\ntry { scheduled = $('Every quarter, 9:00').isExecuted; } catch (e) {}\nconst test = !scheduled;\nconst now = DateTime.now().setZone('America/Winnipeg');\nif (scheduled) {\n  // run only on the first weekday of the quarter's first month\n  if (now.weekday > 5) return [];\n  for (let d = 1; d < now.day; d++) if (now.set({ day: d }).weekday <= 5) return [];\n}\nconst quarter = now.year + 'Q' + Math.ceil(now.month / 3);\nconst optout = new Set($('Get opt-outs').all().map(i => String(i.json.email || '').toLowerCase().trim()).filter(Boolean));\nconst sent = new Set($('Get sent log').all().map(i => i.json.send_key).filter(Boolean));\nconst lost = $('Get lost deals').first().json.data || [];\nconst open = $('Get open deals').first().json.data || [];\nconst openPeople = new Set(open.map(d => d.person_id && d.person_id.value).filter(Boolean));\nconst openOrgs = new Set(open.map(d => d.org_id && d.org_id.value).filter(Boolean));\nconst F = 'font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:10pt;color:#000';\nconst esc = s => String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]));\nconst p = t => '<p style=\"' + F + ';margin:0 0 12px 0\">' + t + '</p>';\n// Letsignit signature copied with its marker, so Letsignit does not add a second one.\nconst sig = '<div style=\"' + F + ';margin-top:16px\">Kind Regards,</div>'\n  + '<p style=\"margin:0.1pt;text-align:left\"></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\">Raf Lakhani <br />Brand Manager | Anago of Manitoba<br />238 St Mary’s Road | Winnipeg, MB R2H 1J3<br />t+ 204.594.4666 |Direct+ 204.809.4347 | <a href=\"mailto:rlakhani@anagomb.ca\">rlakhani@anagomb.ca</a></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\"><a href=\"http://www.anagomb.ca/\">www.AnagoMB.ca</a></p><p></p><table><tbody><tr><td><div id=\"LSI_marker\" style=\"font-size:0px\"> </div></td></tr></tbody></table>';\nconst seen = new Set();\nconst out = [];\nfor (const d of lost) {\n  const person = d.person_id || {};\n  const email = String(((person.email || []).find(e => e.primary) || (person.email || [])[0] || {}).value || '').toLowerCase().trim();\n  if (!email || !/@/.test(email) || optout.has(email) || seen.has(email)) continue;\n  if (/We're Not Pursuing|Bad Data|Do Not Call/i.test(d.lost_reason || '')) continue;\n  if (openPeople.has(person.value) || (d.org_id && openOrgs.has(d.org_id.value))) continue;\n  const lostAt = DateTime.fromISO(String(d.lost_time || d.update_time).replace(' ', 'T'), { zone: 'utc' });\n  const ageDays = now.diff(lostAt, 'days').days;\n  if (ageDays < 60 || ageDays > 3 * 365) continue;\n  const key = quarter + ':' + email;\n  if (sent.has(key)) continue;\n  seen.add(email);\n  const first = String(person.name || '').trim().split(/\\s+/)[0] || 'there';\n  const company = d.org_name || '';\n  const street = esc(String((d.org_id && d.org_id.address) || '').split(',')[0].trim());\n  const year = lostAt.toFormat('yyyy');\n  const what = company ? esc(company) + (street ? ' at ' + street : '') : (street ? 'your space at ' + street : 'your space');\n  const opener = d['1a6bd14374c1ccde3e2bea35879a917c6a9d8c11']\n    ? 'In ' + year + ' we put together a cleaning proposal for ' + what + '.'\n    : 'In ' + year + ' we spoke about cleaning for ' + what + '.';\n  const r = d.lost_reason || '';\n  let middle;\n  if (/Other Service|Same Service|Canceled/i.test(r)) middle = 'You decided to stay with another provider at the time, and I hope it is working well. If anything has slipped, like missed areas, frequent staff changes or slow responses when something comes up, that is usually when businesses give us a second look.';\n  else if (/Price/i.test(r)) middle = 'The price did not fit at the time. Budgets change, and so can the scope: we can adjust the frequency or focus on the high-traffic areas so the numbers work. I would be glad to rework the proposal around a budget you set.';\n  else if (/In House/i.test(r)) middle = 'You were handling cleaning in-house at the time. If that has become more work than it is worth, we can take it off your team’s plate.';\n  else middle = 'The timing was not right then, and that is completely fine. If anything has changed, like a contract coming up for renewal, a new space, or a cleaner who is not meeting expectations, I would be glad to help.';\n  const offer = 'I can do a free 20-minute walkthrough and send you an updated quote within a couple of days. Just reply with a time that suits you, or call me directly at 204-809-4347.';\n  const footer = '<p style=\"font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:8pt;color:#808080;margin:12px 0 0 0\">You are receiving this because you contacted Anago of Manitoba about cleaning' + (company ? ' for ' + esc(company) : '') + '. Reply “unsubscribe” and I will not email you again.</p>';\n  const html = p('Hi ' + esc(first) + ',') + p(opener + ' ' + middle) + p(offer) + sig + footer;\n  const subject = 'Quick check-in about cleaning' + (company ? ' at ' + company : '');\n  out.push({ json: { live: !test, to: test ? RAF : email, subject: (test ? '[TEST to ' + email + '] ' : '') + subject, html, key, deal_id: d.id } });\n  if (test && out.length >= 3) break;\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "ec7a051a-3a62-49dd-887b-0105e5aa2f3a",
+      "name": "Test: send 3 to Raf",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        224
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ca053114-cc17-4d7c-8b47-502dedd5d591",
+      "name": "Send email",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "fd5bcc13-097f-4791-9af5-b5777734a12d"
+    },
+    {
+      "id": "d7f3b74e-6bd6-4da2-b9f8-12c5133beaca",
+      "name": "Real send?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('One at a time').item.json.live }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "601e6609-7261-4f3e-a480-08064ab9450f",
+      "name": "Log in Pipedrive",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2016,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ subject: 'Quarterly check-in email sent', type: 'email', done: 1, user_id: 32883646, deal_id: $('One at a time').item.json.deal_id, note: $('One at a time').item.json.subject }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "dc73d485-5d81-4e9b-975b-a1f75e7d0709",
+      "name": "Remember sent",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "send_key": "={{ $('One at a time').item.json.key }}"
+          },
+          "schema": [
+            {
+              "id": "send_key",
+              "displayName": "send_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6dd00cbd-386f-4314-ae5c-9087fd8d5efa",
+      "name": "Pause 5 seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2464,
+        80
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "webhookId": "375547d3-6982-452e-8163-b70ee55ea993"
+    },
+    {
+      "id": "558b47d1-3abc-4266-bd9a-28d06b6c3e69",
+      "name": "One at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1344,
+        144
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Every quarter, 9:00": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Get sent log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get sent log": {
+      "main": [
+        [
+          {
+            "node": "Get lost deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get lost deals": {
+      "main": [
+        [
+          {
+            "node": "Get open deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get open deals": {
+      "main": [
+        [
+          {
+            "node": "Pick recipients and write emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick recipients and write emails": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test: send 3 to Raf": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Real send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Real send?": {
+      "main": [
+        [
+          {
+            "node": "Log in Pipedrive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log in Pipedrive": {
+      "main": [
+        [
+          {
+            "node": "Remember sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remember sent": {
+      "main": [
+        [
+          {
+            "node": "Pause 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pause 5 seconds": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One at a time": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "America/Winnipeg"
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "r9BSvrtlx5uIWMZ9",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T21:43:28.278Z",
+      "updatedAt": "2026-11-18T21:43:28.278Z"
+    }
+  ],
+  "activeVersion": null
+}
