@@ -1,0 +1,340 @@
+{
+  "id": "q35MZwzoAeKBuIxu",
+  "name": "Before the snow: floor and carpet offer to clients",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T22:46:17.399Z",
+  "updatedAt": "2026-11-24T00:32:03.531Z",
+  "isArchived": false,
+  "versionId": "c441f32c-ea6b-42d7-afa2-cab7538a2fff",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "6bc611ba-5083-4ff9-b342-3bacef60165c",
+      "name": "Run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        144
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "67f56f41-dada-4bb2-b3a6-c0472ef907f4",
+      "name": "Get opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        144
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "c7a573e4-04b0-43d3-bba9-705120571015",
+      "name": "Get sent log",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        144
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "ceeda67e-546f-4fd1-bde9-083f17832cb2",
+      "name": "Build emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        144
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Pre-snow floor and carpet offer to current clients who have had this work before.\nconst RAF = 'rlakhani@anagomb.ca';\nconst LIVE = false; // false: 3 samples to Raf. true: send to every client below (once each).\nconst live = LIVE;\nconst CLIENTS = [{\"email\": \"becky@absolutepetro.ca\", \"greet\": \"Becky\", \"winter\": true, \"client\": \"ABSOLUTE PETROLEUM LTD\", \"name\": \"Absolute Petroleum\", \"where\": \"44 Poneida Rd\", \"lc\": \"2023-11-04\", \"lf\": null}, {\"email\": \"info@aquadentalwellness.com\", \"greet\": \"Val\", \"winter\": true, \"client\": \"AQUA DENTAL WELLNESS\", \"name\": \"Aqua Dental\", \"where\": \"3 - 1565 Regent Ave\", \"lc\": \"2024-12-24\", \"lf\": \"2026-01-03\"}, {\"email\": \"info@aspiredentalcentre.ca\", \"greet\": \"Tara\", \"winter\": true, \"client\": \"ASPIRE DENTAL CENTRE\", \"name\": \"Aspire Dental Centre\", \"where\": \"5302 Roblin Blvd\", \"lc\": null, \"lf\": \"2026-01-02\"}, {\"email\": \"brent.vallee@darlingii.com\", \"greet\": \"there\", \"winter\": true, \"client\": \"DARLING INTERNATIONAL\", \"name\": \"Darling International\", \"where\": \"607 Dawson Rd N\", \"lc\": null, \"lf\": \"2025-10-11\"}, {\"email\": \"garypaige@dentalimage.ca\", \"greet\": \"Gary\", \"winter\": true, \"client\": \"DENTAL IMAGE\", \"name\": \"Dental Image\", \"where\": \"110-1225 St.Mary's rd and 211-2305 McPhillips St\", \"lc\": null, \"lf\": \"2025-11-02\"}, {\"email\": \"info@southpointedentalwpg.ca\", \"greet\": \"Dr. Mitani\", \"winter\": true, \"client\": \"DENTALCORP HEALTH SERVICES LTD\", \"name\": \"South Pointe Dental\", \"where\": \"80 - 2589 Pembina Highway\", \"lc\": \"2024-11-11\", \"lf\": null}, {\"email\": \"ngeladaris@express-scripts.com\", \"greet\": \"Nick\", \"winter\": true, \"client\": \"EXPRESS SCRIPTS CANADA PHARMACY\", \"name\": \"Express Scripts Canada Pharmacy\", \"where\": \"114 - 1790 Wellington Ave\", \"lc\": \"2026-07-02\", \"lf\": null}, {\"email\": \"jason@launchcoworking.ca\", \"greet\": \"Jason\", \"winter\": false, \"client\": \"LAUNCH COWORKING SPACE\", \"name\": \"Launch Coworking Space\", \"where\": \"200 - 1460 Chevrier Blvd\", \"lc\": \"2026-05-22\", \"lf\": null}, {\"email\": \"kkowalski@mccahouse.org\", \"greet\": \"Karen\", \"winter\": true, \"client\": \"MANITOBA CHILD CARE ASSOCIATION\", \"name\": \"Manitoba Child Care Association\", \"where\": \"2350 McPhillips St\", \"lc\": null, \"lf\": \"2024-12-28\"}, {\"email\": \"sales@mantariodoor.com\", \"greet\": \"Bill\", \"winter\": false, \"client\": \"MANTARIO DOOR CONTROL LTD\", \"name\": \"Mantario Door Control\", \"where\": \"670 Golspie St\", \"lc\": \"2026-04-26\", \"lf\": null}, {\"email\": \"rochelle.pelly@mediancu.mb.ca\", \"greet\": \"Rochelle\", \"winter\": false, \"client\": \"ME-DIAN CREDIT UNION\", \"name\": \"Me-Dian Credit Union\", \"where\": \"303 SELKIRK AVE\", \"lc\": \"2025-03-12\", \"lf\": null}, {\"email\": \"drew.samuels@meditek.ca\", \"greet\": \"Drew\", \"winter\": false, \"client\": \"MEDITEK\", \"name\": \"Meditek\", \"where\": \"94 Nicola Drive\", \"lc\": \"2024-08-16\", \"lf\": null}, {\"email\": \"reception@norroof.com\", \"greet\": \"Mike\", \"winter\": true, \"client\": \"NORMANDEAU ROOFING LTD\", \"name\": \"Normandeau Roofing\", \"where\": \"695 Camiel Sys St\", \"lc\": \"2026-05-02\", \"lf\": \"2025-12-06\"}, {\"email\": \"stephanie@northendspring.ca\", \"greet\": \"Stephanie\", \"winter\": false, \"client\": \"NORTHEND SPRING\", \"name\": \"North End Spring\", \"where\": \"70 Oak Point Hwy\", \"lc\": null, \"lf\": \"2025-10-25\"}, {\"email\": \"jason@nmscanada.com\", \"greet\": \"Jason\", \"winter\": false, \"client\": \"NORTHERN MEAT SERVICES\", \"name\": \"Northern Meat Services\", \"where\": \"49 Omands Creek Blvd\", \"lc\": null, \"lf\": \"2025-04-19\"}, {\"email\": \"melissa@prairiehvac.com\", \"greet\": \"Melissa\", \"winter\": true, \"client\": \"PRAIRIE HVAC INC\", \"name\": \"Prairie HVAC\", \"where\": \"621 Discovery Dr\", \"lc\": \"2025-08-23\", \"lf\": null}, {\"email\": \"bmcleod@primaryeng.com\", \"greet\": \"Ben\", \"winter\": false, \"client\": \"PRIMARY ENGINEERING & CONST\", \"name\": \"Primary Engineering & Construction\", \"where\": \"211-1460 Chevrier Blvd\", \"lc\": \"2025-02-01\", \"lf\": null}, {\"email\": \"ryan@diamondicesystems.com\", \"greet\": \"Ryan\", \"winter\": true, \"client\": \"REFRIGERATIVE SUPPLY LIMITED\", \"name\": \"Diamond Ice Systems\", \"where\": \"1561 King Edward\", \"lc\": \"2025-11-01\", \"lf\": \"2024-09-28\"}, {\"email\": \"ceo@trucaremedicalclinic.ca\", \"greet\": \"Melody\", \"winter\": false, \"client\": \"ST JAMES STREET MEDICAL CLINIC\", \"name\": \"St James Street Medical Clinic\", \"where\": \"1600 Portage Ave\", \"lc\": null, \"lf\": \"2026-06-07\"}, {\"email\": \"kristi@stmkidskorner.com\", \"greet\": \"Kristi\", \"winter\": true, \"client\": \"ST MATTHEWS KIDS KORNER INC.\", \"name\": \"St. Matthew's Kids Korner\", \"where\": \"669 ST MATTHEWS AVE\", \"lc\": \"2026-05-16\", \"lf\": null}, {\"email\": \"rafi@manitobadentist.ca\", \"greet\": \"Rafi\", \"winter\": true, \"client\": \"THE MANITOBA DENTAL ASSOCIATION\", \"name\": \"The Manitoba Dental Association\", \"where\": \"1735 Corydon Ave Unit 202\", \"lc\": \"2025-12-27\", \"lf\": null}, {\"email\": \"admin@waverleychurch.ca\", \"greet\": \"Glen\", \"winter\": true, \"client\": \"WAVERLEY CHURCH\", \"name\": \"Waverley Church\", \"where\": \"2171 Waverley St\", \"lc\": null, \"lf\": \"2024-12-02\"}, {\"email\": \"hung.tran@western-global.com\", \"greet\": \"Hung\", \"winter\": true, \"client\": \"WESTERN GLOBAL\", \"name\": \"Western Global\", \"where\": \"101-251 Saulteaux Crescent\", \"lc\": \"2025-12-16\", \"lf\": \"2024-09-19\"}, {\"email\": \"areichert@westernsurgerycentre.ca\", \"greet\": \"Amber\", \"winter\": false, \"client\": \"WESTERN SURGERY CENTRE\", \"name\": \"Western Surgery Centre\", \"where\": \"100 – 1020 Lorimer Blvd\", \"lc\": \"2025-06-28\", \"lf\": \"2025-06-28\"}, {\"email\": \"parker5@mymts.net\", \"greet\": \"Chris\", \"winter\": false, \"client\": \"WESTWOOD COMMUNITY CHURCH\", \"name\": \"Westwood Community Church\", \"where\": \"401 WESTWOOD DR\", \"lc\": \"2025-06-27\", \"lf\": null}];\nconst optout = new Set($('Get opt-outs').all().map(i => String(i.json.email || '').toLowerCase().trim()));\nconst sent = new Set($('Get sent log').all().map(i => i.json.send_key));\nconst F = 'font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:10pt;color:#000';\nconst esc = s => String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]));\nconst p = t => '<p style=\"' + F + ';margin:0 0 12px 0\">' + t + '</p>';\nconst sig = '<div style=\"' + F + ';margin-top:16px\">Kind Regards,</div>'\n  + '<p style=\"margin:0.1pt;text-align:left\"></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\">Raf Lakhani <br />Brand Manager | Anago of Manitoba<br />238 St Mary’s Road | Winnipeg, MB R2H 1J3<br />t+ 204.594.4666 |Direct+ 204.809.4347 | <a href=\"mailto:rlakhani@anagomb.ca\">rlakhani@anagomb.ca</a></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\"><a href=\"http://www.anagomb.ca/\">www.AnagoMB.ca</a></p><p></p><table><tbody><tr><td><div id=\"LSI_marker\" style=\"font-size:0px\"> </div></td></tr></tbody></table>';\nconst MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];\nconst when = d => MONTHS[Number(d.slice(5, 7)) - 1] + ' ' + d.slice(0, 4);\nfunction build(c) {\n  const at = c.name ? esc(c.name) : esc(c.where);\n  let history, why;\n  if (c.lc && c.lf) {\n    history = c.lc >= c.lf ? 'We last cleaned your carpets in ' + when(c.lc) + ' and did your hard floors in ' + when(c.lf) + '.' : 'We last stripped and waxed your floors in ' + when(c.lf) + ' and cleaned your carpets in ' + when(c.lc) + '.';\n    why = 'A fresh coat of finish on the hard floors and a deep extraction on the carpets before winter means the salt and slush wipe off instead of grinding in.';\n  } else if (c.lf) {\n    history = 'We last stripped and waxed your floors in ' + when(c.lf) + '.';\n    why = 'A fresh coat of finish before winter protects the floor, so the salt wipes off instead of eating into it.';\n  } else {\n    history = 'We last cleaned your carpets in ' + when(c.lc) + '.';\n    why = 'A deep extraction before winter lifts out the built-up dirt, so the salt and slush that get tracked in do not grind it deeper.';\n  }\n  const holiday = 'If you are closed over Christmas or New Year’s, that is the best time to do it: no foot traffic, and everything is dry and ready when your team is back. '\n    + (c.winter ? 'That is when you have booked it before, and holiday dates fill up fast.' : 'Holiday dates fill up fast, so it is worth booking now.');\n  const html = p('Hi ' + esc(c.greet) + ',')\n    + p('Snow is on its way. ' + history + ' ' + why)\n    + p(holiday)\n    + p('Just reply with a date that works and I will confirm the details and price for ' + at + '. Or call me directly at 204-809-4347.')\n    + sig\n    + '<p style=\"font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:8pt;color:#808080;margin:12px 0 0 0\">You are receiving this because ' + (c.name ? esc(c.name) + ' is' : 'you are') + ' an Anago client. Reply “unsubscribe” and I will not send you offers like this again.</p>';\n  const subject = 'Before the snow: floor care at ' + (c.name || c.where);\n  return { kind: 'email', live, to: live ? c.email : RAF, subject: live ? subject : '[TEST to ' + c.email + '] ' + subject, html, key: 'floor2026:' + c.email };\n}\nconst out = [];\nif (!live) {\n  // Samples: carpet only, floors only, both, and a returning holiday booker\n  const picks = [CLIENTS.find(c => c.lc && !c.lf && c.winter), CLIENTS.find(c => c.lf && !c.lc && c.name), CLIENTS.find(c => c.lc && c.lf && c.name && c.winter && !c.where.includes(' and '))];\n  for (const c of picks.filter(Boolean)) out.push({ json: build(c) });\n  return out;\n}\nfor (const c of CLIENTS) {\n  if (optout.has(c.email) || sent.has('floor2026:' + c.email)) continue;\n  out.push({ json: build(c) });\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "f9692bab-e7f8-4f33-ac06-b28d7edb4abf",
+      "name": "Send email",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "f2036da8-0519-43ea-9ccd-90dfe6deb849"
+    },
+    {
+      "id": "80b140d7-d77b-4eb1-9438-886d6ad7d899",
+      "name": "Real send?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('One at a time').item.json.live }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "e42c8f53-d9e2-4b4a-9c92-f6b66bbefc30",
+      "name": "Remember sent",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "send_key": "={{ $('One at a time').item.json.key }}"
+          },
+          "schema": [
+            {
+              "id": "send_key",
+              "displayName": "send_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "22a9b580-6060-498f-a681-ea86f0edff94",
+      "name": "Pause 25 seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1792,
+        80
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 25,
+        "unit": "seconds"
+      },
+      "webhookId": "1f6bbe8d-341d-4bee-ae91-c47071567c9d"
+    },
+    {
+      "id": "490fd514-396f-45ba-85f9-448898ada933",
+      "name": "One at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        896,
+        144
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Run": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Get sent log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get sent log": {
+      "main": [
+        [
+          {
+            "node": "Build emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build emails": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Real send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Real send?": {
+      "main": [
+        [
+          {
+            "node": "Remember sent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remember sent": {
+      "main": [
+        [
+          {
+            "node": "Pause 25 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pause 25 seconds": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One at a time": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "q35MZwzoAeKBuIxu",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T22:46:17.399Z",
+      "updatedAt": "2026-11-18T22:46:17.399Z"
+    }
+  ],
+  "activeVersion": null
+}
