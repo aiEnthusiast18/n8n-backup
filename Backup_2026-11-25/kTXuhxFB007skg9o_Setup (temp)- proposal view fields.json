@@ -1,0 +1,169 @@
+{
+  "id": "kTXuhxFB007skg9o",
+  "name": "Setup (temp): proposal view fields",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-24T22:05:11.835Z",
+  "updatedAt": "2026-11-24T22:08:52.796Z",
+  "isArchived": true,
+  "versionId": "ac6277bc-9fd4-400d-a494-d66ab42bf0a3",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "32a06e29-8bdc-440d-8f2e-7d5446d0d47f",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "80305794-cea2-42fc-a36e-97c8b24d8c8e",
+      "name": "Add views field",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/dealFields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"name\": \"Proposal views\", \"field_type\": \"double\"}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "disabled": true
+    },
+    {
+      "id": "10ebecbe-6527-4dd5-bed9-7f258fe3a5f3",
+      "name": "Add last viewed field",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/dealFields",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"name\": \"Proposal last viewed\", \"field_type\": \"date\"}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "disabled": true
+    },
+    {
+      "id": "189814d9-e2f5-450b-80d5-36a59233c443",
+      "name": "Search by link",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://api.pipedrive.com/v1/activities/186",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Add views field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add views field": {
+      "main": [
+        [
+          {
+            "node": "Add last viewed field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add last viewed field": {
+      "main": [
+        [
+          {
+            "node": "Search by link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "kTXuhxFB007skg9o",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-24T22:05:11.835Z",
+      "updatedAt": "2026-11-24T22:05:11.835Z"
+    }
+  ],
+  "activeVersion": null
+}
