@@ -1,0 +1,126 @@
+{
+  "id": "fyPqMoYZQxnUERgj",
+  "name": "Temp: deal notes",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-24T22:09:42.255Z",
+  "updatedAt": "2026-11-24T22:09:58.525Z",
+  "isArchived": true,
+  "versionId": "45fef40c-e3f0-4d49-99b8-1f966cc0b196",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "29bc92b3-0ec9-4501-a01f-625dd03a886c",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d4d0d8df-8aff-4645-b90d-37af78cadaa3",
+      "name": "Note Absolute",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/notes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"deal_id\": 199, \"user_id\": 32883646, \"content\": \"Nov 24: Becky asked for pricing. Last work on file: carpet cleaning Nov 4, 2023 at 44 Poneida Rd (no floor work on file).\"}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "752204e1-1397-47bb-8407-bb13144cf4cc",
+      "name": "Note MCCA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/notes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"deal_id\": 198, \"user_id\": 32883646, \"content\": \"Nov 24: Karen is checking with her boss. They are closed Dec 24 to Jan 3, so that is the window to do the work. Last floor work on file: Dec 28, 2024 at 2350 McPhillips St (done during the same holiday closure).\"}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Note Absolute",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Note Absolute": {
+      "main": [
+        [
+          {
+            "node": "Note MCCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "fyPqMoYZQxnUERgj",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-24T22:09:42.255Z",
+      "updatedAt": "2026-11-24T22:09:42.255Z"
+    }
+  ],
+  "activeVersion": null
+}
