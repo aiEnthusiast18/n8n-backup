@@ -1,0 +1,196 @@
+{
+  "id": "DXLTseQ4VTQaMFqs",
+  "name": "Lookup (temp): proposal views",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-24T22:03:54.221Z",
+  "updatedAt": "2026-11-24T22:08:53.449Z",
+  "isArchived": true,
+  "versionId": "fff5c88b-68d4-420e-9c0c-53936a9f3d1a",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "881fdb3b-b500-4443-a3da-bdd863c99042",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "fb797218-ad46-4339-aeab-d6051cf9240b",
+      "name": "Deal fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/dealFields?limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "86cddbec-e2a0-475a-b9de-86d646e7b9f5",
+      "name": "Person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term=jeremy.gingras%40eecol.com",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "9753e27d-fa48-45f9-b6e6-65684317b998",
+      "name": "Deals EECOL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals/search?term=EECOL",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "98f4b701-10e6-4c2a-a171-3c318d71a09c",
+      "name": "Stages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/stages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Deal fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal fields": {
+      "main": [
+        [
+          {
+            "node": "Person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Person": {
+      "main": [
+        [
+          {
+            "node": "Deals EECOL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deals EECOL": {
+      "main": [
+        [
+          {
+            "node": "Stages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "DXLTseQ4VTQaMFqs",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-24T22:03:54.221Z",
+      "updatedAt": "2026-11-24T22:03:54.221Z"
+    }
+  ],
+  "activeVersion": null
+}
