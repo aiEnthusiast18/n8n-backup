@@ -1,0 +1,1281 @@
+{
+  "id": "J7RvjCAeBDnz6E95",
+  "name": "Pipedrive re-engagement: quarterly emails, 90-day check-in, call tasks",
+  "active": true,
+  "activeVersionId": "7167b5b4-93da-4c46-b5f8-c5f8638a614a",
+  "createdAt": "2026-11-18T22:24:27.115Z",
+  "updatedAt": "2026-11-18T22:29:10.596Z",
+  "isArchived": false,
+  "versionId": "7167b5b4-93da-4c46-b5f8-c5f8638a614a",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "003dd4ae-a565-411b-b3f8-1fe6cb5633fd",
+      "name": "Every Tue-Thu 9:30",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        288
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 9 * * 2-4"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "541c0691-b46d-463e-8013-ffef6c886ad9",
+      "name": "Get opt-outs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        384
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "XAUhH78HlYPmmZRe",
+          "cachedResultName": "quarterly_email_optout"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "ef9cc684-5d1e-4c1a-a9ee-613c300793ce",
+      "name": "Get sent log",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        384
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "f2ff9e56-f825-4ea8-a6f9-1c1b5255ecee",
+      "name": "Get replies",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uGpqmQVuQzTor7NJ",
+          "cachedResultName": "quarterly_email_replied"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "89708cd2-e698-4d33-8a31-ebb47ba9b0a4",
+      "name": "Get lost deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        384
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=lost&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "a9fd3550-c03b-4e82-ba0c-f0e26f70b9a7",
+      "name": "Get open deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        384
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=open&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "badb40f7-d256-43f4-b7c0-98847bdf02cd",
+      "name": "Pick emails and call tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        384
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Quarterly re-engagement: emails (within CASL 6-month window) and call tasks (older, or top deals).\nconst RAF = 'rlakhani@anagomb.ca', USER = 32883646;\nconst EMAIL_CAP = 15, CALL_CAP = 3, QUARTER_CALLS = 25, TOP = 10;\nlet scheduled = false;\ntry { scheduled = $('Every Tue-Thu 9:30').isExecuted; } catch (e) {}\nconst test = !scheduled;\nconst now = DateTime.now().setZone('America/Winnipeg');\nconst today = now.toISODate();\nconst qn = Math.ceil(now.month / 3);\nconst quarter = now.year + 'Q' + qn;\n// quarterly campaign starts on the 2nd Tuesday of the quarter's first month\nconst m1 = now.set({ month: (qn - 1) * 3 + 1, day: 1 }).startOf('day');\nconst start = m1.plus({ days: ((2 - m1.weekday + 7) % 7) + 7 });\nconst START = '2027-01-01'; // nothing goes out before this date\nconst campaignOn = now >= start;\nconst lc = s => String(s || '').toLowerCase().trim();\nconst optout = new Set($('Get opt-outs').all().map(i => lc(i.json.email)).filter(Boolean));\nconst sentRows = $('Get sent log').all().map(i => i.json).filter(r => r.send_key);\nconst sent = new Set(sentRows.map(r => r.send_key));\nconst recentEmailed = new Set(sentRows.filter(r => !/^(call|d97):/.test(r.send_key) && now.diff(DateTime.fromISO(String(r.createdAt)), 'days').days < 60).map(r => r.send_key.split(':').pop()));\nconst replied = new Set($('Get replies').all().map(i => lc(i.json.email)).filter(Boolean));\nconst lost = $('Get lost deals').first().json.data || [];\nconst open = $('Get open deals').first().json.data || [];\nconst openPeople = new Set(open.map(d => d.person_id && d.person_id.value).filter(Boolean));\nconst openOrgs = new Set(open.map(d => d.org_id && d.org_id.value).filter(Boolean));\nconst dt = s => DateTime.fromISO(String(s).replace(' ', 'T'), { zone: 'utc' });\n\nconst F = 'font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:10pt;color:#000';\nconst esc = s => String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]));\nconst p = t => '<p style=\"' + F + ';margin:0 0 12px 0\">' + t + '</p>';\n// Letsignit signature copied with its marker, so Letsignit does not add a second one.\nconst sig = '<div style=\"' + F + ';margin-top:16px\">Kind Regards,</div>'\n  + '<p style=\"margin:0.1pt;text-align:left\"></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\">Raf Lakhani <br />Brand Manager | Anago of Manitoba<br />238 St Mary’s Road | Winnipeg, MB R2H 1J3<br />t+ 204.594.4666 |Direct+ 204.809.4347 | <a href=\"mailto:rlakhani@anagomb.ca\">rlakhani@anagomb.ca</a></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\"><a href=\"http://www.anagomb.ca/\">www.AnagoMB.ca</a></p><p></p><table><tbody><tr><td><div id=\"LSI_marker\" style=\"font-size:0px\"> </div></td></tr></tbody></table>';\nconst OFFER = 'I can do a free 20-minute walkthrough and send you an updated quote within a couple of days. Just reply with a time that suits you, or call me directly at 204-809-4347.';\nconst SEASON = {\n  1: { subj: co => 'Winter floors at ' + (co || 'your building'), hook: 'This time of year, salt and slush get tracked in every day, and by February it shows on the floors and carpets. If it helps, I can include entrance matting and salt removal in the quote.' },\n  2: { subj: co => 'Spring cleaning at ' + (co || 'your building'), hook: 'Spring is when most buildings catch up on what winter left behind: salt-stained floors, carpets, windows and vents. If a full contract is not the right step, I can also quote a one-time spring deep clean.' },\n  3: { subj: co => 'Summer floor work at ' + (co || 'your building'), hook: 'Summer is the quiet window for floor work, like stripping and waxing or carpet extraction, before everyone is back in September. I can quote that as a one-time job, with no ongoing contract.' },\n  4: { subj: co => 'Getting ' + (co || 'your building') + ' ready for winter', hook: 'Before winter hits, it is worth having entrance matting and a salt plan in place, and with flu season coming, regular disinfecting of high-touch areas matters more. I can include both in an updated quote.' },\n};\nconst WENT = /another provider|Other Service/i, STAYED = /current provider|Same Service|In House/i;\nfunction middle(r) {\n  if (WENT.test(r)) return 'You went with another provider at the time, and I hope it is working well. If anything has slipped, like missed areas, frequent staff changes or slow responses, that is usually when businesses give us a second look.';\n  if (STAYED.test(r)) return 'You decided to stay with your current provider at the time, and I hope it is working well. If anything has slipped, like missed areas, frequent staff changes or slow responses, that is usually when businesses give us a second look.';\n  if (/Price/i.test(r)) return 'The price did not fit at the time. Budgets change, and so can the scope: we can adjust the frequency or focus on the high-traffic areas so the numbers work. I would be glad to rework the proposal around a budget you set.';\n  return 'The timing was not right then, and that is completely fine. If anything has changed, like a contract coming up for renewal, a new space, or a cleaner who is not meeting expectations, I would be glad to help.';\n}\nfunction build(c, kind, q) {\n  const d = c.d;\n  const what = c.company ? esc(c.company) + (c.street ? ' at ' + c.street : '') : (c.street ? 'your space at ' + c.street : 'your space');\n  const footer = '<p style=\"font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:8pt;color:#808080;margin:12px 0 0 0\">You are receiving this because you contacted Anago of Manitoba about cleaning' + (c.company ? ' for ' + esc(c.company) : '') + '. Reply “unsubscribe” and I will not email you again.</p>';\n  let subject, body;\n  if (kind === 'd90') {\n    if (WENT.test(c.r)) {\n      subject = 'How is the new cleaning team working out?';\n      body = p('It has been about three months since you went with another provider for ' + what + '. That is usually when you find out whether a new crew is working out: the first few weeks are always good, and the details start to slip after that.');\n    } else {\n      subject = 'How is the cleaning going' + (c.company ? ' at ' + c.company : '') + '?';\n      body = p('It has been about three months since you decided to stay with your current provider for ' + what + '. I hope it has been going well. If the issues that had you looking around have come back, that is usually the sign it will not fix itself.');\n    }\n    body += p('If everything is on track, great, no need to reply. If not, like missed areas, new faces every week or slow responses when you call, I would be glad to do a free 20-minute walkthrough and send you a quote within a couple of days. Just reply, or call me directly at 204-809-4347.');\n  } else {\n    const s = SEASON[q];\n    const opener = (d['1a6bd14374c1ccde3e2bea35879a917c6a9d8c11'] ? 'In ' + c.year + ' we put together a cleaning proposal for ' : 'In ' + c.year + ' we spoke about cleaning for ') + what + '.';\n    subject = s.subj(c.company);\n    body = p(opener + ' ' + middle(c.r)) + p(s.hook) + p(OFFER);\n  }\n  const html = p('Hi ' + esc(c.first) + ',') + body + sig + footer;\n  return { kind: 'email', live: !test, to: test ? RAF : c.email, subject, html, deal_id: d.id };\n}\nfunction callTask(c, key, subject, note) {\n  return { kind: 'task', live: true, key, deal_id: c.d.id, activity: { subject, type: 'call', done: 0, user_id: USER, deal_id: c.d.id, person_id: c.personId || undefined, due_date: today, note } };\n}\n\n// Build the eligible list (one per email address, newest first).\nconst all = [];\nconst seen = new Set();\nconst sorted = lost.slice().sort((a, b) => String(b.lost_time || '').localeCompare(String(a.lost_time || '')));\nfor (const d of sorted) {\n  const person = d.person_id || {};\n  const em = person.email || [];\n  const email = lc((em.find(e => e.primary) || em[0] || {}).value);\n  if (!email || !/@/.test(email) || optout.has(email) || seen.has(email)) continue;\n  const r = d.lost_reason || '';\n  if (/Not Pursuing|Bad Data|Do Not Call|Franchise/i.test(r)) continue;\n  if (openPeople.has(person.value) || (d.org_id && openOrgs.has(d.org_id.value))) continue;\n  // Deals closed in bulk as \"went quiet\" carry the cleanup date, so use the date the lead came in.\n  const ref = dt(/No response|went quiet/i.test(r) ? d.add_time : (d.lost_time || d.update_time));\n  const age = now.diff(ref, 'days').days;\n  const lostAge = now.diff(dt(d.lost_time || d.update_time), 'days').days;\n  if (age > 3 * 365) continue;\n  seen.add(email);\n  const street = String((d.org_id && d.org_id.address) || '').split(',')[0].trim().replace(/\\.+$/, '');\n  let company = String(d.org_name || '').replace(/\\s+c\\/o\\b.*$/i, '').replace(/,?\\s+(Ltd|Inc|Corp|Corporation|Limited|Incorporated)\\.?$/i, '').replace(/,\\s*$/, '').trim();\n  if (/^\\d/.test(company) || lc(company) === lc(street)) company = ''; // org named after its address\n  all.push({ d, r, email, age, lostAge, personId: person.value, value: Number(d.value) || 0,\n    first: String(person.name || '').trim().split(/\\s+/)[0] || 'there', company,\n    street: esc(street), year: ref.toFormat('yyyy') });\n}\n\nconst out = [];\nif (test) {\n  // Samples for Raf: one seasonal email per quarter, plus the 90-day email.\n  const em = all.filter(c => c.age >= 60 && c.age < 183);\n  for (let q = 1; q <= 4 && q <= em.length; q++) out.push({ json: (m => Object.assign(m, { subject: '[TEST Q' + q + ' to ' + em[q - 1].email + '] ' + m.subject }))(build(em[q - 1], 'q', q)) });\n  const sw = all.find(c => WENT.test(c.r)); if (sw) out.push({ json: (m => Object.assign(m, { subject: '[TEST 90-day to ' + sw.email + '] ' + m.subject }))(build(sw, 'd90')) });\n  const st = all.find(c => STAYED.test(c.r)); if (st) out.push({ json: (m => Object.assign(m, { subject: '[TEST 90-day to ' + st.email + '] ' + m.subject }))(build(st, 'd90')) });\n  return out;\n}\n\nif (today < START) return [];\nlet emails = 0, calls = 0;\nconst SWITCH = c => WENT.test(c.r) || STAYED.test(c.r);\n// 1. 90 days after losing to (or staying with) another provider: email, then a call task a week later.\nfor (const c of all) {\n  if (!SWITCH(c)) continue;\n  const k90 = 'd90:' + c.d.id + ':' + c.email;\n  if (c.lostAge >= 90 && c.lostAge < 97 && !sent.has(k90) && emails < EMAIL_CAP) {\n    out.push({ json: Object.assign(build(c, 'd90'), { key: k90 }) }); emails++; recentEmailed.add(c.email);\n  }\n  const k97 = 'd97:' + c.d.id;\n  if (c.lostAge >= 97 && c.lostAge < 125 && sent.has(k90) && !sent.has(k97) && !replied.has(c.email)) {\n    out.push({ json: callTask(c, k97, 'Call ' + c.first + (c.company ? ' at ' + c.company : '') + ': 90-day check-in after switching cleaners', 'We emailed them at day 90 (no reply yet). Ask how the current cleaner is doing. Lost reason: ' + c.r + '.') });\n  }\n}\n// 2. Quarterly: top deals by value and contacts older than 6 months get a call task, the rest get the email.\nif (campaignOn) {\n  const qStart = m1.toUTC().toISO();\n  const callsThisQuarter = sentRows.filter(r => /^call:/.test(r.send_key) && String(r.createdAt) >= qStart).length;\n  const pool = all.filter(c => c.age >= 60);\n  const top = new Set(pool.filter(c => c.value > 0).sort((a, b) => b.value - a.value).slice(0, TOP).map(c => c.d.id));\n  const ordered = pool.slice().sort((a, b) => (top.has(b.d.id) - top.has(a.d.id)) || (a.age - b.age));\n  for (const c of ordered) {\n    // top deals: a call every quarter; older contacts: a call once a year\n    const kq = quarter + ':' + c.email, kc = 'call:' + (top.has(c.d.id) ? quarter : now.year) + ':' + c.email;\n    if (sent.has(kq) || sent.has(kc) || recentEmailed.has(c.email)) continue;\n    if (top.has(c.d.id) || c.age >= 183) {\n      if (calls >= CALL_CAP || callsThisQuarter + calls >= QUARTER_CALLS) continue;\n      out.push({ json: callTask(c, kc, 'Quarterly call: ' + c.first + (c.company ? ' at ' + c.company : ''), (top.has(c.d.id) ? 'Top lost deal by value ($' + Math.round(c.value).toLocaleString() + '/yr). ' : '') + 'Lost reason: ' + c.r + ' (' + c.year + '). Talking point this quarter: ' + SEASON[qn].hook) });\n      calls++;\n    } else {\n      if (emails >= EMAIL_CAP) continue;\n      out.push({ json: Object.assign(build(c, 'q', qn), { key: kq }) }); emails++;\n    }\n  }\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "65b7da16-9672-4412-9896-8b52b0b29751",
+      "name": "Test: send samples to Raf",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        480
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "80f66e86-6e2d-4a06-8e9d-af4afc7ce9cd",
+      "name": "Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        96
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.kind }}",
+              "rightValue": "email",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "0fd5dff5-c8b0-47fc-af29-3a07fb291467",
+      "name": "Send email",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "f9d56937-7fbe-4aeb-befe-132fff475398"
+    },
+    {
+      "id": "d3dc7c34-3235-44d0-8da5-db63d09c9175",
+      "name": "Real send?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('One at a time').item.json.live }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "3ce7937b-34ba-4925-a1b5-6e122931da4c",
+      "name": "Log in Pipedrive",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2464,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ subject: 'Re-engagement email sent: ' + $('One at a time').item.json.subject, type: 'email', done: 1, user_id: 32883646, deal_id: $('One at a time').item.json.deal_id }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "12f5baba-6358-4a5d-9e2f-246562a1a194",
+      "name": "Remember sent",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2688,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "send_key": "={{ $('One at a time').item.json.key }}"
+          },
+          "schema": [
+            {
+              "id": "send_key",
+              "displayName": "send_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6f97ed5e-a500-4739-a318-a9fe23e76962",
+      "name": "Pause 20 seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2912,
+        176
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 20,
+        "unit": "seconds"
+      },
+      "webhookId": "e0e3e37b-5ebc-4d38-bbd4-7182629b71f5"
+    },
+    {
+      "id": "7c63026d-059e-4729-ba7e-7d99c98ef846",
+      "name": "One at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1568,
+        384
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "d40ae7de-677e-49ae-85fb-971b7171bd9e",
+      "name": "Create call task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2016,
+        192
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($('One at a time').item.json.activity) }}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "6ee3f071-46cc-46a4-a134-052b53f1bd83",
+      "name": "Remember task",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        192
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "uk8sIo3Shwupgh84",
+          "cachedResultName": "quarterly_email_sent"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "send_key": "={{ $('One at a time').item.json.key }}"
+          },
+          "schema": [
+            {
+              "id": "send_key",
+              "displayName": "send_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Tue-Thu 9:30": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get opt-outs": {
+      "main": [
+        [
+          {
+            "node": "Get sent log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get sent log": {
+      "main": [
+        [
+          {
+            "node": "Get replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get replies": {
+      "main": [
+        [
+          {
+            "node": "Get lost deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get lost deals": {
+      "main": [
+        [
+          {
+            "node": "Get open deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get open deals": {
+      "main": [
+        [
+          {
+            "node": "Pick emails and call tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick emails and call tasks": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test: send samples to Raf": {
+      "main": [
+        [
+          {
+            "node": "Get opt-outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email?": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create call task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Real send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Real send?": {
+      "main": [
+        [
+          {
+            "node": "Log in Pipedrive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log in Pipedrive": {
+      "main": [
+        [
+          {
+            "node": "Remember sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remember sent": {
+      "main": [
+        [
+          {
+            "node": "Pause 20 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pause 20 seconds": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One at a time": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create call task": {
+      "main": [
+        [
+          {
+            "node": "Remember task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remember task": {
+      "main": [
+        [
+          {
+            "node": "One at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "America/Winnipeg"
+  },
+  "staticData": {
+    "node:Every Tue-Thu 9:30": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "J7RvjCAeBDnz6E95",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T22:24:27.115Z",
+      "updatedAt": "2026-11-18T22:24:27.115Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "7167b5b4-93da-4c46-b5f8-c5f8638a614a",
+    "workflowId": "J7RvjCAeBDnz6E95",
+    "nodes": [
+      {
+        "id": "003dd4ae-a565-411b-b3f8-1fe6cb5633fd",
+        "name": "Every Tue-Thu 9:30",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          288
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "30 9 * * 2-4"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "541c0691-b46d-463e-8013-ffef6c886ad9",
+        "name": "Get opt-outs",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          224,
+          384
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "XAUhH78HlYPmmZRe",
+            "cachedResultName": "quarterly_email_optout"
+          },
+          "returnAll": true
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "ef9cc684-5d1e-4c1a-a9ee-613c300793ce",
+        "name": "Get sent log",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          448,
+          384
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "uk8sIo3Shwupgh84",
+            "cachedResultName": "quarterly_email_sent"
+          },
+          "returnAll": true
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "f2ff9e56-f825-4ea8-a6f9-1c1b5255ecee",
+        "name": "Get replies",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          672,
+          384
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "uGpqmQVuQzTor7NJ",
+            "cachedResultName": "quarterly_email_replied"
+          },
+          "returnAll": true
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "89708cd2-e698-4d33-8a31-ebb47ba9b0a4",
+        "name": "Get lost deals",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          896,
+          384
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.pipedrive.com/v1/deals?status=lost&limit=500",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "executeOnce": true
+      },
+      {
+        "id": "a9fd3550-c03b-4e82-ba0c-f0e26f70b9a7",
+        "name": "Get open deals",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1120,
+          384
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.pipedrive.com/v1/deals?status=open&limit=500",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "executeOnce": true
+      },
+      {
+        "id": "badb40f7-d256-43f4-b7c0-98847bdf02cd",
+        "name": "Pick emails and call tasks",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1344,
+          384
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "mode": "runOnceForAllItems",
+          "jsCode": "// Quarterly re-engagement: emails (within CASL 6-month window) and call tasks (older, or top deals).\nconst RAF = 'rlakhani@anagomb.ca', USER = 32883646;\nconst EMAIL_CAP = 15, CALL_CAP = 3, QUARTER_CALLS = 25, TOP = 10;\nlet scheduled = false;\ntry { scheduled = $('Every Tue-Thu 9:30').isExecuted; } catch (e) {}\nconst test = !scheduled;\nconst now = DateTime.now().setZone('America/Winnipeg');\nconst today = now.toISODate();\nconst qn = Math.ceil(now.month / 3);\nconst quarter = now.year + 'Q' + qn;\n// quarterly campaign starts on the 2nd Tuesday of the quarter's first month\nconst m1 = now.set({ month: (qn - 1) * 3 + 1, day: 1 }).startOf('day');\nconst start = m1.plus({ days: ((2 - m1.weekday + 7) % 7) + 7 });\nconst START = '2027-01-01'; // nothing goes out before this date\nconst campaignOn = now >= start;\nconst lc = s => String(s || '').toLowerCase().trim();\nconst optout = new Set($('Get opt-outs').all().map(i => lc(i.json.email)).filter(Boolean));\nconst sentRows = $('Get sent log').all().map(i => i.json).filter(r => r.send_key);\nconst sent = new Set(sentRows.map(r => r.send_key));\nconst recentEmailed = new Set(sentRows.filter(r => !/^(call|d97):/.test(r.send_key) && now.diff(DateTime.fromISO(String(r.createdAt)), 'days').days < 60).map(r => r.send_key.split(':').pop()));\nconst replied = new Set($('Get replies').all().map(i => lc(i.json.email)).filter(Boolean));\nconst lost = $('Get lost deals').first().json.data || [];\nconst open = $('Get open deals').first().json.data || [];\nconst openPeople = new Set(open.map(d => d.person_id && d.person_id.value).filter(Boolean));\nconst openOrgs = new Set(open.map(d => d.org_id && d.org_id.value).filter(Boolean));\nconst dt = s => DateTime.fromISO(String(s).replace(' ', 'T'), { zone: 'utc' });\n\nconst F = 'font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:10pt;color:#000';\nconst esc = s => String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]));\nconst p = t => '<p style=\"' + F + ';margin:0 0 12px 0\">' + t + '</p>';\n// Letsignit signature copied with its marker, so Letsignit does not add a second one.\nconst sig = '<div style=\"' + F + ';margin-top:16px\">Kind Regards,</div>'\n  + '<p style=\"margin:0.1pt;text-align:left\"></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\">Raf Lakhani <br />Brand Manager | Anago of Manitoba<br />238 St Mary’s Road | Winnipeg, MB R2H 1J3<br />t+ 204.594.4666 |Direct+ 204.809.4347 | <a href=\"mailto:rlakhani@anagomb.ca\">rlakhani@anagomb.ca</a></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\"><a href=\"http://www.anagomb.ca/\">www.AnagoMB.ca</a></p><p></p><table><tbody><tr><td><div id=\"LSI_marker\" style=\"font-size:0px\"> </div></td></tr></tbody></table>';\nconst OFFER = 'I can do a free 20-minute walkthrough and send you an updated quote within a couple of days. Just reply with a time that suits you, or call me directly at 204-809-4347.';\nconst SEASON = {\n  1: { subj: co => 'Winter floors at ' + (co || 'your building'), hook: 'This time of year, salt and slush get tracked in every day, and by February it shows on the floors and carpets. If it helps, I can include entrance matting and salt removal in the quote.' },\n  2: { subj: co => 'Spring cleaning at ' + (co || 'your building'), hook: 'Spring is when most buildings catch up on what winter left behind: salt-stained floors, carpets, windows and vents. If a full contract is not the right step, I can also quote a one-time spring deep clean.' },\n  3: { subj: co => 'Summer floor work at ' + (co || 'your building'), hook: 'Summer is the quiet window for floor work, like stripping and waxing or carpet extraction, before everyone is back in September. I can quote that as a one-time job, with no ongoing contract.' },\n  4: { subj: co => 'Getting ' + (co || 'your building') + ' ready for winter', hook: 'Before winter hits, it is worth having entrance matting and a salt plan in place, and with flu season coming, regular disinfecting of high-touch areas matters more. I can include both in an updated quote.' },\n};\nconst WENT = /another provider|Other Service/i, STAYED = /current provider|Same Service|In House/i;\nfunction middle(r) {\n  if (WENT.test(r)) return 'You went with another provider at the time, and I hope it is working well. If anything has slipped, like missed areas, frequent staff changes or slow responses, that is usually when businesses give us a second look.';\n  if (STAYED.test(r)) return 'You decided to stay with your current provider at the time, and I hope it is working well. If anything has slipped, like missed areas, frequent staff changes or slow responses, that is usually when businesses give us a second look.';\n  if (/Price/i.test(r)) return 'The price did not fit at the time. Budgets change, and so can the scope: we can adjust the frequency or focus on the high-traffic areas so the numbers work. I would be glad to rework the proposal around a budget you set.';\n  return 'The timing was not right then, and that is completely fine. If anything has changed, like a contract coming up for renewal, a new space, or a cleaner who is not meeting expectations, I would be glad to help.';\n}\nfunction build(c, kind, q) {\n  const d = c.d;\n  const what = c.company ? esc(c.company) + (c.street ? ' at ' + c.street : '') : (c.street ? 'your space at ' + c.street : 'your space');\n  const footer = '<p style=\"font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:8pt;color:#808080;margin:12px 0 0 0\">You are receiving this because you contacted Anago of Manitoba about cleaning' + (c.company ? ' for ' + esc(c.company) : '') + '. Reply “unsubscribe” and I will not email you again.</p>';\n  let subject, body;\n  if (kind === 'd90') {\n    if (WENT.test(c.r)) {\n      subject = 'How is the new cleaning team working out?';\n      body = p('It has been about three months since you went with another provider for ' + what + '. That is usually when you find out whether a new crew is working out: the first few weeks are always good, and the details start to slip after that.');\n    } else {\n      subject = 'How is the cleaning going' + (c.company ? ' at ' + c.company : '') + '?';\n      body = p('It has been about three months since you decided to stay with your current provider for ' + what + '. I hope it has been going well. If the issues that had you looking around have come back, that is usually the sign it will not fix itself.');\n    }\n    body += p('If everything is on track, great, no need to reply. If not, like missed areas, new faces every week or slow responses when you call, I would be glad to do a free 20-minute walkthrough and send you a quote within a couple of days. Just reply, or call me directly at 204-809-4347.');\n  } else {\n    const s = SEASON[q];\n    const opener = (d['1a6bd14374c1ccde3e2bea35879a917c6a9d8c11'] ? 'In ' + c.year + ' we put together a cleaning proposal for ' : 'In ' + c.year + ' we spoke about cleaning for ') + what + '.';\n    subject = s.subj(c.company);\n    body = p(opener + ' ' + middle(c.r)) + p(s.hook) + p(OFFER);\n  }\n  const html = p('Hi ' + esc(c.first) + ',') + body + sig + footer;\n  return { kind: 'email', live: !test, to: test ? RAF : c.email, subject, html, deal_id: d.id };\n}\nfunction callTask(c, key, subject, note) {\n  return { kind: 'task', live: true, key, deal_id: c.d.id, activity: { subject, type: 'call', done: 0, user_id: USER, deal_id: c.d.id, person_id: c.personId || undefined, due_date: today, note } };\n}\n\n// Build the eligible list (one per email address, newest first).\nconst all = [];\nconst seen = new Set();\nconst sorted = lost.slice().sort((a, b) => String(b.lost_time || '').localeCompare(String(a.lost_time || '')));\nfor (const d of sorted) {\n  const person = d.person_id || {};\n  const em = person.email || [];\n  const email = lc((em.find(e => e.primary) || em[0] || {}).value);\n  if (!email || !/@/.test(email) || optout.has(email) || seen.has(email)) continue;\n  const r = d.lost_reason || '';\n  if (/Not Pursuing|Bad Data|Do Not Call|Franchise/i.test(r)) continue;\n  if (openPeople.has(person.value) || (d.org_id && openOrgs.has(d.org_id.value))) continue;\n  // Deals closed in bulk as \"went quiet\" carry the cleanup date, so use the date the lead came in.\n  const ref = dt(/No response|went quiet/i.test(r) ? d.add_time : (d.lost_time || d.update_time));\n  const age = now.diff(ref, 'days').days;\n  const lostAge = now.diff(dt(d.lost_time || d.update_time), 'days').days;\n  if (age > 3 * 365) continue;\n  seen.add(email);\n  const street = String((d.org_id && d.org_id.address) || '').split(',')[0].trim().replace(/\\.+$/, '');\n  let company = String(d.org_name || '').replace(/\\s+c\\/o\\b.*$/i, '').replace(/,?\\s+(Ltd|Inc|Corp|Corporation|Limited|Incorporated)\\.?$/i, '').replace(/,\\s*$/, '').trim();\n  if (/^\\d/.test(company) || lc(company) === lc(street)) company = ''; // org named after its address\n  all.push({ d, r, email, age, lostAge, personId: person.value, value: Number(d.value) || 0,\n    first: String(person.name || '').trim().split(/\\s+/)[0] || 'there', company,\n    street: esc(street), year: ref.toFormat('yyyy') });\n}\n\nconst out = [];\nif (test) {\n  // Samples for Raf: one seasonal email per quarter, plus the 90-day email.\n  const em = all.filter(c => c.age >= 60 && c.age < 183);\n  for (let q = 1; q <= 4 && q <= em.length; q++) out.push({ json: (m => Object.assign(m, { subject: '[TEST Q' + q + ' to ' + em[q - 1].email + '] ' + m.subject }))(build(em[q - 1], 'q', q)) });\n  const sw = all.find(c => WENT.test(c.r)); if (sw) out.push({ json: (m => Object.assign(m, { subject: '[TEST 90-day to ' + sw.email + '] ' + m.subject }))(build(sw, 'd90')) });\n  const st = all.find(c => STAYED.test(c.r)); if (st) out.push({ json: (m => Object.assign(m, { subject: '[TEST 90-day to ' + st.email + '] ' + m.subject }))(build(st, 'd90')) });\n  return out;\n}\n\nif (today < START) return [];\nlet emails = 0, calls = 0;\nconst SWITCH = c => WENT.test(c.r) || STAYED.test(c.r);\n// 1. 90 days after losing to (or staying with) another provider: email, then a call task a week later.\nfor (const c of all) {\n  if (!SWITCH(c)) continue;\n  const k90 = 'd90:' + c.d.id + ':' + c.email;\n  if (c.lostAge >= 90 && c.lostAge < 97 && !sent.has(k90) && emails < EMAIL_CAP) {\n    out.push({ json: Object.assign(build(c, 'd90'), { key: k90 }) }); emails++; recentEmailed.add(c.email);\n  }\n  const k97 = 'd97:' + c.d.id;\n  if (c.lostAge >= 97 && c.lostAge < 125 && sent.has(k90) && !sent.has(k97) && !replied.has(c.email)) {\n    out.push({ json: callTask(c, k97, 'Call ' + c.first + (c.company ? ' at ' + c.company : '') + ': 90-day check-in after switching cleaners', 'We emailed them at day 90 (no reply yet). Ask how the current cleaner is doing. Lost reason: ' + c.r + '.') });\n  }\n}\n// 2. Quarterly: top deals by value and contacts older than 6 months get a call task, the rest get the email.\nif (campaignOn) {\n  const qStart = m1.toUTC().toISO();\n  const callsThisQuarter = sentRows.filter(r => /^call:/.test(r.send_key) && String(r.createdAt) >= qStart).length;\n  const pool = all.filter(c => c.age >= 60);\n  const top = new Set(pool.filter(c => c.value > 0).sort((a, b) => b.value - a.value).slice(0, TOP).map(c => c.d.id));\n  const ordered = pool.slice().sort((a, b) => (top.has(b.d.id) - top.has(a.d.id)) || (a.age - b.age));\n  for (const c of ordered) {\n    // top deals: a call every quarter; older contacts: a call once a year\n    const kq = quarter + ':' + c.email, kc = 'call:' + (top.has(c.d.id) ? quarter : now.year) + ':' + c.email;\n    if (sent.has(kq) || sent.has(kc) || recentEmailed.has(c.email)) continue;\n    if (top.has(c.d.id) || c.age >= 183) {\n      if (calls >= CALL_CAP || callsThisQuarter + calls >= QUARTER_CALLS) continue;\n      out.push({ json: callTask(c, kc, 'Quarterly call: ' + c.first + (c.company ? ' at ' + c.company : ''), (top.has(c.d.id) ? 'Top lost deal by value ($' + Math.round(c.value).toLocaleString() + '/yr). ' : '') + 'Lost reason: ' + c.r + ' (' + c.year + '). Talking point this quarter: ' + SEASON[qn].hook) });\n      calls++;\n    } else {\n      if (emails >= EMAIL_CAP) continue;\n      out.push({ json: Object.assign(build(c, 'q', qn), { key: kq }) }); emails++;\n    }\n  }\n}\nreturn out;\n"
+        }
+      },
+      {
+        "id": "65b7da16-9672-4412-9896-8b52b0b29751",
+        "name": "Test: send samples to Raf",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          480
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "80f66e86-6e2d-4a06-8e9d-af4afc7ce9cd",
+        "name": "Email?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1792,
+          96
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.kind }}",
+                "rightValue": "email",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "0fd5dff5-c8b0-47fc-af29-3a07fb291467",
+        "name": "Send email",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          2016,
+          0
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "send",
+          "toRecipients": "={{ $json.to }}",
+          "subject": "={{ $json.subject }}",
+          "bodyContent": "={{ $json.html }}",
+          "additionalFields": {
+            "bodyContentType": "html"
+          }
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "webhookId": "f9d56937-7fbe-4aeb-befe-132fff475398"
+      },
+      {
+        "id": "d3dc7c34-3235-44d0-8da5-db63d09c9175",
+        "name": "Real send?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2240,
+          0
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $('One at a time').item.json.live }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "3ce7937b-34ba-4925-a1b5-6e122931da4c",
+        "name": "Log in Pipedrive",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          2464,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.pipedrive.com/v1/activities",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ subject: 'Re-engagement email sent: ' + $('One at a time').item.json.subject, type: 'email', done: 1, user_id: 32883646, deal_id: $('One at a time').item.json.deal_id }) }}",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "12f5baba-6358-4a5d-9e2f-246562a1a194",
+        "name": "Remember sent",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          2688,
+          0
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "insert",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "uk8sIo3Shwupgh84",
+            "cachedResultName": "quarterly_email_sent"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "send_key": "={{ $('One at a time').item.json.key }}"
+            },
+            "schema": [
+              {
+                "id": "send_key",
+                "displayName": "send_key",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "6f97ed5e-a500-4739-a318-a9fe23e76962",
+        "name": "Pause 20 seconds",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          2912,
+          176
+        ],
+        "parameters": {
+          "resume": "timeInterval",
+          "amount": 20,
+          "unit": "seconds"
+        },
+        "webhookId": "e0e3e37b-5ebc-4d38-bbd4-7182629b71f5"
+      },
+      {
+        "id": "7c63026d-059e-4729-ba7e-7d99c98ef846",
+        "name": "One at a time",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1568,
+          384
+        ],
+        "parameters": {
+          "batchSize": 1,
+          "options": {}
+        }
+      },
+      {
+        "id": "d40ae7de-677e-49ae-85fb-971b7171bd9e",
+        "name": "Create call task",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          2016,
+          192
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.pipedrive.com/v1/activities",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($('One at a time').item.json.activity) }}",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      },
+      {
+        "id": "6ee3f071-46cc-46a4-a134-052b53f1bd83",
+        "name": "Remember task",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          2240,
+          192
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "insert",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "uk8sIo3Shwupgh84",
+            "cachedResultName": "quarterly_email_sent"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "send_key": "={{ $('One at a time').item.json.key }}"
+            },
+            "schema": [
+              {
+                "id": "send_key",
+                "displayName": "send_key",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Every Tue-Thu 9:30": {
+        "main": [
+          [
+            {
+              "node": "Get opt-outs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get opt-outs": {
+        "main": [
+          [
+            {
+              "node": "Get sent log",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get sent log": {
+        "main": [
+          [
+            {
+              "node": "Get replies",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get replies": {
+        "main": [
+          [
+            {
+              "node": "Get lost deals",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get lost deals": {
+        "main": [
+          [
+            {
+              "node": "Get open deals",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get open deals": {
+        "main": [
+          [
+            {
+              "node": "Pick emails and call tasks",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pick emails and call tasks": {
+        "main": [
+          [
+            {
+              "node": "One at a time",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Test: send samples to Raf": {
+        "main": [
+          [
+            {
+              "node": "Get opt-outs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Email?": {
+        "main": [
+          [
+            {
+              "node": "Send email",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create call task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send email": {
+        "main": [
+          [
+            {
+              "node": "Real send?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Real send?": {
+        "main": [
+          [
+            {
+              "node": "Log in Pipedrive",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "One at a time",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log in Pipedrive": {
+        "main": [
+          [
+            {
+              "node": "Remember sent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Remember sent": {
+        "main": [
+          [
+            {
+              "node": "Pause 20 seconds",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pause 20 seconds": {
+        "main": [
+          [
+            {
+              "node": "One at a time",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "One at a time": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Email?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create call task": {
+        "main": [
+          [
+            {
+              "node": "Remember task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Remember task": {
+        "main": [
+          [
+            {
+              "node": "One at a time",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Clean company and street names",
+    "description": "Updated nodes: Pick emails and call tasks",
+    "autosaved": false,
+    "createdAt": "2026-11-18T22:29:10.601Z",
+    "updatedAt": "2026-11-18T22:29:10.601Z"
+  }
+}
