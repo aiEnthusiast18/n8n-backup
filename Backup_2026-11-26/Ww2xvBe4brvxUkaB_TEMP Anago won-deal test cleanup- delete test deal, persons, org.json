@@ -1,0 +1,147 @@
+{
+  "id": "Ww2xvBe4brvxUkaB",
+  "name": "TEMP Anago won-deal test cleanup: delete test deal, persons, org",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T01:32:18.099Z",
+  "updatedAt": "2026-11-18T01:34:01.751Z",
+  "isArchived": true,
+  "versionId": "71913930-d111-4050-b7e7-997b9a43de61",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "ca8ca5fc-bc3d-4bc9-b17e-d4d7d7dcbe52",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "aaf03abb-2277-439c-bafc-8623409c18bb",
+      "name": "Delete deal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://api.pipedrive.com/v1/deals/8",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "42d01cdb-f841-424f-9a15-ef411cfef4da",
+      "name": "Delete persons",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://api.pipedrive.com/v1/persons?ids=243,244",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "8327cc9f-c7ca-4dbf-8f58-dc104de0eef7",
+      "name": "Delete org",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://api.pipedrive.com/v1/organizations/329",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Delete deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete deal": {
+      "main": [
+        [
+          {
+            "node": "Delete persons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete persons": {
+      "main": [
+        [
+          {
+            "node": "Delete org",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "Ww2xvBe4brvxUkaB",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T01:32:18.099Z",
+      "updatedAt": "2026-11-18T01:32:18.099Z"
+    }
+  ],
+  "activeVersion": null
+}
