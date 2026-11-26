@@ -1,0 +1,112 @@
+{
+  "id": "n3E623x5gaMJzKom",
+  "name": "TEMP: quarterly email samples",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T21:17:01.384Z",
+  "updatedAt": "2026-11-18T21:47:35.917Z",
+  "isArchived": true,
+  "versionId": "d401e8ab-fc61-4e0b-843e-154c1dfff28e",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "2cc47ebc-3884-45ca-95bc-aa22cb8af14a",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "3f349ad7-09da-4a4a-a2a0-8e8e160bee1a",
+      "name": "Write sample emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const rows = [\n  { first: 'Ryan', company: 'Medline Canada', address: '179 West Creek Way, Rosser, MB, R0H 1E0', reason: 'Chose Other Service', lost: '2024-12-16', proposal: true },\n  { first: 'Daniel', company: 'Union Gospel Mission', address: '220 and 240 Pritchard,, Winnipeg, MB, R3B 3C7', reason: 'Lost Due to Price', lost: '2024-11-07', proposal: true },\n  { first: 'Allen', company: 'Tereck Diesel', address: '1655 Dugald Road, Winnipeg, MB, R2J 0H3', reason: 'Not Interested', lost: '2025-05-29', proposal: false }\n];\nconst F = 'font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:10pt;color:#000';\nconst esc = s => String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]));\nconst sig = '<div style=\"' + F + ';margin-top:16px\">Kind Regards,</div>'\n  + '<p style=\"margin:0.1pt;text-align:left\"></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\">Raf Lakhani <br />Brand Manager | Anago of Manitoba<br />238 St Mary’s Road | Winnipeg, MB R2H 1J3<br />t+ 204.594.4666 |Direct+ 204.809.4347 | <a href=\"mailto:rlakhani@anagomb.ca\">rlakhani@anagomb.ca</a></p><p style=\"margin:0cm;font-size:15px;font-family:&quot;Calibri&quot;,sans-serif\"><a href=\"http://www.anagomb.ca/\">www.AnagoMB.ca</a></p><p></p><table><tbody><tr><td><div id=\"LSI_marker\" style=\"font-size:0px\"> </div></td></tr></tbody></table>';\nconst p = t => '<p style=\"' + F + ';margin:0 0 12px 0\">' + t + '</p>';\nreturn rows.map((r, i) => {\n  const street = esc(String(r.address || '').split(',')[0].trim());\n  const year = String(r.lost || '').slice(0, 4);\n  const at = street ? ' at ' + street : '';\n  const opener = r.proposal\n    ? 'In ' + year + ' we put together a cleaning proposal for ' + esc(r.company) + at + '.'\n    : 'In ' + year + ' we spoke about cleaning for ' + esc(r.company) + at + '.';\n  let middle;\n  if (/Other Service|Same Service|Canceled/.test(r.reason)) middle = 'You decided to stay with another provider at the time, and I hope it is working well. If anything has slipped, like missed areas, frequent staff changes or slow responses when something comes up, that is usually when businesses give us a second look.';\n  else if (/Price/.test(r.reason)) middle = 'The price did not fit at the time. Budgets change, and so can the scope: we can adjust the frequency or focus on the high-traffic areas so the numbers work. I would be glad to rework the proposal around a budget you set.';\n  else if (/In House/.test(r.reason)) middle = 'You were handling cleaning in-house at the time. If that has become more work than it is worth, we can take it off your team’s plate.';\n  else middle = 'The timing was not right then, and that is completely fine. If anything has changed, like a contract coming up for renewal, a new space, or a cleaner who is not meeting expectations, I would be glad to help.';\n  const offer = 'I can do a free 20-minute walkthrough and send you an updated quote within a couple of days. Just reply with a time that suits you, or call me directly at 204-809-4347.';\n  const footer = '<p style=\"font-family:Tahoma,Arial,Helvetica,sans-serif;font-size:8pt;color:#808080;margin:12px 0 0 0\">You are receiving this because you contacted Anago of Manitoba about cleaning for ' + esc(r.company) + '. Reply “unsubscribe” and I will not email you again.</p>';\n  const html = p('Hi ' + esc(r.first) + ',') + p(opener + ' ' + middle) + p(offer) + sig + footer;\n  return { json: { to: 'rlakhani@anagomb.ca', subject: '[SAMPLE v3 ' + (i + 1) + '/3] Quick check-in about cleaning at ' + r.company, html } };\n});\n"
+      }
+    },
+    {
+      "id": "9858e236-d56a-4625-88f5-8a0fce9b3737",
+      "name": "Send sample to Raf",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "1ec185ab-559c-4d68-9c54-733e6ebe3b69"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Write sample emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write sample emails": {
+      "main": [
+        [
+          {
+            "node": "Send sample to Raf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "n3E623x5gaMJzKom",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T21:17:01.384Z",
+      "updatedAt": "2026-11-18T21:17:01.384Z"
+    }
+  ],
+  "activeVersion": null
+}
