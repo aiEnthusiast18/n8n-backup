@@ -1,0 +1,1390 @@
+{
+  "id": "2iDyGdzWNlrDSu9C",
+  "name": "Proposal viewed: update the deal in Pipedrive",
+  "active": true,
+  "activeVersionId": "406795bb-c897-4752-8d2d-e12fcd29d714",
+  "createdAt": "2026-11-24T22:07:49.688Z",
+  "updatedAt": "2026-11-24T22:08:36.606Z",
+  "isArchived": false,
+  "versionId": "406795bb-c897-4752-8d2d-e12fcd29d714",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "2963d3b9-558c-457b-874c-83bc7111de25",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        96
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cc4914a7-71bf-48cc-8ce0-516dfe30c15a",
+      "name": "Get recent mail",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        96
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": true,
+        "output": "fields",
+        "fields": [
+          "subject",
+          "from",
+          "body",
+          "receivedDateTime"
+        ],
+        "filtersUI": {
+          "values": {
+            "filterBy": "filters",
+            "filters": {
+              "readStatus": "both",
+              "receivedAfter": "={{ $execution.mode === 'production' ? $now.minus({ hours: 3 }).toISO() : $now.minus({ days: 10 }).toISO() }}"
+            }
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "alwaysOutputData": true,
+      "webhookId": "958cce68-d07e-4f2f-a5b4-d1df5e3810f0"
+    },
+    {
+      "id": "ec219553-9382-4524-bdce-094507da69a1",
+      "name": "Get seen views",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        96
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "dVXsxjUwXDQxW00N",
+          "cachedResultName": "proposal_views"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "3b11a416-52cf-4ada-885e-863c4795ad4d",
+      "name": "Parse views",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        96
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Reads \"proposal viewed\" notifications from the proposal system and works out what changed.\nconst TEST = $execution.mode !== 'production';\nconst ONLY = TEST ? /EECOL/i : null; // a test run touches only the EECOL proposal\nconst seen = $('Get seen views').all().map(i => i.json);\nconst doneMsg = new Set(seen.map(r => String(r.message_id || '')));\nconst prevViews = {};\nfor (const r of seen) if (r.bid_link) prevViews[r.bid_link] = Math.max(prevViews[r.bid_link] || 0, Number(r.views) || 0);\nconst strip = h => String(h || '').replace(/<li[^>]*>/gi, '\\n').replace(/<br\\s*\\/?>|<\\/p>|<\\/div>/gi, '\\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');\nconst parseT = s => { const m = /(\\d\\d)\\/(\\d\\d)\\/(\\d{4}) - (\\d\\d):(\\d\\d) (AM|PM)/.exec(s); if (!m) return null;\n  let h = Number(m[4]) % 12; if (m[6] === 'PM') h += 12; return Date.UTC(+m[3], +m[1] - 1, +m[2], h, +m[5]); };\nconst fmt = t => { const d = new Date(t); const h = d.getUTCHours(); return d.toISOString().slice(0, 10) + ' ' + ((h % 12) || 12) + ':' + String(d.getUTCMinutes()).padStart(2, '0') + (h < 12 ? ' am' : ' pm'); };\nconst DAY = 86400000;\nconst best = {}; // one result per proposal per run: the notification with the most views\nfor (const m of $('Get recent mail').all().map(i => i.json)) {\n  const from = String((m.from && m.from.emailAddress && m.from.emailAddress.address) || '').toLowerCase();\n  const subj = String(m.subject || '');\n  if (from !== 'notifications@myanagoclean.com' || !/Has Been Viewed/i.test(subj)) continue;\n  if (ONLY && !ONLY.test(subj)) continue;\n  const id = String(m.id || '');\n  if (!id || doneMsg.has(id)) continue;\n  const html = String((m.body && m.body.content) || '');\n  const text = strip(html);\n  const link = (/Bid Link:\\s*<a href=\"([^\"]+)\"/i.exec(html) || /Bid Link:\\s*(https?:\\S+)/i.exec(text) || [])[1];\n  if (!link) continue;\n  const company = (/Proposal for (.+?) Has Been Viewed/i.exec(subj) || [])[1] || '';\n  const kind = (/Your (\\w+) Proposal for/i.exec(subj) || [])[1] || '';\n  const ol = (/<ol>([\\s\\S]*?)<\\/ol>/i.exec(html) || [])[1] || '';\n  const times = [...ol.matchAll(/<li>([^<]+)<\\/li>/gi)].map(x => parseT(x[1])).filter(Boolean).sort((a, b) => a - b);\n  const count = Number((/accessed (\\d+) time/i.exec(text) || [])[1]) || times.length;\n  if (!times.length) { const t = parseT((/most recent access on ([^.]+)/i.exec(text) || [])[1] || ''); if (t) times.push(t); }\n  const dm = (/Decision Maker([\\s\\S]*?)(Walk-Thru Contact|The Anago Team)/i.exec(text) || [])[1] || '';\n  const dmName = ((/Name:\\s*([^\\n]+)/.exec(dm) || [])[1] || '').trim();\n  const dmEmail = ((/Email:\\s*([^\\s\\n]+@[^\\s\\n]+)/.exec(dm) || [])[1] || '').trim().toLowerCase();\n  const dmPhone = ((/Phone:\\s*([^\\n]+)/.exec(dm) || [])[1] || '').trim();\n  const cur = best[link];\n  if (cur && cur.views >= count) { cur.message_ids.push(id); continue; }\n  best[link] = { bid_link: link, company, kind, views: count, times, dm_name: dmName, dm_email: dmEmail, dm_phone: dmPhone, message_ids: (cur ? cur.message_ids : []).concat(id) };\n}\nconst out = [];\nfor (const v of Object.values(best)) {\n  const prev = prevViews[v.bid_link] || 0;\n  if (v.views <= prev) continue; // repeat of a notification already handled\n  // Call when: first view we know of, or any new open comes 3+ days after the open before it.\n  let gapDays = 0;\n  for (let i = Math.max(prev, 1); i < v.times.length; i++) gapDays = Math.max(gapDays, (v.times[i] - v.times[i - 1]) / DAY);\n  const last = v.times.length ? v.times[v.times.length - 1] : null;\n  const task = prev === 0 || gapDays >= 3;\n  const why = gapDays >= 3 ? 'came back to the proposal after ' + Math.floor(gapDays) + ' days' : (v.views <= 1 ? 'opened the proposal for the first time' : 'has opened the proposal ' + v.views + ' times');\n  out.push({ json: Object.assign(v, {\n    prev_views: prev, task, why,\n    last_date: last ? new Date(last).toISOString().slice(0, 10) : $now.setZone('America/Winnipeg').toISODate(),\n    last_text: last ? fmt(last) : '',\n    history: v.times.map(fmt).join('<br>'),\n    message_id: v.message_ids.join(','),\n  }) });\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "18871a75-3419-4e43-a756-2521e2aa9577",
+      "name": "Find deal by link",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        96
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/deals/search?fields=custom_fields&exact_match=true&status=open&term={{ encodeURIComponent($json.bid_link) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "62adc5f0-9948-4f86-87a5-ac6c13e22f91",
+      "name": "Find person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        96
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Parse views').item.json.dm_email || 'none@none.invalid') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "756ac4e5-41dc-483d-981c-f5b4512a3062",
+      "name": "Person deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1344,
+        96
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/persons/{{ ((($json.data || {}).items || [])[0] || { item: {} }).item.id || 0 }}/deals?status=open",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "4ca38a85-0fbb-481f-89dc-d72072bb11de",
+      "name": "Pick deal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        96
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Find the open deal for this proposal: by the proposal link first, then by the decision maker's email.\nconst v = $('Parse views').item.json;\nconst byLink = ((($('Find deal by link').item.json.data || {}).items) || []).map(x => x.item).filter(d => d && d.status === 'open');\nconst person = (((($('Find person').item.json.data || {}).items) || [])[0] || { item: {} }).item;\nlet deal = null, via = 'none';\nif (byLink.length) { const d = byLink[0]; deal = { id: d.id, stage_id: d.stage && d.stage.id, person_id: d.person && d.person.id }; via = 'proposal link'; }\nelse if (person.id) {\n  const ds = (Array.isArray($json.data) ? $json.data : []).filter(d => d.status === 'open')\n    .sort((a, b) => ((a.pipeline_id === 1 ? 0 : 1) - (b.pipeline_id === 1 ? 0 : 1)) || String(b.update_time).localeCompare(String(a.update_time)));\n  if (ds[0]) { const d = ds[0]; deal = { id: d.id, stage_id: d.stage_id, person_id: (d.person_id && d.person_id.value) || d.person_id || person.id }; via = 'decision maker email'; }\n}\nreturn { json: Object.assign({}, v, { deal_id: deal ? deal.id : null, stage_id: deal ? deal.stage_id : null, person_id: (deal && deal.person_id) || person.id || null, org_id: (person.organization && person.organization.id) || null, matched_by: via }) };\n"
+      }
+    },
+    {
+      "id": "b06df555-9000-4c02-adfe-d89b62ec2396",
+      "name": "Record view",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1792,
+        96
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "dVXsxjUwXDQxW00N",
+          "cachedResultName": "proposal_views"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "bid_link": "={{ $json.bid_link }}",
+            "views": "={{ $json.views }}",
+            "company": "={{ $json.company }}",
+            "message_id": "={{ $json.message_id }}",
+            "deal_id": "={{ $json.deal_id || 0 }}"
+          },
+          "schema": [
+            {
+              "id": "bid_link",
+              "displayName": "bid_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "views",
+              "displayName": "views",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deal_id",
+              "displayName": "deal_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "319cf1c9-3c94-43dd-9570-27abf70ed154",
+      "name": "Deal found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2016,
+        96
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ !!$('Pick deal').item.json.deal_id }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "327ee759-6edc-45ef-b8f6-dedcb7f63def",
+      "name": "Update deal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2240,
+        0
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.pipedrive.com/v1/deals/{{ $('Pick deal').item.json.deal_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify(Object.assign({ 'e19591bd302e6f84b3f3a3023b41888cebf2ce07': $('Pick deal').item.json.views, '7d9b6b907a883d1ff6d3ca911dd3c0541387d746': $('Pick deal').item.json.last_date }, $('Pick deal').item.json.stage_id === 3 ? { stage_id: 4 } : {})) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "e326099c-a56e-4ef0-9c76-be9da2ab58fb",
+      "name": "Get deal notes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2464,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/notes?limit=200&deal_id={{ $('Pick deal').item.json.deal_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "67dd1899-e1fd-4265-91ae-45574005698c",
+      "name": "Save views note",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2688,
+        0
+      ],
+      "parameters": {
+        "method": "={{ (Array.isArray($json.data) ? $json.data : []).find(n => String(n.content || '').includes('Proposal views</b> (kept up to date automatically)')) ? 'PUT' : 'POST' }}",
+        "url": "={{ 'https://api.pipedrive.com/v1/notes' + (((Array.isArray($json.data) ? $json.data : []).find(n => String(n.content || '').includes('Proposal views</b> (kept up to date automatically)'))) ? '/' + ((Array.isArray($json.data) ? $json.data : []).find(n => String(n.content || '').includes('Proposal views</b> (kept up to date automatically)'))).id : '') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ deal_id: $('Pick deal').item.json.deal_id, pinned_to_deal_flag: 1, user_id: 32883646, content: '<b>Proposal views</b> (kept up to date automatically)<br>Opened ' + $('Pick deal').item.json.views + ' time(s). Last opened ' + $('Pick deal').item.json.last_text + '.<br>Proposal: ' + $('Pick deal').item.json.bid_link + '<br><br>Every open:<br>' + $('Pick deal').item.json.history }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "43c76949-f2ef-4870-9be5-5e4e85c75593",
+      "name": "Call now?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2912,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Pick deal').item.json.task === true && !((($('Update deal').item.json.data || {}).next_activity_type === 'call') && String(($('Update deal').item.json.data || {}).next_activity_date || '9999') <= $now.setZone('America/Winnipeg').plus({ days: 2 }).toISODate()) }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "8618e147-500f-49e2-9986-15bfb661563d",
+      "name": "Deal call task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3136,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ subject: 'Call ' + ($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ': ' + $('Pick deal').item.json.company + ' ' + $('Pick deal').item.json.why, type: 'call', done: 0, user_id: 32883646, deal_id: $('Pick deal').item.json.deal_id, person_id: $('Pick deal').item.json.person_id || undefined, due_date: $now.setZone('America/Winnipeg').toISODate(), note: (($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ' ' + $('Pick deal').item.json.why + ' (' + $('Pick deal').item.json.views + ' opens, last ' + $('Pick deal').item.json.last_text + '). ' + ($('Pick deal').item.json.dm_phone ? 'Phone ' + $('Pick deal').item.json.dm_phone + '. ' : '') + 'Proposal: ' + $('Pick deal').item.json.bid_link) }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "62bde813-8445-49ae-b817-5e423d35d944",
+      "name": "Call now? (no deal)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        192
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Pick deal').item.json.task === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "7d5d7cfa-d16e-40f3-bdb9-b773cda934b4",
+      "name": "Unmatched call task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2464,
+        192
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ subject: 'Call ' + ($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ': ' + $('Pick deal').item.json.company + ' ' + $('Pick deal').item.json.why, type: 'call', done: 0, user_id: 32883646, person_id: $('Pick deal').item.json.person_id || undefined, org_id: $('Pick deal').item.json.org_id || undefined, due_date: $now.setZone('America/Winnipeg').toISODate(), note: (($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ' ' + $('Pick deal').item.json.why + ' (' + $('Pick deal').item.json.views + ' opens, last ' + $('Pick deal').item.json.last_text + '). ' + ($('Pick deal').item.json.dm_phone ? 'Phone ' + $('Pick deal').item.json.dm_phone + '. ' : '') + 'Proposal: ' + $('Pick deal').item.json.bid_link) + '. No open Pipedrive deal has this proposal link in Proposal / quote link, and none was found by the decision maker email (' + ($('Pick deal').item.json.dm_email || 'none') + '). Paste the link into the deal so the next view updates it.' }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every hour": {
+      "main": [
+        [
+          {
+            "node": "Get recent mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get recent mail": {
+      "main": [
+        [
+          {
+            "node": "Get seen views",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get seen views": {
+      "main": [
+        [
+          {
+            "node": "Parse views",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse views": {
+      "main": [
+        [
+          {
+            "node": "Find deal by link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find deal by link": {
+      "main": [
+        [
+          {
+            "node": "Find person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find person": {
+      "main": [
+        [
+          {
+            "node": "Person deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Person deals": {
+      "main": [
+        [
+          {
+            "node": "Pick deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick deal": {
+      "main": [
+        [
+          {
+            "node": "Record view",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record view": {
+      "main": [
+        [
+          {
+            "node": "Deal found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal found?": {
+      "main": [
+        [
+          {
+            "node": "Update deal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call now? (no deal)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update deal": {
+      "main": [
+        [
+          {
+            "node": "Get deal notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get deal notes": {
+      "main": [
+        [
+          {
+            "node": "Save views note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save views note": {
+      "main": [
+        [
+          {
+            "node": "Call now?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call now?": {
+      "main": [
+        [
+          {
+            "node": "Deal call task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call now? (no deal)": {
+      "main": [
+        [
+          {
+            "node": "Unmatched call task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": {
+    "node:Every hour": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "2iDyGdzWNlrDSu9C",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-24T22:07:49.688Z",
+      "updatedAt": "2026-11-24T22:07:49.688Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "406795bb-c897-4752-8d2d-e12fcd29d714",
+    "workflowId": "2iDyGdzWNlrDSu9C",
+    "nodes": [
+      {
+        "id": "2963d3b9-558c-457b-874c-83bc7111de25",
+        "name": "Every hour",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          96
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 1,
+                "triggerAtMinute": 20
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cc4914a7-71bf-48cc-8ce0-516dfe30c15a",
+        "name": "Get recent mail",
+        "type": "n8n-nodes-base.microsoftOutlook",
+        "typeVersion": 2,
+        "position": [
+          224,
+          96
+        ],
+        "parameters": {
+          "resource": "message",
+          "operation": "getAll",
+          "returnAll": true,
+          "output": "fields",
+          "fields": [
+            "subject",
+            "from",
+            "body",
+            "receivedDateTime"
+          ],
+          "filtersUI": {
+            "values": {
+              "filterBy": "filters",
+              "filters": {
+                "readStatus": "both",
+                "receivedAfter": "={{ $execution.mode === 'production' ? $now.minus({ hours: 3 }).toISO() : $now.minus({ days: 10 }).toISO() }}"
+              }
+            }
+          },
+          "options": {}
+        },
+        "credentials": {
+          "microsoftOutlookOAuth2Api": {
+            "id": "58F0urplGysVGdHg",
+            "name": "Microsoft Outlook account"
+          }
+        },
+        "alwaysOutputData": true,
+        "webhookId": "958cce68-d07e-4f2f-a5b4-d1df5e3810f0"
+      },
+      {
+        "id": "ec219553-9382-4524-bdce-094507da69a1",
+        "name": "Get seen views",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          448,
+          96
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "dVXsxjUwXDQxW00N",
+            "cachedResultName": "proposal_views"
+          },
+          "returnAll": true
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "3b11a416-52cf-4ada-885e-863c4795ad4d",
+        "name": "Parse views",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          96
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "mode": "runOnceForAllItems",
+          "jsCode": "// Reads \"proposal viewed\" notifications from the proposal system and works out what changed.\nconst TEST = $execution.mode !== 'production';\nconst ONLY = TEST ? /EECOL/i : null; // a test run touches only the EECOL proposal\nconst seen = $('Get seen views').all().map(i => i.json);\nconst doneMsg = new Set(seen.map(r => String(r.message_id || '')));\nconst prevViews = {};\nfor (const r of seen) if (r.bid_link) prevViews[r.bid_link] = Math.max(prevViews[r.bid_link] || 0, Number(r.views) || 0);\nconst strip = h => String(h || '').replace(/<li[^>]*>/gi, '\\n').replace(/<br\\s*\\/?>|<\\/p>|<\\/div>/gi, '\\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');\nconst parseT = s => { const m = /(\\d\\d)\\/(\\d\\d)\\/(\\d{4}) - (\\d\\d):(\\d\\d) (AM|PM)/.exec(s); if (!m) return null;\n  let h = Number(m[4]) % 12; if (m[6] === 'PM') h += 12; return Date.UTC(+m[3], +m[1] - 1, +m[2], h, +m[5]); };\nconst fmt = t => { const d = new Date(t); const h = d.getUTCHours(); return d.toISOString().slice(0, 10) + ' ' + ((h % 12) || 12) + ':' + String(d.getUTCMinutes()).padStart(2, '0') + (h < 12 ? ' am' : ' pm'); };\nconst DAY = 86400000;\nconst best = {}; // one result per proposal per run: the notification with the most views\nfor (const m of $('Get recent mail').all().map(i => i.json)) {\n  const from = String((m.from && m.from.emailAddress && m.from.emailAddress.address) || '').toLowerCase();\n  const subj = String(m.subject || '');\n  if (from !== 'notifications@myanagoclean.com' || !/Has Been Viewed/i.test(subj)) continue;\n  if (ONLY && !ONLY.test(subj)) continue;\n  const id = String(m.id || '');\n  if (!id || doneMsg.has(id)) continue;\n  const html = String((m.body && m.body.content) || '');\n  const text = strip(html);\n  const link = (/Bid Link:\\s*<a href=\"([^\"]+)\"/i.exec(html) || /Bid Link:\\s*(https?:\\S+)/i.exec(text) || [])[1];\n  if (!link) continue;\n  const company = (/Proposal for (.+?) Has Been Viewed/i.exec(subj) || [])[1] || '';\n  const kind = (/Your (\\w+) Proposal for/i.exec(subj) || [])[1] || '';\n  const ol = (/<ol>([\\s\\S]*?)<\\/ol>/i.exec(html) || [])[1] || '';\n  const times = [...ol.matchAll(/<li>([^<]+)<\\/li>/gi)].map(x => parseT(x[1])).filter(Boolean).sort((a, b) => a - b);\n  const count = Number((/accessed (\\d+) time/i.exec(text) || [])[1]) || times.length;\n  if (!times.length) { const t = parseT((/most recent access on ([^.]+)/i.exec(text) || [])[1] || ''); if (t) times.push(t); }\n  const dm = (/Decision Maker([\\s\\S]*?)(Walk-Thru Contact|The Anago Team)/i.exec(text) || [])[1] || '';\n  const dmName = ((/Name:\\s*([^\\n]+)/.exec(dm) || [])[1] || '').trim();\n  const dmEmail = ((/Email:\\s*([^\\s\\n]+@[^\\s\\n]+)/.exec(dm) || [])[1] || '').trim().toLowerCase();\n  const dmPhone = ((/Phone:\\s*([^\\n]+)/.exec(dm) || [])[1] || '').trim();\n  const cur = best[link];\n  if (cur && cur.views >= count) { cur.message_ids.push(id); continue; }\n  best[link] = { bid_link: link, company, kind, views: count, times, dm_name: dmName, dm_email: dmEmail, dm_phone: dmPhone, message_ids: (cur ? cur.message_ids : []).concat(id) };\n}\nconst out = [];\nfor (const v of Object.values(best)) {\n  const prev = prevViews[v.bid_link] || 0;\n  if (v.views <= prev) continue; // repeat of a notification already handled\n  // Call when: first view we know of, or any new open comes 3+ days after the open before it.\n  let gapDays = 0;\n  for (let i = Math.max(prev, 1); i < v.times.length; i++) gapDays = Math.max(gapDays, (v.times[i] - v.times[i - 1]) / DAY);\n  const last = v.times.length ? v.times[v.times.length - 1] : null;\n  const task = prev === 0 || gapDays >= 3;\n  const why = gapDays >= 3 ? 'came back to the proposal after ' + Math.floor(gapDays) + ' days' : (v.views <= 1 ? 'opened the proposal for the first time' : 'has opened the proposal ' + v.views + ' times');\n  out.push({ json: Object.assign(v, {\n    prev_views: prev, task, why,\n    last_date: last ? new Date(last).toISOString().slice(0, 10) : $now.setZone('America/Winnipeg').toISODate(),\n    last_text: last ? fmt(last) : '',\n    history: v.times.map(fmt).join('<br>'),\n    message_id: v.message_ids.join(','),\n  }) });\n}\nreturn out;\n"
+        }
+      },
+      {
+        "id": "18871a75-3419-4e43-a756-2521e2aa9577",
+        "name": "Find deal by link",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          896,
+          96
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "=https://api.pipedrive.com/v1/deals/search?fields=custom_fields&exact_match=true&status=open&term={{ encodeURIComponent($json.bid_link) }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "62adc5f0-9948-4f86-87a5-ac6c13e22f91",
+        "name": "Find person",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1120,
+          96
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "=https://api.pipedrive.com/v1/persons/search?fields=email&exact_match=true&term={{ encodeURIComponent($('Parse views').item.json.dm_email || 'none@none.invalid') }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "756ac4e5-41dc-483d-981c-f5b4512a3062",
+        "name": "Person deals",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          1344,
+          96
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "=https://api.pipedrive.com/v1/persons/{{ ((($json.data || {}).items || [])[0] || { item: {} }).item.id || 0 }}/deals?status=open",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "4ca38a85-0fbb-481f-89dc-d72072bb11de",
+        "name": "Pick deal",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1568,
+          96
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "mode": "runOnceForEachItem",
+          "jsCode": "// Find the open deal for this proposal: by the proposal link first, then by the decision maker's email.\nconst v = $('Parse views').item.json;\nconst byLink = ((($('Find deal by link').item.json.data || {}).items) || []).map(x => x.item).filter(d => d && d.status === 'open');\nconst person = (((($('Find person').item.json.data || {}).items) || [])[0] || { item: {} }).item;\nlet deal = null, via = 'none';\nif (byLink.length) { const d = byLink[0]; deal = { id: d.id, stage_id: d.stage && d.stage.id, person_id: d.person && d.person.id }; via = 'proposal link'; }\nelse if (person.id) {\n  const ds = (Array.isArray($json.data) ? $json.data : []).filter(d => d.status === 'open')\n    .sort((a, b) => ((a.pipeline_id === 1 ? 0 : 1) - (b.pipeline_id === 1 ? 0 : 1)) || String(b.update_time).localeCompare(String(a.update_time)));\n  if (ds[0]) { const d = ds[0]; deal = { id: d.id, stage_id: d.stage_id, person_id: (d.person_id && d.person_id.value) || d.person_id || person.id }; via = 'decision maker email'; }\n}\nreturn { json: Object.assign({}, v, { deal_id: deal ? deal.id : null, stage_id: deal ? deal.stage_id : null, person_id: (deal && deal.person_id) || person.id || null, org_id: (person.organization && person.organization.id) || null, matched_by: via }) };\n"
+        }
+      },
+      {
+        "id": "b06df555-9000-4c02-adfe-d89b62ec2396",
+        "name": "Record view",
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          1792,
+          96
+        ],
+        "parameters": {
+          "resource": "row",
+          "operation": "insert",
+          "dataTableId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "dVXsxjUwXDQxW00N",
+            "cachedResultName": "proposal_views"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "bid_link": "={{ $json.bid_link }}",
+              "views": "={{ $json.views }}",
+              "company": "={{ $json.company }}",
+              "message_id": "={{ $json.message_id }}",
+              "deal_id": "={{ $json.deal_id || 0 }}"
+            },
+            "schema": [
+              {
+                "id": "bid_link",
+                "displayName": "bid_link",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "views",
+                "displayName": "views",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "company",
+                "displayName": "company",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "message_id",
+                "displayName": "message_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "deal_id",
+                "displayName": "deal_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "319cf1c9-3c94-43dd-9570-27abf70ed154",
+        "name": "Deal found?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2016,
+          96
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ !!$('Pick deal').item.json.deal_id }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "327ee759-6edc-45ef-b8f6-dedcb7f63def",
+        "name": "Update deal",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          2240,
+          0
+        ],
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.pipedrive.com/v1/deals/{{ $('Pick deal').item.json.deal_id }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {},
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify(Object.assign({ 'e19591bd302e6f84b3f3a3023b41888cebf2ce07': $('Pick deal').item.json.views, '7d9b6b907a883d1ff6d3ca911dd3c0541387d746': $('Pick deal').item.json.last_date }, $('Pick deal').item.json.stage_id === 3 ? { stage_id: 4 } : {})) }}"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "e326099c-a56e-4ef0-9c76-be9da2ab58fb",
+        "name": "Get deal notes",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          2464,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "=https://api.pipedrive.com/v1/notes?limit=200&deal_id={{ $('Pick deal').item.json.deal_id }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {}
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "67dd1899-e1fd-4265-91ae-45574005698c",
+        "name": "Save views note",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          2688,
+          0
+        ],
+        "parameters": {
+          "method": "={{ (Array.isArray($json.data) ? $json.data : []).find(n => String(n.content || '').includes('Proposal views</b> (kept up to date automatically)')) ? 'PUT' : 'POST' }}",
+          "url": "={{ 'https://api.pipedrive.com/v1/notes' + (((Array.isArray($json.data) ? $json.data : []).find(n => String(n.content || '').includes('Proposal views</b> (kept up to date automatically)'))) ? '/' + ((Array.isArray($json.data) ? $json.data : []).find(n => String(n.content || '').includes('Proposal views</b> (kept up to date automatically)'))).id : '') }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {},
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ deal_id: $('Pick deal').item.json.deal_id, pinned_to_deal_flag: 1, user_id: 32883646, content: '<b>Proposal views</b> (kept up to date automatically)<br>Opened ' + $('Pick deal').item.json.views + ' time(s). Last opened ' + $('Pick deal').item.json.last_text + '.<br>Proposal: ' + $('Pick deal').item.json.bid_link + '<br><br>Every open:<br>' + $('Pick deal').item.json.history }) }}"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "43c76949-f2ef-4870-9be5-5e4e85c75593",
+        "name": "Call now?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2912,
+          0
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $('Pick deal').item.json.task === true && !((($('Update deal').item.json.data || {}).next_activity_type === 'call') && String(($('Update deal').item.json.data || {}).next_activity_date || '9999') <= $now.setZone('America/Winnipeg').plus({ days: 2 }).toISODate()) }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "8618e147-500f-49e2-9986-15bfb661563d",
+        "name": "Deal call task",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          3136,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.pipedrive.com/v1/activities",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {},
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ subject: 'Call ' + ($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ': ' + $('Pick deal').item.json.company + ' ' + $('Pick deal').item.json.why, type: 'call', done: 0, user_id: 32883646, deal_id: $('Pick deal').item.json.deal_id, person_id: $('Pick deal').item.json.person_id || undefined, due_date: $now.setZone('America/Winnipeg').toISODate(), note: (($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ' ' + $('Pick deal').item.json.why + ' (' + $('Pick deal').item.json.views + ' opens, last ' + $('Pick deal').item.json.last_text + '). ' + ($('Pick deal').item.json.dm_phone ? 'Phone ' + $('Pick deal').item.json.dm_phone + '. ' : '') + 'Proposal: ' + $('Pick deal').item.json.bid_link) }) }}"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "id": "62bde813-8445-49ae-b817-5e423d35d944",
+        "name": "Call now? (no deal)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2240,
+          192
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $('Pick deal').item.json.task === true }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "7d5d7cfa-d16e-40f3-bdb9-b773cda934b4",
+        "name": "Unmatched call task",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          2464,
+          192
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.pipedrive.com/v1/activities",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "options": {},
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ subject: 'Call ' + ($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ': ' + $('Pick deal').item.json.company + ' ' + $('Pick deal').item.json.why, type: 'call', done: 0, user_id: 32883646, person_id: $('Pick deal').item.json.person_id || undefined, org_id: $('Pick deal').item.json.org_id || undefined, due_date: $now.setZone('America/Winnipeg').toISODate(), note: (($('Pick deal').item.json.dm_name || $('Pick deal').item.json.company) + ' ' + $('Pick deal').item.json.why + ' (' + $('Pick deal').item.json.views + ' opens, last ' + $('Pick deal').item.json.last_text + '). ' + ($('Pick deal').item.json.dm_phone ? 'Phone ' + $('Pick deal').item.json.dm_phone + '. ' : '') + 'Proposal: ' + $('Pick deal').item.json.bid_link) + '. No open Pipedrive deal has this proposal link in Proposal / quote link, and none was found by the decision maker email (' + ($('Pick deal').item.json.dm_email || 'none') + '). Paste the link into the deal so the next view updates it.' }) }}"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "onError": "continueRegularOutput"
+      }
+    ],
+    "connections": {
+      "Every hour": {
+        "main": [
+          [
+            {
+              "node": "Get recent mail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get recent mail": {
+        "main": [
+          [
+            {
+              "node": "Get seen views",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get seen views": {
+        "main": [
+          [
+            {
+              "node": "Parse views",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse views": {
+        "main": [
+          [
+            {
+              "node": "Find deal by link",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find deal by link": {
+        "main": [
+          [
+            {
+              "node": "Find person",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find person": {
+        "main": [
+          [
+            {
+              "node": "Person deals",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Person deals": {
+        "main": [
+          [
+            {
+              "node": "Pick deal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pick deal": {
+        "main": [
+          [
+            {
+              "node": "Record view",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Record view": {
+        "main": [
+          [
+            {
+              "node": "Deal found?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Deal found?": {
+        "main": [
+          [
+            {
+              "node": "Update deal",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Call now? (no deal)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update deal": {
+        "main": [
+          [
+            {
+              "node": "Get deal notes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get deal notes": {
+        "main": [
+          [
+            {
+              "node": "Save views note",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save views note": {
+        "main": [
+          [
+            {
+              "node": "Call now?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call now?": {
+        "main": [
+          [
+            {
+              "node": "Deal call task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call now? (no deal)": {
+        "main": [
+          [
+            {
+              "node": "Unmatched call task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Skip call task when a call is already due",
+    "description": "Updated nodes: Call now?",
+    "autosaved": false,
+    "createdAt": "2026-11-24T22:08:36.613Z",
+    "updatedAt": "2026-11-24T22:08:36.613Z"
+  }
+}
