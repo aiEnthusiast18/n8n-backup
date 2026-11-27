@@ -1,0 +1,122 @@
+{
+  "id": "j9JiovyB2Rqt750G",
+  "name": "Temp: won deal check",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-26T19:46:32.021Z",
+  "updatedAt": "2026-11-26T19:47:57.092Z",
+  "isArchived": true,
+  "versionId": "228b3fb2-0da8-4e37-94c4-041565000b2b",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "45b278d1-f91a-48b0-b0dc-a1619077a091",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "51d5df65-e77e-49ea-a885-12fb8fd8865d",
+      "name": "Won deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/products?limit=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "970ed075-9541-4fbc-bc7a-6aa90058cb25",
+      "name": "Webhooks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals/199/flow?limit=30",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Won deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Won deals": {
+      "main": [
+        [
+          {
+            "node": "Webhooks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "j9JiovyB2Rqt750G",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-26T19:46:32.021Z",
+      "updatedAt": "2026-11-26T19:46:32.021Z"
+    }
+  ],
+  "activeVersion": null
+}
