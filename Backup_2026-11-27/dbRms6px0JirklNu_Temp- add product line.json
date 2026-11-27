@@ -1,0 +1,126 @@
+{
+  "id": "dbRms6px0JirklNu",
+  "name": "Temp: add product line",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-26T21:23:06.273Z",
+  "updatedAt": "2026-11-26T21:23:06.273Z",
+  "isArchived": false,
+  "versionId": "b676ddb2-f575-415f-9c74-346fb459ded5",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "e5ae3229-f3d8-4428-b62a-be4884e037ba",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "05f65ab3-a093-41ef-bfac-cba08a0b1272",
+      "name": "Add line",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/deals/199/products",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"product_id\": 3, \"item_price\": 550, \"quantity\": 1, \"comments\": \"Carpet wash, quoted as a flat $550 (sq ft not recorded)\"}",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "d3e18212-d6a2-4e6f-b42c-1135c86ccbd3",
+      "name": "Lines",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals/199/products",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Add line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add line": {
+      "main": [
+        [
+          {
+            "node": "Lines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "dbRms6px0JirklNu",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-26T21:23:06.273Z",
+      "updatedAt": "2026-11-26T21:23:06.273Z"
+    }
+  ],
+  "activeVersion": null
+}
