@@ -1,0 +1,108 @@
+{
+  "id": "8J1Vrt8Feg6OAMEH",
+  "name": "TEMP: list lost deals",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T21:15:41.554Z",
+  "updatedAt": "2026-11-18T21:16:18.198Z",
+  "isArchived": true,
+  "versionId": "d5a96807-700d-4274-a4bb-3cbe779a5539",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "fdfa2f71-7257-4b69-a017-455713e8f450",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4420a9d7-c851-4289-8a54-28a1be4bfa49",
+      "name": "Lost deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=lost&limit=200",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "31a86d39-e105-44b5-9fbd-3841eb756d31",
+      "name": "Slim",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const d = $input.first().json.data || []; const reasons = {}; d.forEach(x => { reasons[x.lost_reason] = (reasons[x.lost_reason]||0)+1; }); return [{ json: { count: d.length, reasons, sample: d.slice(0,40).map(x => [x.id, x.org_name, x.person_name, x.lost_reason, x.lost_time, x.value, x.stage_id, x['1a6bd14374c1ccde3e2bea35879a917c6a9d8c11'] ? 'proposal' : 'noprop', x.org_id && x.org_id.address].join(' | ')) } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Lost deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lost deals": {
+      "main": [
+        [
+          {
+            "node": "Slim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "8J1Vrt8Feg6OAMEH",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T21:15:41.554Z",
+      "updatedAt": "2026-11-18T21:15:41.554Z"
+    }
+  ],
+  "activeVersion": null
+}
