@@ -1,0 +1,292 @@
+{
+  "id": "Z6zzcssGfyZqELrt",
+  "name": "Pipedrive: deal Value = Monthly value x 12",
+  "active": true,
+  "activeVersionId": "da59dad4-5465-4dad-888e-a935ae1b57b4",
+  "createdAt": "2026-11-18T21:42:00.277Z",
+  "updatedAt": "2026-11-19T00:51:56.374Z",
+  "isArchived": false,
+  "versionId": "da59dad4-5465-4dad-888e-a935ae1b57b4",
+  "triggerCount": 1,
+  "nodes": [
+    {
+      "id": "eebf9610-b169-4f91-9b2d-da171fa60ed7",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6566ae76-e931-49f8-ab1c-378f58a1050e",
+      "name": "Get open deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/deals?status=open&limit=500",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "03b54ae0-e0ca-46bf-bb45-c2644bf0479e",
+      "name": "Deals needing annual value",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const MONTHLY = '655cbcd2e5a131c6c93d0e46b43dd513eb375e8a';\nconst PROGRAM = 'e2d6b7321f684cd972fd6711fb4f9bf02fdf40cf';\nconst PROGRAM_MONTHLY = { '97': 1000, '98': 2000, '99': 3000, '100': 4000, '101': 5000, '102': 6000 }; // Program I..VI initial business per month\nconst deals = $('Get open deals').first().json.data || [];\nconst out = [];\nfor (const d of deals) {\n  if (![1, 3].includes(d.pipeline_id)) continue; // Recurring clients, Franchise sales\n  let m = Number(d[MONTHLY]);\n  let fillMonthly = false;\n  if ((!m || m <= 0) && d.pipeline_id === 3 && d[PROGRAM] != null && PROGRAM_MONTHLY[String(d[PROGRAM])]) {\n    m = PROGRAM_MONTHLY[String(d[PROGRAM])];\n    fillMonthly = true;\n  }\n  if (!m || m <= 0) continue;\n  const annual = Math.round(m * 12 * 100) / 100;\n  if (!fillMonthly && Number(d.value) === annual && d.currency === 'CAD') continue;\n  const body = { value: annual, currency: 'CAD' };\n  if (fillMonthly) { body[MONTHLY] = m; body[MONTHLY + '_currency'] = 'CAD'; }\n  out.push({ json: { id: d.id, body } });\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "e4745dd0-62f5-4182-800a-8c67b8722b14",
+      "name": "Set Value = Monthly x 12",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.pipedrive.com/v1/deals/{{ $json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Get open deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get open deals": {
+      "main": [
+        [
+          {
+            "node": "Deals needing annual value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deals needing annual value": {
+      "main": [
+        [
+          {
+            "node": "Set Value = Monthly x 12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": {
+    "node:Every 15 minutes": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "Z6zzcssGfyZqELrt",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T21:42:00.277Z",
+      "updatedAt": "2026-11-18T21:42:00.277Z"
+    }
+  ],
+  "activeVersion": {
+    "versionId": "da59dad4-5465-4dad-888e-a935ae1b57b4",
+    "workflowId": "Z6zzcssGfyZqELrt",
+    "nodes": [
+      {
+        "id": "eebf9610-b169-4f91-9b2d-da171fa60ed7",
+        "name": "Every 15 minutes",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "6566ae76-e931-49f8-ab1c-378f58a1050e",
+        "name": "Get open deals",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          224,
+          0
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.pipedrive.com/v1/deals?status=open&limit=500",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        },
+        "executeOnce": true
+      },
+      {
+        "id": "03b54ae0-e0ca-46bf-bb45-c2644bf0479e",
+        "name": "Deals needing annual value",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          448,
+          0
+        ],
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const MONTHLY = '655cbcd2e5a131c6c93d0e46b43dd513eb375e8a';\nconst PROGRAM = 'e2d6b7321f684cd972fd6711fb4f9bf02fdf40cf';\nconst PROGRAM_MONTHLY = { '97': 1000, '98': 2000, '99': 3000, '100': 4000, '101': 5000, '102': 6000 }; // Program I..VI initial business per month\nconst deals = $('Get open deals').first().json.data || [];\nconst out = [];\nfor (const d of deals) {\n  if (![1, 3].includes(d.pipeline_id)) continue; // Recurring clients, Franchise sales\n  let m = Number(d[MONTHLY]);\n  let fillMonthly = false;\n  if ((!m || m <= 0) && d.pipeline_id === 3 && d[PROGRAM] != null && PROGRAM_MONTHLY[String(d[PROGRAM])]) {\n    m = PROGRAM_MONTHLY[String(d[PROGRAM])];\n    fillMonthly = true;\n  }\n  if (!m || m <= 0) continue;\n  const annual = Math.round(m * 12 * 100) / 100;\n  if (!fillMonthly && Number(d.value) === annual && d.currency === 'CAD') continue;\n  const body = { value: annual, currency: 'CAD' };\n  if (fillMonthly) { body[MONTHLY] = m; body[MONTHLY + '_currency'] = 'CAD'; }\n  out.push({ json: { id: d.id, body } });\n}\nreturn out;"
+        }
+      },
+      {
+        "id": "e4745dd0-62f5-4182-800a-8c67b8722b14",
+        "name": "Set Value = Monthly x 12",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.5,
+        "position": [
+          672,
+          0
+        ],
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.pipedrive.com/v1/deals/{{ $json.id }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "pipedriveApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.body) }}"
+        },
+        "credentials": {
+          "pipedriveApi": {
+            "id": "ajHszCs70ZE0Syjy",
+            "name": "Pipedrive Anago"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Every 15 minutes": {
+        "main": [
+          [
+            {
+              "node": "Get open deals",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get open deals": {
+        "main": [
+          [
+            {
+              "node": "Deals needing annual value",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Deals needing annual value": {
+        "main": [
+          [
+            {
+              "node": "Set Value = Monthly x 12",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Raf Lakhani (via MCP)",
+    "name": "Fill franchise Monthly value from program",
+    "description": "Updated nodes: Deals needing annual value, Set Value = Monthly x 12",
+    "autosaved": false,
+    "createdAt": "2026-11-19T00:51:56.381Z",
+    "updatedAt": "2026-11-19T00:51:56.381Z"
+  }
+}
