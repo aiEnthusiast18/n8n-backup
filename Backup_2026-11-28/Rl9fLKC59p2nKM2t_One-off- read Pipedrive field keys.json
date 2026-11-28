@@ -1,0 +1,188 @@
+{
+  "id": "Rl9fLKC59p2nKM2t",
+  "name": "One-off: read Pipedrive field keys",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-24T20:11:52.835Z",
+  "updatedAt": "2026-11-24T20:15:31.015Z",
+  "isArchived": true,
+  "versionId": "23c5e551-1d85-42ef-af04-2c3ef75cdfe4",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "d7a2402e-f057-4efb-9bd7-9f198f120a7c",
+      "name": "Run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f1d9b435-98c4-4195-b2b9-abc1ca8827bf",
+      "name": "Deal fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "https://api.pipedrive.com/v1/activities/181",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "contentType": "json",
+        "jsonBody": "{\"done\": 1, \"note\": \"Replaced by the call-back task on deal 198 (Pre-winter floor care).\"}",
+        "sendBody": true,
+        "specifyBody": "json"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "548a4718-8164-4b60-8d9b-938b91603c11",
+      "name": "Org fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "https://api.pipedrive.com/v1/activities/182",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "contentType": "json",
+        "jsonBody": "{\"done\": 1, \"note\": \"Replaced by the call-back task on deal 199 (Pre-winter floor care).\"}",
+        "sendBody": true,
+        "specifyBody": "json"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "b74c2447-4159-46c5-885b-ca3402f83da0",
+      "name": "Stages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.pipedrive.com/v1/stages?pipeline_id=2",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "id": "2b4df01a-0980-4fc5-98d8-640a7841e9a3",
+      "name": "Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "const pick = f => ({ key: f.key, name: f.name, type: f.field_type, options: (f.options || []).map(o => o.id + ':' + o.label).join(' | ') });\nconst want = /deal type|app client|app site|lead source|po number|monthly value|campaign/i;\nconst d = ($('Deal fields').first().json.data || []).filter(f => want.test(f.name)).map(pick);\nconst o = ($('Org fields').first().json.data || []).filter(f => want.test(f.name)).map(pick);\nconst s = ($('Stages').first().json.data || []).map(x => x.id + ':' + x.name + ':' + x.pipeline_id);\nreturn [{ json: { deal: d, org: o, stages: s } }];"
+      },
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Run": {
+      "main": [
+        [
+          {
+            "node": "Deal fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal fields": {
+      "main": [
+        [
+          {
+            "node": "Org fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Org fields": {
+      "main": [
+        [
+          {
+            "node": "Stages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stages": {
+      "main": [
+        [
+          {
+            "node": "Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "Rl9fLKC59p2nKM2t",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-24T20:11:52.835Z",
+      "updatedAt": "2026-11-24T20:11:52.835Z"
+    }
+  ],
+  "activeVersion": null
+}
