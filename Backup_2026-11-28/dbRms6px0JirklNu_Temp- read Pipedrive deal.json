@@ -1,0 +1,126 @@
+{
+  "id": "dbRms6px0JirklNu",
+  "name": "Temp: read Pipedrive deal",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-26T21:23:06.273Z",
+  "updatedAt": "2026-11-27T19:53:35.341Z",
+  "isArchived": true,
+  "versionId": "4f75bc03-b3d2-40a3-88a7-3eab90bd35c1",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "e5ae3229-f3d8-4428-b62a-be4884e037ba",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "05f65ab3-a093-41ef-bfac-cba08a0b1272",
+      "name": "Add line",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "method": "GET",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "url": "https://api.pipedrive.com/v1/dealFields?start=0&limit=500"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "d3e18212-d6a2-4e6f-b42c-1135c86ccbd3",
+      "name": "Lines",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ '3cb526fa6de62bdff7e0e9d33c5111b4ff324c48': $json.data.find(f => f.key === '3cb526fa6de62bdff7e0e9d33c5111b4ff324c48').options.find(o => o.label.trim().toLowerCase() === 'no').id, '4d80fae56da1369de3ac7c50f48a72d9e8fc179f': 984 }) }}",
+        "method": "PUT",
+        "nodeCredentialType": "pipedriveApi",
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "url": "https://api.pipedrive.com/v1/deals/195"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Add line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add line": {
+      "main": [
+        [
+          {
+            "node": "Lines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "dbRms6px0JirklNu",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-26T21:23:06.273Z",
+      "updatedAt": "2026-11-26T21:23:06.273Z"
+    }
+  ],
+  "activeVersion": null
+}
