@@ -1,0 +1,318 @@
+{
+  "id": "gOvjjxLLJYTmRN81",
+  "name": "TEMP backfill missed corporate lead",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-17T21:35:59.053Z",
+  "updatedAt": "2026-11-17T21:36:14.721Z",
+  "isArchived": true,
+  "versionId": "3c92bec5-baa1-46cc-b774-dba7b417250f",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "92f73cc7-1411-4663-b635-6272a2a25720",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "1e52be41-9571-4e19-89d9-80779ae7636a",
+      "name": "Missed lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "full_name",
+              "value": "Duniya Hassen",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "email",
+              "value": "dinakadir237@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "phone",
+              "value": "204-881-9455",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "lead_title",
+              "value": "Franchise enquiry – Duniya Hassen (R2X 0V4)",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "note",
+              "value": "<p><b>Anago corporate lead (backfilled)</b></p><p>Franchise lead from Anago corporate, received 2026-11-11 19:39 Winnipeg time.<br>Vendor: SmartSites<br>Source: ChatGPT - ai_referral<br>Company: Ifa janitorial<br>Interest: Unit Franchising<br>Postal code: R2X 0V4<br>Language: English</p><p>Phone: 204-881-9455<br>Email: dinakadir237@gmail.com</p><p>This came in before email-to-lead covered corporate lead emails, so it was added by hand.</p>",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "23eec414-bef3-4ab6-a19c-a6342a8d3f70",
+      "name": "Find person",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "resource": "person",
+        "operation": "search",
+        "authentication": "apiToken",
+        "term": "={{ $json.email }}",
+        "exactMatch": true,
+        "returnAll": false,
+        "limit": 1
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "2b92242a-3eca-4813-a290-651930af7515",
+      "name": "Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.id }}",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "dbde1579-3a26-4b76-bb2c-3a73839fc068",
+      "name": "Create lead",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "resource": "lead",
+        "operation": "create",
+        "authentication": "apiToken",
+        "title": "={{ $('Missed lead').item.json.lead_title }}",
+        "associateWith": "person",
+        "person_id": "={{ $json.id }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "433f0d93-0334-472a-bfed-264a0c03e55b",
+      "name": "Add note",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "resource": "note",
+        "operation": "create",
+        "authentication": "apiToken",
+        "content": "={{ $('Missed lead').item.json.note }}",
+        "additionalFields": {
+          "lead_id": "={{ $json.id }}"
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "ab73f2ee-a39a-4ee6-839d-079bcb990b84",
+      "name": "Create person",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [
+        896,
+        80
+      ],
+      "parameters": {
+        "resource": "person",
+        "operation": "create",
+        "authentication": "apiToken",
+        "name": "={{ $('Missed lead').item.json.full_name }}",
+        "additionalFields": {
+          "emails": {
+            "emailProperties": [
+              {
+                "value": "={{ $('Missed lead').item.json.email }}",
+                "primary": true,
+                "label": "work"
+              }
+            ]
+          },
+          "phones": {
+            "phoneProperties": [
+              {
+                "value": "={{ $('Missed lead').item.json.phone }}",
+                "primary": true,
+                "label": "mobile"
+              }
+            ]
+          }
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Missed lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Missed lead": {
+      "main": [
+        [
+          {
+            "node": "Find person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find person": {
+      "main": [
+        [
+          {
+            "node": "Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exists?": {
+      "main": [
+        [
+          {
+            "node": "Create lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create lead": {
+      "main": [
+        [
+          {
+            "node": "Add note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create person": {
+      "main": [
+        [
+          {
+            "node": "Create lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "gOvjjxLLJYTmRN81",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-17T21:35:59.053Z",
+      "updatedAt": "2026-11-17T21:35:59.053Z"
+    }
+  ],
+  "activeVersion": null
+}
