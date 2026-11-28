@@ -1,0 +1,87 @@
+{
+  "id": "ubDzjiB4LttlBHxg",
+  "name": "TEMP: itsupport sender test",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-13T22:56:17.990Z",
+  "updatedAt": "2026-11-13T22:57:01.255Z",
+  "isArchived": true,
+  "versionId": "e436b1d2-a960-4e80-96c1-247c7db51f2a",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "dd545f29-639c-4988-94ef-5b1fb7e245bc",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4367309a-219a-490a-89ac-43a3d1dbc7d7",
+      "name": "Send Test From itsupport",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "rida@anagomb.ca",
+        "subject": "[TEST] Late clock-in alert sender check (itsupport@anagomb.ca)",
+        "bodyContent": "Test only. Checks that n8n can send late clock-in alert emails from itsupport@anagomb.ca. No action needed.",
+        "additionalFields": {
+          "from": "itsupport@anagomb.ca",
+          "bodyContentType": "Text"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "58F0urplGysVGdHg",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "webhookId": "49181143-5421-4b49-9415-4c11d61a8f53"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Send Test From itsupport",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "ubDzjiB4LttlBHxg",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-13T22:56:17.990Z",
+      "updatedAt": "2026-11-13T22:56:17.990Z"
+    }
+  ],
+  "activeVersion": null
+}
