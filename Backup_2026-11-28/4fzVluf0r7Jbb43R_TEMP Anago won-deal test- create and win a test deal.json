@@ -1,0 +1,233 @@
+{
+  "id": "4fzVluf0r7Jbb43R",
+  "name": "TEMP Anago won-deal test: create and win a test deal",
+  "active": false,
+  "activeVersionId": null,
+  "createdAt": "2026-11-18T01:29:42.249Z",
+  "updatedAt": "2026-11-18T01:34:00.909Z",
+  "isArchived": true,
+  "versionId": "10630bb3-9c71-40db-aa2d-9cbccd83a350",
+  "triggerCount": 0,
+  "nodes": [
+    {
+      "id": "ffdee0e9-585a-4027-a8aa-bcff25ace6c7",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "82882384-5cf0-491e-bc11-5d1706b20e71",
+      "name": "Create org",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/organizations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: \"[TEST] ZZTEST New starts check\" }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "6d90d6ea-fd67-4805-aa40-ef91bf244927",
+      "name": "Create primary person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/persons",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: \"ZZTEST Primary\", org_id: $(\"Create org\").item.json.data.id, email: [{ value: \"zztest-ns-primary@example.invalid\", primary: true }], phone: [{ value: \"2045550101\", primary: true }] }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "d8abc78c-e011-47cf-bdc4-56eb13ef5527",
+      "name": "Create AP person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/persons",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: \"ZZTEST Payables\", org_id: $(\"Create org\").item.json.data.id, email: [{ value: \"zztest-ns-ap@example.invalid\", primary: true }], phone: [{ value: \"2045550102\", primary: true }] }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "5979c267-779b-435d-8229-300088c9ec83",
+      "name": "Create deal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipedrive.com/v1/deals",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ title: \"[TEST] ZZTEST New starts check\", org_id: $(\"Create org\").item.json.data.id, person_id: $(\"Create primary person\").item.json.data.id, value: 1000, currency: \"CAD\", \"02cc7cad41bc5cfb05f5d68d093848e6039063a0\": 48, \"655cbcd2e5a131c6c93d0e46b43dd513eb375e8a\": 1000, \"655cbcd2e5a131c6c93d0e46b43dd513eb375e8a_currency\": \"CAD\", \"f96227e76600b58ea41e1660ce4d507c803ccf8c\": \"2026-12-01\", \"8498ee80156bfc0b4f825a5abe5a47022abc3c74\": \"5 times a week\", \"270ff7ebd3f11087193741127ab3657ea9bfcfeb\": \"60,61,62,63,64\", \"83fbf4b1b95e464d4910a65dcb98d16f8e6e8374\": \"6 pm to 10 pm\", \"62d4430b90ba2a8b0607c3875f1592304de7b08c\": 5000, \"3cb526fa6de62bdff7e0e9d33c5111b4ff324c48\": 68, \"4d80fae56da1369de3ac7c50f48a72d9e8fc179f\": $(\"Create AP person\").item.json.data.id }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    },
+    {
+      "id": "04afb8c1-1b11-4c33-a6b4-e439de417970",
+      "name": "Mark won",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ \"https://api.pipedrive.com/v1/deals/\" + $(\"Create deal\").item.json.data.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: \"won\" }) }}"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "ajHszCs70ZE0Syjy",
+          "name": "Pipedrive Anago"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Create org",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create org": {
+      "main": [
+        [
+          {
+            "node": "Create primary person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create primary person": {
+      "main": [
+        [
+          {
+            "node": "Create AP person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create AP person": {
+      "main": [
+        [
+          {
+            "node": "Create deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create deal": {
+      "main": [
+        [
+          {
+            "node": "Mark won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "pinData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "workflowId": "4fzVluf0r7Jbb43R",
+      "projectId": "XdtqOzYGfnG4XSvo",
+      "createdAt": "2026-11-18T01:29:42.249Z",
+      "updatedAt": "2026-11-18T01:29:42.249Z"
+    }
+  ],
+  "activeVersion": null
+}
